@@ -23,6 +23,16 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+enum MovementDirection {
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN,
+    NONE
+};
+
 class Utils {
 public:
     /**

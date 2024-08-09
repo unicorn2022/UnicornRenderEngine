@@ -3,8 +3,15 @@
 
 class GOCamera : public GO {
 public:
-    GOCamera(std::string name) : GO(name) {
+    /** 相机游戏对象
+     * \param name GO名称
+     * \param aspect 宽高比
+     * \param fov 视野, 0~90°
+     * \param near 近平面距离
+     * \param far 远平面距离
+     */
+    GOCamera(std::string name, float aspect, float fov, float near, float far) : GO(name) {
         AddComponent(new ComponentTransform(this));
-        AddComponent(new ComponentCamera(this));
+        AddComponent(new ComponentCamera(this, aspect, fov, near, far));
     }
 };

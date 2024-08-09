@@ -8,9 +8,8 @@ static const int window_width = 800;
 static const int window_height = 800;
 
 /* 相机信息 */
-// static const glm::vec3 CAMERA_POSITION = glm::vec3(0.0f, 9.0f, 26.0f);
+// static const glm::vec3 main_camera_position = glm::vec3(0.0f, 9.0f, 26.0f);
 static const glm::vec3 main_camera_position = glm::vec3(0.0f, 0.0f, 5.0f);
-static const glm::vec3 main_camera_up = glm::vec3(0.0f, 1.0f, 0.0f);
 static const float main_camera_znear = 0.1f;
 static const float main_camera_zfar = 100.0f;
 

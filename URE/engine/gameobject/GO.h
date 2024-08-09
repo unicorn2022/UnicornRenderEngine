@@ -18,7 +18,6 @@ ComponentType* GO::GetComponent() const {
 }
 
 void GO::AddComponent(Component* component) {
-    std::cout << component->gameobject->GetName() << " 组件类型: " << component->type << "\n";
     components.push_back(component);
     GameComponent::GetInstance().AddComponent(component);
 }
