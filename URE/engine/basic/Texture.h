@@ -18,39 +18,13 @@ public:
 
     /** 从图片中生成纹理
      * \param file_name 文件名
-     */
-    Texture(std::string file_name) {
-        this->width = 0;
-        this->height = 0;
-        this->name = file_name;
-        this->path = root_path_texture + file_name;
-        CreateTexture();
-        LoadTextureData();
-    }
-
-    /** 从图片中生成纹理
      * \param root_directory 根文件夹路径, 含`/`
-     * \param file_name 文件名
      */
-    Texture(std::string root_directory, std::string file_name) {
+    Texture(std::string file_name, std::string root_directory = root_path_texture) {
         this->width = 0;
         this->height = 0;
         this->name = file_name;
         this->path = root_directory + file_name;
-        CreateTexture();
-        LoadTextureData();
-    }
-
-    /** 从图片中生成纹理
-     * \param root_directory 根文件夹路径, 含`/`
-     * \param name 纹理名称
-     * \param type 纹理类型, 即文件后缀名
-     */
-    Texture(std::string root_directory, std::string name, std::string type) {
-        this->width = 0;
-        this->height = 0;
-        this->name = name;
-        this->path = root_directory + name + "." + type;
         CreateTexture();
         LoadTextureData();
     }

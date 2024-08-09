@@ -1,6 +1,5 @@
 #pragma once
 #include "engine/component/Component.h"
-#include "engine/basic/Light.h"
 
 class ComponentLight : public Component {
 public:
@@ -9,6 +8,7 @@ public:
      * \param light_data 光源数据
      */
     ComponentLight(GO* gameobject, Light* light_data) : Component(gameobject) {
+        this->type = "component_light";
         this->light_data = light_data;
     }
     virtual ~ComponentLight() {

@@ -1,7 +1,26 @@
 #pragma once
 #include "Utils.h"
-#include "engine/gameobject/GO.h"
-#include "engine/basic/Camera.h"
+#include "engine/basic/ALL.h"
+#include "engine/mesh/Mesh.h"
+#include "engine/material/ALL.h"
+
+class Component;
+class GO {
+public:
+    GO(std::string name);
+    virtual ~GO();
+
+public:
+    template<typename ComponentType>
+    ComponentType* GetComponent() const;
+
+    void AddComponent(Component* component);
+    std::string GetName() const;
+
+private:
+    std::vector<Component*> components;
+    std::string name;
+};
 
 class Component{
 public:
@@ -10,10 +29,10 @@ public:
      */
     Component(GO* gameobject) {
         this->gameobject = gameobject;
-        gameobject->AddComponent(this);
     }
     virtual ~Component() {}
 
 public:
     GO* gameobject;
+    std::string type;
 };

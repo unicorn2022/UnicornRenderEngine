@@ -1,6 +1,5 @@
 #pragma once
 #include "engine/material/Material.h"
-#include "engine/basic/Texture.h"
 
 class MaterialPostProcess : public Material {
 public:

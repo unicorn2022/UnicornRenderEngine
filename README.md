@@ -25,7 +25,27 @@
 - **framebuffer**：创建帧缓冲，大小自定义
   - 包含：一个颜色附件，一个深度模板附件
 
-## 1.2	组件 Component
+## 1.3	网格体 Mesh：依赖于`basic/Texture.h`
+
+包含一个形状的VAO，顶点属性为：位置、法线、纹理坐标
+
+- **MeshSquare**：四边形
+- **MeshCube**：立方体
+- **MeshOBJ**：从文件中导入的obj模型
+  - 包含：多个**MeshOBJSubMesh**
+
+## 1.4	材质 Material：依赖于`basic/ALL.h`
+
+每个材质绑定唯一shader程序，纹理的改变放在mesh组件中
+
+- **MaterialConstantColor**：指定颜色
+- **MaterialDepth**：深度可视化
+- **MaterialNoLight**：仅显示diffuse贴图
+- **MaterialPhongLight**：phong光照模型材质
+- **MaterialPostProcess**：后处理材质，仅用于帧缓冲
+- **MaterialSkybox**：天空盒材质
+
+## 1.5	组件 Component：依赖于`basic/ALL.h, material/ALL.h, mesh/Mesh.h`
 
 每次tick，只tick组件
 
@@ -41,27 +61,7 @@
 - **ComponentLight**：表示发光体
   - 包含：光源类型
 
-## 1.3	网格体 Mesh
-
-包含一个形状的VAO，顶点属性为：位置、法线、纹理坐标
-
-- **MeshSquare**：四边形
-- **MeshCube**：立方体
-- **MeshOBJ**：从文件中导入的obj模型
-  - 包含：多个**MeshOBJSubMesh**
-
-## 1.4	材质 Material
-
-每个材质绑定唯一shader程序，纹理的改变放在mesh组件中
-
-- **MaterialConstantColor**：指定颜色
-- **MaterialDepth**：深度可视化
-- **MaterialNoLight**：仅显示diffuse贴图
-- **MaterialPhongLight**：phong光照模型材质
-- **MaterialPostProcess**：后处理材质，仅用于帧缓冲
-- **MaterialSkybox**：天空盒材质
-
-## 1.5	内建游戏对象 GO
+## 1.6	内建游戏对象 GO：依赖于`component/ALL.h`
 
 管理者为GameWorld
 

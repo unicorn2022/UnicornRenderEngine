@@ -1,9 +1,6 @@
 #pragma once
 #include "engine/component/ComponentTransform.h"
 #include "engine/component/ComponentLight.h"
-#include "engine/mesh/Mesh.h"
-#include "engine/material/ALL.h"
-#include "GameWorld.h"
 
 class ComponentMesh : public Component {
 public:
@@ -14,6 +11,7 @@ public:
      * \param is_transport 是否是半透明物体
      */
     ComponentMesh(GO* gameobject, Mesh* mesh, Material* material, bool is_transport = false) : Component(gameobject) {
+        this->type = "component_mesh";
         this->mesh = mesh;
         this->material = material;
         this->is_transport = is_transport;

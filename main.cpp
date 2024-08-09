@@ -49,11 +49,11 @@ void Run() {
         GameWorld::GetInstance().GameTick();
 
         /* 2.2 每个相机渲染一次 */ 
-        auto camera_components = GameWorld::GetInstance().GetAllComponent<ComponentCamera>();
+        auto camera_components = GameComponent::GetInstance().GetComponentCamera();
         for (auto camera_component : camera_components) 
             camera_component->RenderTick(
-                GameWorld::GetInstance().GetAllComponentMesh(camera_component->camera),
-                GameWorld::GetInstance().GetAllComponent<ComponentLight>(),
+                GameComponent::GetInstance().GetComponentMesh(camera_component->camera),
+                GameComponent::GetInstance().GetComponentLight(),
                 GameWorld::GetInstance().skybox->GetComponent<ComponentMesh>()
             );
 

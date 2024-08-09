@@ -8,6 +8,7 @@ public:
      * \param parent 父对象的Transform组件
      */
     ComponentTransform(GO* gameobject, ComponentTransform* parent = NULL) : Component(gameobject) {
+        this->type = "component_transform";
         this->position = glm::vec3(0.0f);
         this->rotate = glm::vec3(0.0f);
         this->scale = glm::vec3(1.0f);

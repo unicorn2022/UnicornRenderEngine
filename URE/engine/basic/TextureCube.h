@@ -1,14 +1,15 @@
 #pragma once
 #include "Utils.h"
+#include "GlobalValue.h"
 
 class TextureCube {
 public:
     /** 从图片中生成立方纹理
-     * \param root_directory 根文件夹路径, 含`/`
      * \param file_name 文件名(右,左,上,下,前,后)
      * \param type 纹理类型, 即文件后缀名
+     * \param root_directory 根文件夹路径, 含`/`
      */
-    TextureCube(std::string root_directory, std::string file_name[6], std::string type) {
+    TextureCube(std::string file_name[6], std::string type, std::string root_directory = root_path_skybox) {
         for (int i = 0; i < 6; i++)
             this->path[i] = root_directory + file_name[i] + "." + type;
         CreateTextureCube();

@@ -1,6 +1,5 @@
 #pragma once
 #include "engine/material/Material.h"
-#include "engine/basic/TextureCube.h"
 
 class MaterialSkybox : public Material {
 public:

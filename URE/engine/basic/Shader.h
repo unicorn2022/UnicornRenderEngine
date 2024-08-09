@@ -6,10 +6,11 @@ class Shader {
 public:
     /** 着色器程序
      * \param name 着色器名称
+     * \param root_directory 根文件夹路径, 含`/`
      */
-    Shader(std::string name){
+    Shader(std::string name, std::string root_directory = root_path_shader){
         this->name = name;
-        CreateShader(root_path_shader + name + ".vert", root_path_shader + name + ".frag");
+        CreateShader(root_directory + name + ".vert", root_directory + name + ".frag");
     }
 
     ~Shader() {

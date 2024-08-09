@@ -1,5 +1,6 @@
 #pragma once
 #include "Utils.h"
+#include "engine/basic/Light.h"
 
 /* 窗口信息 */
 static const char* window_name = "UnicornRenderEngine";
@@ -65,3 +66,61 @@ private:
     std::map<std::string, float> float_value;
     std::map<std::string, int> int_value;
 };
+
+/* 场景物体信息 */
+// 1. 2个箱子的初始位置
+std::vector<glm::vec3> container_position {
+    glm::vec3(-1.0f, 0.0f, -1.0f),
+    glm::vec3(2.0f, 0.0f, 0.0f)
+};
+// 2. 5个窗户的初始位置
+std::vector<glm::vec3> window_position {
+    glm::vec3(-1.5f, 0.0f, -0.48f),
+    glm::vec3( 1.5f, 0.0f, 0.51f),
+    glm::vec3( 0.0f, 0.0f, 0.7f),
+    glm::vec3(-0.3f, 0.0f, -2.3f),
+    glm::vec3( 0.5f, 0.0f, -0.6f)
+};
+// 3. 1个定向光, 5个点光源, 1个聚光源的属性
+Light* light_datas[] = {
+    new DirectLight(
+        glm::vec3(-0.2f, -1.0f, -0.3f),     // 方向
+        glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+        glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
+        glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
+    ),
+    new PointLight(
+        glm::vec3(0.7f,  0.2f,  2.0f),      // 位置
+        glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+        glm::vec3(0.8f, 0.8f, 0.8f),        // 漫反射
+        glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
+    ),
+    new PointLight(
+        glm::vec3(2.3f, -3.3f, -4.0f),      // 位置
+        glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+        glm::vec3(0.8f, 0.8f, 0.8f),        // 漫反射
+        glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
+    ),
+    new PointLight(
+        glm::vec3(-4.0f,  2.0f, -12.0f),    // 位置
+        glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+        glm::vec3(0.8f, 0.8f, 0.8f),        // 漫反射
+        glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
+    ),
+    new PointLight(
+        glm::vec3(0.0f,  0.0f, -3.0f),      // 位置
+        glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+        glm::vec3(0.8f, 0.8f, 0.8f),        // 漫反射
+        glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
+    ),
+    new SpotLight(
+        glm::vec3(0.0f,  0.0f, 0.0f),       // 位置
+        glm::vec3(-0.2f, -1.0f, -0.3f),     // 方向
+        glm::vec3(0, 0, 0),                 // 环境光
+        glm::vec3(1.0f, 1.0f, 1.0f),        // 漫反射
+        glm::vec3(1.0f, 1.0f, 1.0f),        // 高光
+        12.5f,                              // 内切角
+        15.0f                               // 外切角
+    )
+};
+

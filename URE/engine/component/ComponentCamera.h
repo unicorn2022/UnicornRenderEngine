@@ -1,10 +1,7 @@
 #pragma once
 #include "engine/component/ComponentTransform.h"
+#include "engine/component/ComponentLight.h"
 #include "engine/component/ComponentMesh.h"
-#include "engine/basic/FrameBuffer.h"
-#include "engine/basic/Camera.h"
-#include "GlobalValue.h"
-#include "GameWorld.h"
 
 class ComponentCamera : public Component {
 public:
@@ -12,6 +9,7 @@ public:
      * \param gameobject 绑定的游戏对象
      */
     ComponentCamera(GO* gameobject) : Component(gameobject) {
+        this->type = "component_camera";
         ComponentTransform* transform = gameobject->GetComponent<ComponentTransform>();
         this->camera = new RoamingCameraPerspective(
             (float)window_width / (float)window_height,

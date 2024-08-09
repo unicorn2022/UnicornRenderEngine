@@ -1,6 +1,6 @@
 #pragma once
 #include "Utils.h"
-#include "engine/basic/Shader.h"
+#include "engine/basic/ALL.h"
 
 /* 每种 Material 唯一对应一个Shader */
 class Material {

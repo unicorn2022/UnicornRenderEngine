@@ -1,6 +1,5 @@
 #pragma once
 #include "engine/mesh/Mesh.h"
-#include "engine/basic/Texture.h"
 
 class MeshOBJSubMesh : public Mesh{
 public:

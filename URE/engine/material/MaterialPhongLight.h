@@ -1,7 +1,5 @@
 #pragma once
 #include "engine/material/Material.h"
-#include "engine/basic/Texture.h"
-#include "engine/basic/Light.h"
 
 const static int MAX_POINT_LIGHT_COUNT = 4;
 

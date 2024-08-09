@@ -1,5 +1,6 @@
 #pragma once
 #include "Utils.h"
+#include "engine/basic/Texture.h"
 
 /* Mesh 中仅包含网格体的顶点信息 */
 class Mesh {
