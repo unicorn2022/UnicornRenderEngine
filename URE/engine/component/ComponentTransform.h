@@ -14,8 +14,6 @@ public:
         this->scale = glm::vec3(1.0f);
         this->parent = parent;
         this->move_speed = 2.5;
-        this->yaw = -90.0f;
-        this->pitch = 0.0f;
     }
     virtual ~ComponentTransform() {}
 
@@ -42,9 +40,12 @@ public:
     }
 
 public:
+    /* 获取当前GO的位置 */
     glm::vec3 GetPosition() const { return position; }
-    float GetYaw() const { return yaw; }
-    float GetPitch() const { return pitch;}
+    /* 获取相机GO的偏航角 */ 
+    float GetYaw() const { return rotate.y; }   
+    /* 获取相机GO的俯仰角 */ 
+    float GetPitch() const { return rotate.x; }
 
 public:
     /* 获取模型变换矩阵 */
@@ -73,9 +74,9 @@ public:
 
         /* 计算前右上方向 */
         glm::vec3 front, right, up;
-        front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        front.y = sin(glm::radians(pitch));
-        front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        front.x = cos(glm::radians(GetYaw())) * cos(glm::radians(GetPitch()));
+        front.y = sin(glm::radians(GetPitch()));
+        front.z = sin(glm::radians(GetYaw())) * cos(glm::radians(GetPitch()));
         front = glm::normalize(front);
         right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));
         up = glm::normalize(glm::cross(right, front));
@@ -97,10 +98,10 @@ public:
 
     /* 鼠标控制左右+上下移动 */
     void ProcessMouseMovement(float xoffset, float yoffset) {
-        yaw += xoffset;
-        pitch += yoffset;
-        if (pitch > 89.0f) pitch = 89.0f;
-        if (pitch < -89.0f) pitch = -89.0f;
+        rotate.y += xoffset;
+        rotate.x += yoffset;
+        if (rotate.x > 89.0f) rotate.x = 89.0f;
+        if (rotate.x < -89.0f) rotate.x = -89.0f;
     }
 
 private:
@@ -109,8 +110,4 @@ private:
     glm::vec3 scale;    // XYZ轴的缩放
     ComponentTransform* parent;
     float move_speed;
-
-private:
-    float yaw;      // 相机的偏航角
-    float pitch;    // 相机的俯仰角
 };

@@ -86,6 +86,7 @@ GameWorld::GameWorld() {
     /* 主相机 */
     GO* camera = new GOCamera("main_camera", (float)window_width/(float)window_height, 45, main_camera_znear, main_camera_zfar);
     camera->GetComponent<ComponentTransform>()->TransformTranslate(main_camera_position);
+    camera->GetComponent<ComponentTransform>()->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
     all_game_object.push_back(camera);
     main_camera = camera->GetComponent<ComponentCamera>();
 
