@@ -1,4 +1,10 @@
+#include "engine/basic/ALL.h"
+#include "engine/mesh/ALL.h"
+#include "engine/material/ALL.h"
+#include "engine/component/ALL.h"
+#include "engine/gameobject/ALL.h"
 #include "GameWorld.h"
+#include "GameComponent.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void keyboard_callback(GLFWwindow* window);

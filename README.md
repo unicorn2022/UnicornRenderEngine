@@ -4,80 +4,53 @@
 
 基于OpenGL3.3的渲染引擎
 
-# 一、引擎架构
+# 一、知识点
 
-## 1.1	总览
+## 1.1	OpenGL渲染测试的顺序
 
-- 整个场景由多个游戏对象GO组成
-- 每个GO会有多个组件
+顶点着色器 => 面剔除 => 提前深度测试 => 片段着色器 => 模板测试 => 深度测试
 
-单例模式
+- 使用**提前深度测试**时，片段着色器就不能写入片段的深度值
+- **面剔除**：逆时针方向的三角形，视为正向三角形
+  - 环绕顺序是在**光栅化**阶段进行的，此时顶点就是**观察者视角**所见的
 
-- **GlobalValue**单例：存放全局配置信息
-- **GameWorld**单例：管理所有的Component、Mesh、Material、GO
 
-## 1.2	Basic
+# 二、环境配置
 
-- **light**：光源
-- **shader**：从文件中加载着色器，并编译
-- **texture**：从文件中加载纹理，并分配空间
-- **textureCube**：从文件中加载立方纹理，并分配空间
-- **framebuffer**：创建帧缓冲，大小自定义
-  - 包含：一个颜色附件，一个深度模板附件
+## 2.1	对VSCode的配置
 
-## 1.3	网格体 Mesh：依赖于`basic/Texture.h`
+### 2.1.1	设置编译工具&构建工具
 
-包含一个形状的VAO，顶点属性为：位置、法线、纹理坐标
+> ctrl + shift + p > cmake: scan for kits
 
-- **MeshSquare**：四边形
-- **MeshCube**：立方体
-- **MeshOBJ**：从文件中导入的obj模型
-  - 包含：多个**MeshOBJSubMesh**
+- 扫描工具包
 
-## 1.4	材质 Material：依赖于`basic/ALL.h`
+> ctrl + shift + p > cmake: select a kit
 
-每个材质绑定唯一shader程序，纹理的改变放在mesh组件中
+- 设置工具包为：**VS x86_amd64**
 
-- **MaterialConstantColor**：指定颜色
-- **MaterialDepth**：深度可视化
-- **MaterialNoLight**：仅显示diffuse贴图
-- **MaterialPhongLight**：phong光照模型材质
-- **MaterialPostProcess**：后处理材质，仅用于帧缓冲
-- **MaterialSkybox**：天空盒材质
+### 2.1.2	解决输出乱码问题
 
-## 1.5	组件 Component：依赖于`basic/ALL.h, material/ALL.h, mesh/Mesh.h`
+> ctrl + , > cmake: output log encoding
 
-每次tick，只tick组件
+- 设置输出日志编码为：**utf-8**
 
-- **ComponentCamera**：表示观察者所在位置。
-  - 包含：虚拟相机，帧缓冲
-  - 每个相机观察到的图片存储在帧缓冲中
-  - 生成最终的project，view矩阵
-- **ComponenTransform**：表示GO的位置，旋转，缩放，父子关系。
-  - 旋转：绕XYZ轴分别旋转了多少度
-  - 生成最终的model矩阵。
-- **ComponentMesh**：表示GO的可见形状
-  - 包含：VAO，material，texture
-- **ComponentLight**：表示发光体
-  - 包含：光源类型
+### 2.1.3	解决代码补全问题
 
-## 1.6	内建游戏对象 GO：依赖于`component/ALL.h`
+- 安装**C/C++**扩展
+- 设置扩展的编译器路径为：**D:\Program\VS\Community\VC\Tools\MSVC\14.40.33807\bin\Hostx64\x64\cl.exe**
+- 设置扩展的包含路径为：**E:\MyProject\GameEngine\OpenGL_Learning\3rd-party\\\*\***
 
-管理者为GameWorld
+### 2.1.4	解决终端乱码问题
 
-- **GOSquare**：四边形
-  - 包含mesh组件，transform组件
-- **GOSquare**：立方体
-  - 包含mesh组件，transform组件
-- **GONanosuit**：机器人
-  - 包含mesh组件，transform组件
-- **GOSkybox**：天空盒
-  - 包含mesh组件（cube），材质为天空盒材质
-- **GOCamera**：摄像机
-  - 包含camera组件，transform组件
+- 在vscode的终端中，将编码临时修改为utf-8
 
-# 二、绘制过程
+```bash
+chcp 650001
+```
 
-- 配置，添加物体到GameWorld中
-- 对每个带有camera组件的GO，渲染GameWorld中带有Mesh组件的GO，结果存储在camera组件的帧缓冲中
-- 选中一个camera，将其帧缓冲绘制到屏幕上
+## 2.2	对ASSIMP库的配置
+
+### 2.2.1	dll动态连接文件
+
+将`assimp-vc143-mtd.dll`拷贝到`C:\Windows\System32`和`C:\Windows\SysWOW64`中
