@@ -13,7 +13,8 @@ ComponentMesh::~ComponentMesh() {
     delete material;
 }
 
-void ComponentMesh::Draw(Camera* camera, std::vector<ComponentLight*> lights) {
+void ComponentMesh::Draw(Camera* camera, std::vector<ComponentLight*> &lights) {
+    if (!enable) return;
     /* 使用材质 */
     // 固定颜色
     if (dynamic_cast<MaterialConstantColor*>(material) != NULL) {

@@ -21,7 +21,7 @@ public:
      * \param camera 摄像机
      * \param lights 灯光信息
      */
-    void Draw(Camera* camera, std::vector<ComponentLight*> lights);
+    void Draw(Camera* camera, std::vector<ComponentLight*> &lights);
 
     bool IsTransport() const;
 private:

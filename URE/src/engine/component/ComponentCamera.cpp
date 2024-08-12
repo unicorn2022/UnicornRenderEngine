@@ -26,7 +26,8 @@ void ComponentCamera::ProcessMouseScroll(float yoffset) {
     camera->SetFOV(fov);
 }
 
-void ComponentCamera::RenderTick(std::vector<ComponentMesh*> render_objects, std::vector<ComponentLight*> lights, ComponentMesh* skybox) {
+void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, std::vector<ComponentLight*> &lights, ComponentMesh* skybox) {
+    if (!enable) return;
     // 2.2.0 绑定帧缓冲, 修改视口大小
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer->ID);
     glViewport(0, 0, frame_buffer->width, frame_buffer->height);

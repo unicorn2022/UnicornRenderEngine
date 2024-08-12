@@ -4,6 +4,7 @@ ComponentLight::ComponentLight(GO* gameobject, Light* light_data) : Component(ga
     this->type = "component_light";
     this->light_data = light_data;
 }
+
 ComponentLight::~ComponentLight() {
     delete light_data;
 }

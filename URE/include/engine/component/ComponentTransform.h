@@ -42,6 +42,8 @@ public:
     float GetPitch() const;
 
 public:
+    /* 获取局部坐标系变换(平移+旋转)矩阵 */
+    glm::mat4 GetTranslateRotateMatrix() const;
     /* 获取模型变换矩阵 */
     glm::mat4 GetModelMatrix() const;
 

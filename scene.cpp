@@ -8,7 +8,7 @@ void GameWorld::GameTick() {
     light_data->position = main_camera->camera->position;
     light_data->direction = main_camera->camera->front;
     /* 更新相机状态 */
-    // test_camera->gameobject->GetComponent<ComponentTransform>()->TransformRotate(glm::vec3(0, 1, 0));
+    test_camera->gameobject->GetComponent<ComponentTransform>()->TransformRotate(glm::vec3(0, 1, 0));
     auto camera_component = GameComponent::GetInstance().GetComponentCamera();
         for (auto camera_component : camera_component)
             camera_component->UpdateCameraState();
@@ -17,27 +17,23 @@ void GameWorld::GameTick() {
 
 GameWorld::GameWorld() {
     /* 主相机 */
-    GO* camera = new GOCamera("main_camera", 45, main_camera_znear, main_camera_zfar);
+    GOCamera* camera = new GOCamera("main_camera", 45, main_camera_znear, main_camera_zfar);
     camera->GetComponent<ComponentTransform>()->SetMoveSpeedClamp(main_camera_move_speed_min, main_camera_move_speed_max);
     camera->GetComponent<ComponentTransform>()->TransformTranslate(main_camera_position);
     camera->GetComponent<ComponentTransform>()->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
     all_game_object.push_back(camera);
     main_camera = camera->GetComponent<ComponentCamera>();
 
-    /* 副相机 + 相机捕获画面(square) + 相机可视化(cube) */
-    camera = new GOCamera("camera", 89, main_camera_znear, main_camera_zfar, 1920, 1080);
-    camera->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(0, 0, 3));
-    camera->GetComponent<ComponentTransform>()->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
-    all_game_object.push_back(camera);
-    test_camera = camera->GetComponent<ComponentCamera>();
-    GO* screen = new GOSquare("camera_capture", new MaterialNoLight(camera->GetComponent<ComponentCamera>()->frame_buffer->color_texture) );
+    /* 场景捕获对象 + 相机捕获画面(square) */
+    GOCapture2D* capture = new GOCapture2D("camera", 89, main_camera_znear, main_camera_zfar, 1920, 1080);
+    capture->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(0, 0, 3));
+    capture->GetComponent<ComponentTransform>()->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
+    all_game_object.push_back(capture);
+    test_camera = capture->GetComponent<ComponentCamera>();
+    GO* screen = new GOSquare("camera_capture", new MaterialNoLight(capture->GetCaptureTexture()));
     screen->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(0, 0, -50));
     screen->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(16, 9, 1));
     all_game_object.push_back(screen);
-    GO* camera_cube = new GOCube("main_camera_cube", new MaterialConstantColor(glm::vec4(1, 0, 0, 1)) );
-    camera_cube->GetComponent<ComponentTransform>()->SetParent(camera);
-    camera_cube->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.1, 0.1, 0.1));
-    all_game_object.push_back(camera_cube);
 
     /* 2个箱子 */
     int cnt = 0;

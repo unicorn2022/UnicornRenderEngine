@@ -61,24 +61,27 @@ float ComponentTransform::GetYaw() const {
 float ComponentTransform::GetPitch() const { 
     return rotate.x; 
 }
-
-/* 获取模型变换矩阵 */
-glm::mat4 ComponentTransform::GetModelMatrix() const {
-    glm::mat4 model_scale = glm::mat4(1.0f);
+/* 获取局部坐标系变换矩阵 */
+glm::mat4 ComponentTransform::GetTranslateRotateMatrix() const {
     glm::mat4 model_rotate = glm::mat4(1.0f);
-    glm::mat4 model_translate = glm::mat4(1.0f);
-    // 1. 缩放
-    model_scale = glm::scale(model_scale, scale);
-    // 2. 旋转
     model_rotate = glm::rotate(model_rotate, glm::radians(rotate.x), glm::vec3(1.0f, 0.0f, 0.0f));
     model_rotate = glm::rotate(model_rotate, glm::radians(rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
     model_rotate = glm::rotate(model_rotate, glm::radians(rotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    // 3. 平移
-    glm::vec3 move = position;
+    glm::mat4 model_translate = glm::mat4(1.0f);
+    model_translate = glm::translate(model_translate, position);
+    return model_translate * model_rotate;
+}
+/* 获取模型变换矩阵 */
+glm::mat4 ComponentTransform::GetModelMatrix() const {
+    // 1. 缩放
+    glm::mat4 model_scale = glm::mat4(1.0f);
+    model_scale = glm::scale(model_scale, scale);
+    // 2. 旋转 + 平移
+    glm::mat4 model_translate_rotate = GetTranslateRotateMatrix();
+    
     ComponentTransform* prt = parent;
-    while(prt != NULL) move += prt->position, prt = prt->parent;
-    model_translate = glm::translate(model_translate, move);
-    return model_translate * model_rotate * model_scale;
+    while(prt != NULL) model_translate_rotate = prt->GetTranslateRotateMatrix() * model_translate_rotate, prt = prt->parent;
+    return model_translate_rotate * model_scale;
 }
 
 /* `WASDQE` 控制 `前后左右下上`移动 */

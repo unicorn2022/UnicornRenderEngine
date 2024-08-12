@@ -13,4 +13,5 @@ public:
 public:
     GO* gameobject;
     std::string type;
+    bool enable;
 };
