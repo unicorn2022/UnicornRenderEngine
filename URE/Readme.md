@@ -259,11 +259,11 @@ Phong光照材质
 
 # 二、URE引擎绘制过程
 
-## 2.1	定义游戏对象&游戏逻辑：`GameWorld.cpp`
+## 2.1	定义游戏对象&游戏逻辑：`scene.cpp`
 
-- 在`GameWorld::GameWorld()`中，定义游戏对象
+- 实现`GameWorld::GameWorld()`：定义游戏对象
 
-- 在`GameWorld::GameTick()`中，定义游戏逻辑
+- 实现`GameWorld::GameTick()`：定义游戏逻辑
 
 ## 2.2	渲染过程：`main.cpp`
 

@@ -9,12 +9,13 @@ class ComponentCamera : public Component {
 public:
     /** 摄像机组件: GO拥有观察场景的功能
      * \param gameobject 绑定的游戏对象
-     * \param aspect 宽高比
      * \param fov 视野, 0~90°
      * \param near 近平面距离
      * \param far 远平面距离
+     * \param width 相机帧缓冲宽度
+     * \param height 相机帧缓冲高度
      */
-    ComponentCamera(GO* gameobject, float aspect, float fov, float near, float far);
+    ComponentCamera(GO* gameobject, float fov, float near, float far, int width = window_width, int height = window_height);
 
     virtual ~ComponentCamera();
 

@@ -1,10 +1,10 @@
 #include "engine/component/ComponentCamera.h"
 #include "engine/gameobject/GO.h"
 
-ComponentCamera::ComponentCamera(GO* gameobject, float aspect, float fov, float near, float far) : Component(gameobject) {
+ComponentCamera::ComponentCamera(GO* gameobject, float fov, float near, float far, int width, int height) : Component(gameobject) {
     this->type = "component_camera";
-    this->camera = new RoamingCameraPerspective(aspect, fov, near, far);
-    this->frame_buffer = new FrameBuffer(window_width, window_height);
+    this->camera = new RoamingCameraPerspective((float)width / (float)height, fov, near, far);
+    this->frame_buffer = new FrameBuffer(width, height);
 }
 
 ComponentCamera::~ComponentCamera() {
@@ -27,8 +27,9 @@ void ComponentCamera::ProcessMouseScroll(float yoffset) {
 }
 
 void ComponentCamera::RenderTick(std::vector<ComponentMesh*> render_objects, std::vector<ComponentLight*> lights, ComponentMesh* skybox) {
-    // 2.2.0 绑定帧缓冲
+    // 2.2.0 绑定帧缓冲, 修改视口大小
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer->ID);
+    glViewport(0, 0, frame_buffer->width, frame_buffer->height);
     // 2.2.1 清屏: 颜色缓冲, 深度缓冲, 模板缓冲
     glClearColor(color_background.x, color_background.y, color_background.z, color_background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

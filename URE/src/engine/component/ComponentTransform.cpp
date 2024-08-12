@@ -1,5 +1,6 @@
 #include "engine/component/ComponentTransform.h"
 #include "engine/gameobject/GO.h"
+#include "GlobalValue.h"
 
 ComponentTransform::ComponentTransform(GO* gameobject, ComponentTransform* parent) : Component(gameobject) {
     this->type = "component_transform";
@@ -8,6 +9,8 @@ ComponentTransform::ComponentTransform(GO* gameobject, ComponentTransform* paren
     this->scale = glm::vec3(1.0f);
     this->parent = parent;
     this->move_speed = 2.5;
+    this->move_speed_min = 2.5;
+    this->move_speed_max = 8.0;
 }
 ComponentTransform::~ComponentTransform() {}
 
@@ -16,6 +19,22 @@ void ComponentTransform::SetParent(GO* parent) {
 }
 void ComponentTransform::SetParent(ComponentTransform* parent) {
     this->parent = parent;
+}
+void ComponentTransform::SetMoveSpeedClamp(float move_speed_min, float move_speed_max) {
+    this->move_speed_min = move_speed_min;
+    this->move_speed_max = move_speed_max;
+    if (this->move_speed > move_speed_max) this->move_speed = move_speed_max;
+    if (this->move_speed < move_speed_min) this->move_speed = move_speed_min;
+}
+
+
+void ComponentTransform::MoveSpeedUp() {
+    move_speed += 0.1f;
+    if (move_speed > move_speed_max) move_speed = move_speed_max;
+}
+void ComponentTransform::MoveSpeedDown() {
+    move_speed -= 0.1f;
+    if (move_speed < move_speed_min) move_speed = move_speed_min;
 }
 
 void ComponentTransform::TransformTranslate(glm::vec3 direction) {

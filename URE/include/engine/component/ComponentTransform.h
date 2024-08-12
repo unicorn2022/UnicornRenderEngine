@@ -13,7 +13,11 @@ public:
 public:
     void SetParent(GO* parent);
     void SetParent(ComponentTransform* parent);
+    void SetMoveSpeedClamp(float move_speed_min = 2.5f, float move_speed_max = 8.0f);
+    void MoveSpeedUp();
+    void MoveSpeedDown();
 
+public:
     /** 平移物体
      * \param direction 平移向量
      */
@@ -53,5 +57,5 @@ private:
     glm::vec3 rotate;   // XYZ轴的旋转
     glm::vec3 scale;    // XYZ轴的缩放
     ComponentTransform* parent;
-    float move_speed;
+    float move_speed, move_speed_min, move_speed_max;
 };

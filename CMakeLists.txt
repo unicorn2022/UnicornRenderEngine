@@ -45,6 +45,7 @@ add_executable(${PROJECT_NAME}
     ${SRC_ENGINE_MATERIAL}
     ${SRC_ENGINE_MESH}
     main.cpp
+    scene.cpp
 )
 target_link_libraries(${PROJECT_NAME} glfw3 assimp-vc143-mtd)
 

@@ -36,8 +36,6 @@ void RoamingCamera::UpdateCameraVector() {
     this->up = up;
 }
 
-
-
 RoamingCameraPerspective::RoamingCameraPerspective(float aspect, float fov, float near, float far) : RoamingCamera() {
     this->aspect = aspect;
     this->fov = fov;

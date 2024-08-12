@@ -69,6 +69,7 @@ void Run() {
         glDisable(GL_CULL_FACE);
         glClear(GL_COLOR_BUFFER_BIT);
         // 2.3.2 绘制屏幕长方形对象
+        glViewport(0, 0, window_width, window_height);
         screen_mat->screen_texture = GameWorld::GetInstance().main_camera->frame_buffer->color_texture;
         screen_mat->choose_post_process = GlobalValue::GetInstance().GetIntValue("choose_post_process");
         screen_mat->Use();

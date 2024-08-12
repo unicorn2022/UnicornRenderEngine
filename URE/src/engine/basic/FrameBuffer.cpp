@@ -5,6 +5,7 @@ FrameBuffer::FrameBuffer(int width, int height) {
     this->height = height;
     CreateFrameBuffer();
 }
+
 FrameBuffer::~FrameBuffer() {
     glDeleteRenderbuffers(1, &RBO);
     glDeleteFramebuffers(1, &ID);
