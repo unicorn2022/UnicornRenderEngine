@@ -14,14 +14,13 @@ const float main_camera_move_speed_min = 2.5f;
 const float main_camera_move_speed_max = 8.0f;
 
 /* 颜色信息 */
-const glm::vec4 color_background = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+const glm::vec4 color_background = glm::vec4(0.2f, 0.3f, 0.3f, 1.0f);
 const glm::vec3 color_border = glm::vec3(1.0f, 0.0f, 0.0f);
 
 /* 后期处理效果个数 */
 const int num_post_process = 9;
 
 /* 路径信息 */
-// 所有章节公用资源
 const std::string root_path = "E:/MyProject/GameEngine/UnicornRenderEngine/URE/";
 const std::string root_path_shader = root_path + "shader/";
 const std::string root_path_resource = root_path + "resource/";
@@ -107,8 +106,8 @@ Light* light_datas[6] = {
         glm::vec3(0.0f,  0.0f, 0.0f),       // 位置
         glm::vec3(-0.2f, -1.0f, -0.3f),     // 方向
         glm::vec3(0, 0, 0),                 // 环境光
-        glm::vec3(1.0f, 1.0f, 1.0f),        // 漫反射
-        glm::vec3(1.0f, 1.0f, 1.0f),        // 高光
+        glm::vec3(10.0f, 10.0f, 10.0f),     // 漫反射
+        glm::vec3(10.0f, 10.0f, 10.0f),     // 高光
         12.5f,                              // 内切角
         15.0f                               // 外切角
     )

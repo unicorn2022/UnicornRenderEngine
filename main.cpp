@@ -60,7 +60,7 @@ void Run() {
             camera_component->RenderTick(
                 GameComponent::GetInstance().GetComponentMesh(camera_component->camera),
                 GameComponent::GetInstance().GetComponentLight(),
-                GameWorld::GetInstance().skybox->GetComponent<ComponentMesh>()
+                GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponent<ComponentMesh>() : NULL
             );
 
         /* 2.3 将main_camera的帧缓冲绘制到屏幕上 */

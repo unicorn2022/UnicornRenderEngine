@@ -58,7 +58,7 @@ in vec3 Normal;
 in vec2 TexCoord;
 
 /* uniform 变量 */
-// 观察方向
+// 观察位置
 uniform vec3 view_position;
 // 光源
 uniform DirectLight direct_light;
@@ -78,7 +78,7 @@ void main() {
     for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++)
         color += CalcPointLight(point_lights[i], normal_dir, Position, view_dir);
     color += CalcSpotLight(spot_light, normal_dir, Position, view_dir);
-    
+
     FragColor = vec4(color, alpha);
 }
 

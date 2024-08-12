@@ -4,5 +4,5 @@
 
 GOSquare::GOSquare(std::string name, Material* material, bool is_transport) : GO(name) {
     AddComponent(new ComponentTransform(this));
-    AddComponent(new ComponentMesh(this, new MeshSquare(), material, is_transport));
+    AddComponent(new ComponentMesh(this, {new MeshSquare()}, {material}, is_transport));
 }

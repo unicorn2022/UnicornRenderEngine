@@ -28,6 +28,8 @@ public:
     DirectLight* direct_light;
     PointLight* point_lights[MAX_POINT_LIGHT_COUNT];
     SpotLight* spot_light;
+    /* 观察位置 */
+    glm::vec3 view_position;
 
 private:
     /* 材质信息 */

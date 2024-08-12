@@ -6,3 +6,4 @@
 #include "engine/gameobject/GOSquare.h"
 #include "engine/gameobject/GOSkybox.h"
 #include "engine/gameobject/GOCapture2D.h"
+#include "engine/gameobject/GONanosuit.h"

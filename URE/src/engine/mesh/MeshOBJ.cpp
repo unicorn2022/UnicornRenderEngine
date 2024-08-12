@@ -1,4 +1,5 @@
 #include "engine/mesh/MeshOBJ.h"
+#include "engine/material/MaterialPhongLight.h"
 
 MeshOBJSubMesh::MeshOBJSubMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
     this->vertices = vertices;
@@ -47,27 +48,15 @@ void MeshOBJSubMesh::CreateOBJSubMesh() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-MeshOBJ::MeshOBJ(std::string root_path, std::string name) {
+
+
+OBJModel::OBJModel(std::string root_path, std::string name) {
     this->directory = root_path + name + "/";
     this->obj_model_path = directory + name + ".obj";
     CreateOBJ();
 }
 
-MeshOBJ::~MeshOBJ() {
-    for (auto mesh : sub_meshs) delete mesh;
-    for (auto texture : sub_meshs_diffuse) delete texture;
-    for (auto texture : sub_meshs_specular) delete texture;
-    sub_meshs.clear();
-    sub_meshs_diffuse.clear();
-    sub_meshs_specular.clear();
-}
-
-void MeshOBJ::Draw() {
-    for (auto mesh : sub_meshs) 
-        mesh->Draw();
-}
-
-void MeshOBJ::CreateOBJ() {
+void OBJModel::CreateOBJ() {
     /* 加载模型 */
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(obj_model_path, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -79,7 +68,7 @@ void MeshOBJ::CreateOBJ() {
     ProcessNode(scene->mRootNode, scene);
 }
 
-void MeshOBJ::ProcessNode(aiNode* node, const aiScene* scene) {
+void OBJModel::ProcessNode(aiNode* node, const aiScene* scene) {
     // 1. 处理所有的网格体
     for (int i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -91,10 +80,10 @@ void MeshOBJ::ProcessNode(aiNode* node, const aiScene* scene) {
     }
 }
 
-void MeshOBJ::ProcessMesh(aiMesh* ai_mesh, const aiScene* scene) {
+void OBJModel::ProcessMesh(aiMesh* ai_mesh, const aiScene* scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-
+    
     // 1. 处理顶点
     for (unsigned int i = 0; i < ai_mesh->mNumVertices; i++) {
         Vertex vertex;
@@ -134,13 +123,14 @@ void MeshOBJ::ProcessMesh(aiMesh* ai_mesh, const aiScene* scene) {
     sub_meshs.push_back(mesh);
 }
 
-Texture* MeshOBJ::ProcessTexture(aiMaterial* mat, aiTextureType type) {
+Texture* OBJModel::ProcessTexture(aiMaterial* mat, aiTextureType type) {
     Texture* first_texture = NULL;
     for (int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString file_name;
         mat->GetTexture(type, i, &file_name);
-        Texture* texture = new Texture(directory, file_name.C_Str());
+        Texture* texture = new Texture(file_name.C_Str(), directory);
         if (first_texture == NULL) first_texture = texture;
+        else std::cout << "[INFO] 舍弃纹理: " << file_name.C_Str() << "\n";
     }
     return first_texture;
 }

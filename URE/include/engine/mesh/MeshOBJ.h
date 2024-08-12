@@ -1,6 +1,6 @@
 #pragma once
-#include "engine/mesh/Mesh.h"
 #include "engine/basic/Texture.h"
+#include "engine/mesh/Mesh.h"
 
 class MeshOBJSubMesh : public Mesh{
 public:
@@ -20,22 +20,20 @@ private:
     void CreateOBJSubMesh();
 };
 
-class MeshOBJ : public Mesh {
+class OBJModel{
 public:
     /** 从文件中加载OBJ模型
      * \param root_path 模型根路径
      * \param name 模型名称
      */
-    MeshOBJ(std::string root_path, std::string name);
-
-    ~MeshOBJ();
+    OBJModel(std::string root_path, std::string name);
 
 public:
-    virtual void Draw();
-private:
-    std::vector<MeshOBJSubMesh*> sub_meshs;
+    std::vector<Mesh*> sub_meshs;
     std::vector<Texture*> sub_meshs_diffuse;
     std::vector<Texture*> sub_meshs_specular;
+
+private:
     std::string directory;
     std::string obj_model_path;
 
@@ -58,6 +56,7 @@ private:
      * \param mat assimp 材质
      * \param type assimp 纹理类型
      * \return 材质中, 对应类型的第一张纹理
+     * \note 仅处理第一张纹理
      */
     Texture* ProcessTexture(aiMaterial* mat, aiTextureType type);
 };

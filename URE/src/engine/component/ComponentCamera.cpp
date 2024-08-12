@@ -39,11 +39,13 @@ void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, st
         object->Draw(camera, lights);
     }
     // 2.2.3 绘制天空盒
-    glDepthFunc(GL_LEQUAL);
-    glDisable(GL_CULL_FACE);
-    skybox->Draw(camera, lights);
-    glEnable(GL_CULL_FACE);
-    glDepthFunc(GL_LESS);
+    if (skybox != NULL) {
+        glDepthFunc(GL_LEQUAL);
+        glDisable(GL_CULL_FACE);
+        skybox->Draw(camera, lights);
+        glEnable(GL_CULL_FACE);
+        glDepthFunc(GL_LESS);
+    }
     // 2.2.4 解除绑定帧缓冲
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

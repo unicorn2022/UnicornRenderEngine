@@ -18,3 +18,7 @@ void MaterialSkybox::Use() {
         shader->SetUniform("skybox_texture", 0);
     }
 }
+
+TextureCube* MaterialSkybox::GetSkyboxTexture() const {
+    return skybox_texture;
+}

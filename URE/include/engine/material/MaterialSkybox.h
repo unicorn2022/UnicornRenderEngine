@@ -13,6 +13,7 @@ public:
 
 public:
     virtual void Use();
+    TextureCube* GetSkyboxTexture() const;
 
 public:
     /* 变换信息 */

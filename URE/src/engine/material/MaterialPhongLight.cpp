@@ -57,4 +57,7 @@ void MaterialPhongLight::Use() {
     shader->SetUniform("spot_light.constant", spot_light->constant);
     shader->SetUniform("spot_light.linear", spot_light->linear);
     shader->SetUniform("spot_light.quadratic", spot_light->quadratic);
+    
+    /* 观察位置 */
+    shader->SetUniform("view_position", view_position);
 }

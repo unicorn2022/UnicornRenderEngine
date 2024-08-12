@@ -9,11 +9,11 @@ class ComponentMesh : public Component {
 public:
     /** 网格体组件: 表示GO的形状
      * \param gameobject 绑定的游戏对象
-     * \param mesh 网格体信息
-     * \param material 材质信息
+     * \param meshs 网格体信息
+     * \param materials 材质信息
      * \param is_transport 是否是半透明物体
      */
-    ComponentMesh(GO* gameobject, Mesh* mesh, Material* material, bool is_transport = false);
+    ComponentMesh(GO* gameobject, std::vector<Mesh*> meshs, std::vector<Material*> materials, bool is_transport = false);
     virtual ~ComponentMesh();
 
 public:
@@ -24,8 +24,19 @@ public:
     void Draw(Camera* camera, std::vector<ComponentLight*> &lights);
 
     bool IsTransport() const;
+
 private:
-    Mesh* mesh;
-    Material* material;
+    /** 渲染单个网格体
+     * \param camera 摄像机
+     * \param lights 灯光信息
+     * \param mesh 网格体
+     * \param material 材质
+     */
+    void DrawOneMesh(Camera* camera, std::vector<ComponentLight*> &lights, Mesh* mesh, Material* material);
+
+
+private:
+    std::vector<Mesh*> meshs;
+    std::vector<Material*> materials;
     bool is_transport;
 };

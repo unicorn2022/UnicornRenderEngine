@@ -13,6 +13,7 @@ std::string Utils::ReadFile(std::string path) {
         stream << file.rdbuf();
         // 关闭文件
         file.close();
+        // std::cout << "[INFO] 读取文件: " << path << std::endl;
         // 字符流 => string
         return stream.str();
     } catch (std::ifstream::failure& e) {
@@ -28,6 +29,8 @@ unsigned char* Utils::ReadPicture(std::string path, int& width, int& height, int
     unsigned char *data =  stbi_load(path.c_str(), &width, &height, &channel, 0);
     if (data == NULL) {
         std::cout << "[ERROR::Utils.h::ReadPicture()] 图片读取失败: " << path << std::endl;
+    } else {
+        // std::cout << "[INFO] 读取图片: " << path << std::endl;
     }
     return data;
 }
