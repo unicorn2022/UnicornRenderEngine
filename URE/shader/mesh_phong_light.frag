@@ -53,9 +53,11 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 vi
 
 /* 输入输出变量 */
 out vec4 FragColor;
-in vec3 Position;
-in vec3 Normal;
-in vec2 TexCoord;
+in VS_OUT {
+    vec3 Position;
+    vec3 Normal;
+    vec2 TexCoord;
+} fs_in;
 
 /* uniform 变量 */
 // 观察位置
@@ -69,30 +71,30 @@ uniform SpotLight spot_light;
 uniform PhongMaterial material;
 
 void main() {
-    vec3 normal_dir = normalize(Normal);
-    vec3 view_dir = normalize(view_position - Position);
-    float alpha = texture(material.diffuse, TexCoord).a;
+    vec3 normal_dir = normalize(fs_in.Normal);
+    vec3 view_dir = normalize(view_position - fs_in.Position);
+    float alpha = texture(material.diffuse, fs_in.TexCoord).a;
 
     // 计算三种光照
     vec3 color = CalcDirectLight(direct_light, normal_dir, view_dir);
     for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++)
-        color += CalcPointLight(point_lights[i], normal_dir, Position, view_dir);
-    color += CalcSpotLight(spot_light, normal_dir, Position, view_dir);
+        color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir);
+    color += CalcSpotLight(spot_light, normal_dir, fs_in.Position, view_dir);
 
     FragColor = vec4(color, alpha);
 }
 
 vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir) {
     // 1. 环境光
-    vec3 ambient = light.ambient * texture(material.diffuse, TexCoord).rgb;
+    vec3 ambient = light.ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
 
     // 2. 漫反射光
     vec3 light_dir = normalize(-light.direction);
-    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, TexCoord).rgb;
+    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, fs_in.TexCoord).rgb;
 
     // 3. 高光
     vec3 reflect_dir = reflect(-light_dir, normal_dir);
-    vec3 specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, TexCoord).rgb;
+    vec3 specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
 
     // 最终颜色
     vec3 color = ambient + diffuse + specular;
@@ -101,15 +103,15 @@ vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir) {
 
 vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir) {
     // 1. 环境光
-    vec3 ambient = light.ambient * texture(material.diffuse, TexCoord).rgb;
+    vec3 ambient = light.ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
 
     // 2. 漫反射光
     vec3 light_dir = normalize(light.position - frag_position);
-    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, TexCoord).rgb;
+    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, fs_in.TexCoord).rgb;
 
     // 3. 高光
     vec3 reflect_dir = reflect(-light_dir, normal_dir);
-    vec3 specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, TexCoord).rgb;
+    vec3 specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
 
     // 4. 衰减
     float dist = length(light.position - frag_position);
@@ -122,15 +124,15 @@ vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 
 
 vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir) {
     // 1. 环境光
-    vec3 ambient = light.ambient * texture(material.diffuse, TexCoord).rgb;
+    vec3 ambient = light.ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
 
     // 2. 漫反射光
     vec3 light_dir = normalize(light.position - frag_position);
-    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, TexCoord).rgb;
+    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, fs_in.TexCoord).rgb;
 
     // 3. 高光
     vec3 reflect_dir = reflect(-light_dir, normal_dir);
-    vec3 specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, TexCoord).rgb;
+    vec3 specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
 
     // 4. 衰减
     float dist = length(light.position - frag_position);

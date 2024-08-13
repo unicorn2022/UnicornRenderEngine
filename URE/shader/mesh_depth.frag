@@ -3,9 +3,12 @@
 
 /* 输入输出变量 */
 out vec4 FragColor;
-in vec3 Position;
-in vec3 Normal;
-in vec2 TexCoord;
+in VS_OUT {
+    vec3 Position;
+    vec3 Normal;
+    vec2 TexCoord;
+} fs_in;
+
 
 /* uniform 变量 */
 uniform float z_near;

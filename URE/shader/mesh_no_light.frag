@@ -8,15 +8,17 @@ struct Material {
 
 /* 输入输出变量 */
 out vec4 FragColor;
-in vec3 Position;
-in vec3 Normal;
-in vec2 TexCoord;
+in VS_OUT {
+    vec3 Position;
+    vec3 Normal;
+    vec2 TexCoord;
+} fs_in;
 
 /* uniform 变量 */
 uniform Material material;
 
 void main() {
-    vec3 color = texture(material.diffuse, TexCoord).rgb;
-    float alpha = texture(material.diffuse, TexCoord).a;
+    vec3 color = texture(material.diffuse, fs_in.TexCoord).rgb;
+    float alpha = texture(material.diffuse, fs_in.TexCoord).a;
     FragColor = vec4(color, alpha);
 }

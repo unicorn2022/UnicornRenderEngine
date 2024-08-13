@@ -3,9 +3,11 @@
 
 /* 输入输出变量 */
 out vec4 FragColor;
-in vec3 Position;
-in vec3 Normal;
-in vec2 TexCoord;
+in VS_OUT {
+    vec3 Position;
+    vec3 Normal;
+    vec2 TexCoord;
+} fs_in;
 
 /* uniform 变量 */
 // 观察位置
@@ -14,8 +16,8 @@ uniform vec3 view_position;
 uniform samplerCube skybox;
 
 void main() {
-    vec3 I = normalize(Position - view_position);
-    vec3 R = reflect(I, normalize(Normal));
+    vec3 I = normalize(fs_in.Position - view_position);
+    vec3 R = reflect(I, normalize(fs_in.Normal));
     vec3 color = texture(skybox, R).rgb;
     FragColor = vec4(color, 1.0);
 }

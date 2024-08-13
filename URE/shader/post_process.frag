@@ -1,7 +1,9 @@
 #version 330 core
 out vec4 FragColor;
 
-in vec2 TexCoord;
+in VS_OUT {
+    vec2 TexCoord;
+} fs_in;
 
 
 /** 后期处理效果
@@ -80,7 +82,7 @@ void SampleColor() {
         vec2( offset, -offset)  // 右下
     );
     for (int i = 0; i < 9; i++)
-        sample_color[i] = texture(screen_texture, TexCoord + offsets[i]).rgb;
+        sample_color[i] = texture(screen_texture, fs_in.TexCoord + offsets[i]).rgb;
 }
 
 vec3 UseKernel(float kernel[9]) {

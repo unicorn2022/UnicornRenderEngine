@@ -28,15 +28,15 @@ GameWorld::GameWorld() {
 
     /* 场景捕获对象 + 相机捕获画面(square) */
     {
-        // GOCapture2D* capture = new GOCapture2D("camera", 89, main_camera_znear, main_camera_zfar, 1920, 1080);
-        // capture->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(0, 0, 3));
-        // capture->GetComponent<ComponentTransform>()->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
-        // all_game_object.push_back(capture);
-        // test_camera = capture->GetComponent<ComponentCamera>();
-        // GOSquare* screen = new GOSquare("camera_capture", new MaterialNoLight(capture->GetCaptureTexture()));
-        // screen->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(0, 0, -50));
-        // screen->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(16, 9, 1));
-        // all_game_object.push_back(screen);
+        GOCapture2D* capture = new GOCapture2D("camera", 89, main_camera_znear, main_camera_zfar, 1920, 1080);
+        capture->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(0, 0, 3));
+        capture->GetComponent<ComponentTransform>()->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
+        all_game_object.push_back(capture);
+        test_camera = capture->GetComponent<ComponentCamera>();
+        GOSquare* screen = new GOSquare("camera_capture", new MaterialNoLight(capture->GetCaptureTexture()));
+        screen->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(0, 0, -50));
+        screen->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(16, 9, 1));
+        all_game_object.push_back(screen);
     }
 
     /* 6个灯光 */
@@ -59,35 +59,35 @@ GameWorld::GameWorld() {
 
     /* 2个箱子 */
     {
-        // int cnt = 0;
-        // for (auto position : container_position) {
-        //     GOCube* container = new GOCube("container[" + std::to_string(cnt++) + "]",
-        //         new MaterialPhongLight(
-        //             new Texture("container_diffuse.png"), 
-        //             new Texture("container_specular.png")
-        //         )
-        //     );
-        //     container->GetComponent<ComponentTransform>()->TransformTranslate(position);
-        //     container->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5f));
-        //     all_game_object.push_back(container);
-        // }
+        int cnt = 0;
+        for (auto position : container_position) {
+            GOCube* container = new GOCube("container[" + std::to_string(cnt++) + "]",
+                new MaterialPhongLight(
+                    new Texture("container_diffuse.png"), 
+                    new Texture("container_specular.png")
+                )
+            );
+            container->GetComponent<ComponentTransform>()->TransformTranslate(position);
+            container->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5f));
+            all_game_object.push_back(container);
+        }
     }
 
     /* 5个窗户 */
     {
-        // int cnt = 0;
-        // for (auto position : window_position) {
-        //     GO* windows = new GOSquare("windows[" + std::to_string(cnt++) + "]",
-        //         new MaterialPhongLight(
-        //             new Texture("window.png"), 
-        //             new Texture("window.png")
-        //         ),
-        //         true
-        //     );
-        //     windows->GetComponent<ComponentTransform>()->TransformTranslate(position);
-        //     windows->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5f));
-        //     all_game_object.push_back(windows);
-        // }
+        int cnt = 0;
+        for (auto position : window_position) {
+            GO* windows = new GOSquare("windows[" + std::to_string(cnt++) + "]",
+                new MaterialPhongLight(
+                    new Texture("window.png"), 
+                    new Texture("window.png")
+                ),
+                true
+            );
+            windows->GetComponent<ComponentTransform>()->TransformTranslate(position);
+            windows->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5f));
+            all_game_object.push_back(windows);
+        }
     }
 
     /* 1个机器人(Mesh数据是没错的, 但是diffuse贴图有问题, 会导致开了alpha通道后直接看不到) */
