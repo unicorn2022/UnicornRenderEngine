@@ -1,4 +1,4 @@
-#version 330 core
+#version 460 core
 #extension GL_ARB_shading_language_include : enable
 
 /* Phong 材质*/
@@ -57,11 +57,10 @@ in VS_OUT {
     vec3 Position;
     vec3 Normal;
     vec2 TexCoord;
+    vec3 ViewPosition;
 } fs_in;
 
 /* uniform 变量 */
-// 观察位置
-uniform vec3 view_position;
 // 光源
 uniform DirectLight direct_light;
 #define MAX_POINT_LIGHT_COUNT 4
@@ -72,7 +71,7 @@ uniform PhongMaterial material;
 
 void main() {
     vec3 normal_dir = normalize(fs_in.Normal);
-    vec3 view_dir = normalize(view_position - fs_in.Position);
+    vec3 view_dir = normalize(fs_in.ViewPosition - fs_in.Position);
     float alpha = texture(material.diffuse, fs_in.TexCoord).a;
 
     // 计算三种光照

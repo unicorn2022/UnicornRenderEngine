@@ -15,10 +15,6 @@ public:
     virtual void Use();
     TextureCube* GetSkyboxTexture() const;
 
-public:
-    /* 变换信息 */
-    glm::mat4 view_transform;
-    glm::mat4 projection_transform;
 private:
     /* 材质信息 */
     TextureCube* skybox_texture;

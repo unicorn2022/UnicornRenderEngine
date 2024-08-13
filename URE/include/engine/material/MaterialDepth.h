@@ -15,8 +15,6 @@ public:
 public:
     /* 变换信息 */
     glm::mat4 model_transform;
-    glm::mat4 view_transform;
-    glm::mat4 projection_transform;
 
 private:
     /* 材质信息 */

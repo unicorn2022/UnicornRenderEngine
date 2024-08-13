@@ -18,21 +18,19 @@ public:
 
 public:
     /** 渲染该网格体
-     * \param camera 摄像机
      * \param lights 灯光信息
      */
-    void Draw(Camera* camera, std::vector<ComponentLight*> &lights);
+    void Draw(std::vector<ComponentLight*> &lights);
 
     bool IsTransport() const;
 
 private:
     /** 渲染单个网格体
-     * \param camera 摄像机
      * \param lights 灯光信息
      * \param mesh 网格体
      * \param material 材质
      */
-    void DrawOneMesh(Camera* camera, std::vector<ComponentLight*> &lights, Mesh* mesh, Material* material);
+    void DrawOneMesh(std::vector<ComponentLight*> &lights, Mesh* mesh, Material* material);
 
 
 private:

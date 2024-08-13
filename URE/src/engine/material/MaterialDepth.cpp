@@ -9,8 +9,6 @@ MaterialDepth::MaterialDepth(float z_near, float z_far) {
 void MaterialDepth::Use() {
     shader->Use();
     shader->SetUniform("model_transform", model_transform);
-    shader->SetUniform("view_transform", view_transform);
-    shader->SetUniform("projection_transform", projection_transform);
     shader->SetUniform("z_near", z_near);
     shader->SetUniform("z_far", z_far);
 }

@@ -1,5 +1,6 @@
 #include "engine/component/ComponentCamera.h"
 #include "engine/gameobject/GO.h"
+#include "engine/basic/UniformBuffer.h"
 
 ComponentCamera::ComponentCamera(GO* gameobject, float fov, float near, float far, int width, int height) : Component(gameobject) {
     this->type = "component_camera";
@@ -28,24 +29,29 @@ void ComponentCamera::ProcessMouseScroll(float yoffset) {
 
 void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, std::vector<ComponentLight*> &lights, ComponentMesh* skybox) {
     if (!enable) return;
-    // 2.2.0 绑定帧缓冲, 修改视口大小
+    /* 1. 预处理 */
+    // 1.1 绑定帧缓冲
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer->ID);
+    // 1.2 修改视口大小
     glViewport(0, 0, frame_buffer->width, frame_buffer->height);
-    // 2.2.1 清屏: 颜色缓冲, 深度缓冲, 模板缓冲
+    // 1.3 更新 UniformBufferCamera 的值
+    UniformBufferCamera::GetInstance().view_transform = camera->GetViewMatrix();
+    UniformBufferCamera::GetInstance().projection_transform = camera->GetProjectionMatrix();
+    UniformBufferCamera::GetInstance().UpdateUniformData();
+    /* 2. 清屏: 颜色缓冲, 深度缓冲, 模板缓冲 */
     glClearColor(color_background.x, color_background.y, color_background.z, color_background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // 2.2.2 绘制物体
-    for (auto object : render_objects){
-        object->Draw(camera, lights);
-    }
-    // 2.2.3 绘制天空盒
+    /* 3. 绘制物体 */ 
+    for (auto object : render_objects)
+        object->Draw(lights);
+    /* 4. 绘制天空盒 */
     if (skybox != NULL) {
         glDepthFunc(GL_LEQUAL);
         glDisable(GL_CULL_FACE);
-        skybox->Draw(camera, lights);
+        skybox->Draw(lights);
         glEnable(GL_CULL_FACE);
         glDepthFunc(GL_LESS);
     }
-    // 2.2.4 解除绑定帧缓冲
+    /* 5. 解除绑定帧缓冲 */
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

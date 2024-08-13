@@ -82,6 +82,13 @@ tex->Use(index);
 shader->SetUniform("tex", index);
 ```
 
+### 1.1.7	UniformBuffer.h
+
+uniform缓冲类，封装OpenGL中与uniform缓冲对象有关的接口
+
+- 使用单例模式设计，每个uniform缓冲对象对应一个类
+- 在`ComponentCamera`中进行渲染时，要先更新`UniformBufferCamera`中的内容
+
 ## 1.2	组件类 Component
 
 定义不同种组件，组件表示游戏对象的功能。
@@ -121,7 +128,7 @@ shader->SetUniform("tex", index);
 
 接口信息：
 
-- `Draw()`：绘制该网格体，需要传入相机和光源数据
+- `Draw()`：绘制该网格体，需要传入光源数据
 
 ### 1.2.5	ComponentTransform.h
 
@@ -150,35 +157,50 @@ shader->SetUniform("tex", index);
 - 维护当前GO包含的组件
 - 在GO被销毁时，销毁组件
 
-### 1.3.2	GOCamera
+### 1.3.2	GOCamera.h
 
 相机游戏对象，包含：
 
 - 一个`Transform`组件
 - 一个`Camera`组件
 
-### 1.3.3	GOCube
+### 1.3.3	GOCapture2D.h
+
+屏幕捕获2D对象，包含：
+
+- 一个`Transform`组件
+- 一个`Camera`组件
+- 一个`Mesh`组件，形状为`cube`，材质为`constant_color(1.0, 1.0, 1.0, 1.0)`
+
+### 1.3.4	GOCube.h
 
 立方体游戏对象，包含：
 
 - 一个`Transform`组件
 - 一个`Mesh`组件，形状为`cube`
 
-### 1.3.3	GOLight
+### 1.3.5	GOLight.h
 
 光源游戏对象，包含：
 
 - 一个`Transform`组件
 - 一个`Light`组件
 
-### 1.3.4	GOSkybox
+### 1.3.6	GONanosuit.h
+
+机器人游戏对象，包含：
+
+- 一个`Transform`组件
+- 一个`Mesh`组件，形状为`nanosuit`
+
+### 1.3.7	GOSkybox.h
 
 天空盒游戏对象，包含：
 
 - 一个`Transform`组件
 - 一个`Mesh`组件，形状为`cube`
 
-### 1.3.5	GOSquare
+### 1.3.8	GOSquare.h
 
 长方形游戏对象，包含：
 
@@ -197,28 +219,28 @@ shader->SetUniform("tex", index);
 
 固定颜色材质
 
-- 变化信息：`model, view, projection`
+- 变化信息：`model`
 - 材质信息：`color`
 
 ### 1.4.3	MaterialDepth.h
 
 深度可视化
 
-- 变化信息：`model, view, projection`
+- 变化信息：`model`
 - 材质信息：`z_near, z_far `
 
 ### 1.4.4	MaterialNoLight.h
 
 无光照材质，仅显示diffuse贴图
 
-- 变化信息：`model, view, projection`
+- 变化信息：`model`
 - 材质信息：`diffuse`
 
 ### 1.4.5	MaterialPhongLight.h
 
 Phong光照材质
 
-- 变化信息：`model, view, projection`
+- 变化信息：`model`
 - 光照信息：`direct_light, point_lights[MAX_POINT_LIGHT_COUNT], spot_light`
 - 材质信息：`diffuse, specular, shininess`
 
@@ -228,12 +250,25 @@ Phong光照材质
 
 - 材质信息：`screen_texture, choose_post_process`
 
-### 1.4.7	MaterialDepth.h
+### 1.4.7	MaterialSkybox.h
 
-天空盒可视化
+天空盒材质
 
-- 变化信息：`view, projection`
-- 材质信息：`skybox_texture `
+- 材质信息：`skybox `
+
+### 1.4.8	MaterialSkyboxReflect.h
+
+反射天空盒材质
+
+- 变化信息：`model`
+- 材质信息：`skybox `
+
+### 1.4.9	MaterialSkyboxRefract.h
+
+折射天空盒材质
+
+- 变化信息：`model`
+- 材质信息：`skybox `
 
 ## 1.5	网格体 Mesh
 

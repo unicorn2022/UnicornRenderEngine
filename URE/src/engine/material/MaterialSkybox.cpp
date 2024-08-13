@@ -11,8 +11,6 @@ MaterialSkybox::~MaterialSkybox() {
 
 void MaterialSkybox::Use() {
     shader->Use();
-    shader->SetUniform("view_transform", view_transform);
-    shader->SetUniform("projection_transform", projection_transform);
     if (skybox_texture != NULL) {
         skybox_texture->Use(0);
         shader->SetUniform("skybox_texture", 0);

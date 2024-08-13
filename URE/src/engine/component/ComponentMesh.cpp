@@ -21,21 +21,19 @@ ComponentMesh::~ComponentMesh() {
     materials.clear();
 }
 
-void ComponentMesh::Draw(Camera* camera, std::vector<ComponentLight*> &lights) {
+void ComponentMesh::Draw(std::vector<ComponentLight*> &lights) {
     if (!enable) return;
     for (int i = 0; i < meshs.size(); i++)
-        DrawOneMesh(camera, lights, meshs[i], materials[i]);
+        DrawOneMesh(lights, meshs[i], materials[i]);
 }
 
-void ComponentMesh::DrawOneMesh(Camera* camera, std::vector<ComponentLight*> &lights, Mesh* mesh, Material* material) {
+void ComponentMesh::DrawOneMesh(std::vector<ComponentLight*> &lights, Mesh* mesh, Material* material) {
     /* 使用材质 */
     // 固定颜色
     if (dynamic_cast<MaterialConstantColor*>(material) != NULL) {
         MaterialConstantColor* mat = dynamic_cast<MaterialConstantColor*>(material);
         /* 变换信息 */
         mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        mat->view_transform = camera->GetViewMatrix();
-        mat->projection_transform = camera->GetProjectionMatrix();
         /* 使用材质 */
         mat->Use();
     }
@@ -44,8 +42,6 @@ void ComponentMesh::DrawOneMesh(Camera* camera, std::vector<ComponentLight*> &li
         MaterialDepth* mat = dynamic_cast<MaterialDepth*>(material);
         /* 变换信息 */
         mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        mat->view_transform = camera->GetViewMatrix();
-        mat->projection_transform = camera->GetProjectionMatrix();
         /* 使用材质 */
         mat->Use();
     }
@@ -54,8 +50,6 @@ void ComponentMesh::DrawOneMesh(Camera* camera, std::vector<ComponentLight*> &li
         MaterialNoLight* mat = dynamic_cast<MaterialNoLight*>(material);
         /* 变换信息 */
         mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        mat->view_transform = camera->GetViewMatrix();
-        mat->projection_transform = camera->GetProjectionMatrix();
         /* 使用材质 */
         mat->Use();
     }
@@ -64,8 +58,6 @@ void ComponentMesh::DrawOneMesh(Camera* camera, std::vector<ComponentLight*> &li
         MaterialPhongLight* mat = dynamic_cast<MaterialPhongLight*>(material);
         /* 变换信息 */
         mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        mat->view_transform = camera->GetViewMatrix();
-        mat->projection_transform = camera->GetProjectionMatrix();
         /* 光照信息 */
         int point_light_cnt = 0;
         for (auto light_component : lights) {
@@ -77,17 +69,12 @@ void ComponentMesh::DrawOneMesh(Camera* camera, std::vector<ComponentLight*> &li
                 mat->spot_light = dynamic_cast<SpotLight*>(light_component->light_data);
             }
         }
-        /* 观察位置 */
-        mat->view_position = camera->position;
         /* 使用材质 */
         mat->Use();
     }
     // 天空盒
     else if (dynamic_cast<MaterialSkybox*>(material) != NULL) {
         MaterialSkybox* mat = dynamic_cast<MaterialSkybox*>(material);
-        /* 变换信息 */
-        mat->view_transform = camera->GetViewMatrix();
-        mat->projection_transform = camera->GetProjectionMatrix();
         /* 使用材质 */
         mat->Use();
     }
@@ -96,10 +83,6 @@ void ComponentMesh::DrawOneMesh(Camera* camera, std::vector<ComponentLight*> &li
         MaterialSkyboxReflect* mat = dynamic_cast<MaterialSkyboxReflect*>(material);
         /* 变换信息 */
         mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        mat->view_transform = camera->GetViewMatrix();
-        mat->projection_transform = camera->GetProjectionMatrix();
-        /* 观察位置 */
-        mat->view_position = camera->position;
         /* 使用材质 */
         mat->Use();
     }
@@ -108,10 +91,6 @@ void ComponentMesh::DrawOneMesh(Camera* camera, std::vector<ComponentLight*> &li
         MaterialSkyboxRefract* mat = dynamic_cast<MaterialSkyboxRefract*>(material);
         /* 变换信息 */
         mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        mat->view_transform = camera->GetViewMatrix();
-        mat->projection_transform = camera->GetProjectionMatrix();
-        /* 观察位置 */
-        mat->view_position = camera->position;
         /* 使用材质 */
         mat->Use();
     }

@@ -56,7 +56,6 @@ GameWorld::GameWorld() {
         skybox = new GOSkybox("skybox", new MaterialSkybox(new TextureCube(skybox_file_name, "jpg")));
     }
 
-
     /* 2个箱子 */
     {
         int cnt = 0;

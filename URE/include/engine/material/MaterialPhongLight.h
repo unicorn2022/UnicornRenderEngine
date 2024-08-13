@@ -22,14 +22,10 @@ public:
 public:
     /* 变换信息 */
     glm::mat4 model_transform;
-    glm::mat4 view_transform;
-    glm::mat4 projection_transform;
     /* 光照信息 */
     DirectLight* direct_light;
     PointLight* point_lights[MAX_POINT_LIGHT_COUNT];
     SpotLight* spot_light;
-    /* 观察位置 */
-    glm::vec3 view_position;
 
 private:
     /* 材质信息 */

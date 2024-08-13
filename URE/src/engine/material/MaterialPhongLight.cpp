@@ -16,8 +16,6 @@ void MaterialPhongLight::Use() {
     shader->Use();
     /* 变换信息 */
     shader->SetUniform("model_transform", model_transform);
-    shader->SetUniform("view_transform", view_transform);
-    shader->SetUniform("projection_transform", projection_transform);
 
     /* 材质信息 */
     if (diffuse != NULL) {
@@ -57,7 +55,4 @@ void MaterialPhongLight::Use() {
     shader->SetUniform("spot_light.constant", spot_light->constant);
     shader->SetUniform("spot_light.linear", spot_light->linear);
     shader->SetUniform("spot_light.quadratic", spot_light->quadratic);
-    
-    /* 观察位置 */
-    shader->SetUniform("view_position", view_position);
 }
