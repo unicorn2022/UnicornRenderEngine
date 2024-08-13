@@ -1,8 +1,11 @@
 #include "engine/basic/Shader.h"
 
-Shader::Shader(std::string name, std::string root_directory){
+Shader::Shader(std::string name, bool use_geometry_shader, std::string root_directory){
     this->name = name;
-    CreateShader(root_directory + name + ".vert", root_directory + name + ".frag");
+    if (use_geometry_shader) 
+        CreateShader(root_directory + name + ".vert", root_directory + name + ".geom", root_directory + name + ".frag");
+    else 
+        CreateShader(root_directory + name + ".vert", root_directory + name + ".frag");
 }
 
 Shader::~Shader() {
@@ -71,8 +74,47 @@ void Shader::CreateShader(std::string vertex_shader_path, std::string fragment_s
     glDeleteShader(fragment_shader);
 }
 
+void Shader::CreateShader(std::string vertex_shader_path, std::string geometry_shader_path, std::string fragment_shader_path) {
+    /* 1. 从文件中读取源代码 */
+    std::string vertex_shader_source = Utils::ReadFile(vertex_shader_path);
+    std::string geometry_shader_source = Utils::ReadFile(geometry_shader_path);
+    std::string fragment_shader_source = Utils::ReadFile(fragment_shader_path);
+    const char* vertex_shader_code = vertex_shader_source.c_str();
+    const char* geometry_shader_code = geometry_shader_source.c_str();
+    const char* fragment_shader_code = fragment_shader_source.c_str();
 
-/* 判断 shader 编译是否成功 */
+    /* 2.1 顶点着色器 */
+    unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex_shader, 1, &vertex_shader_code, NULL);
+    glCompileShader(vertex_shader);
+    Check(vertex_shader, "顶点着色器编译失败 [" + vertex_shader_path + "]");
+    
+    /* 2.2 几何着色器 */
+    unsigned int geometry_shader = glCreateShader(GL_GEOMETRY_SHADER);
+    glShaderSource(geometry_shader, 1, &geometry_shader_code, NULL);
+    glCompileShader(geometry_shader);
+    Check(geometry_shader, "几何着色器编译失败 [" + geometry_shader_path + "]");
+
+    /* 2.3 片段着色器 */
+    unsigned int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment_shader, 1, &fragment_shader_code, NULL);
+    glCompileShader(fragment_shader);
+    Check(fragment_shader, "片段着色器编译失败 [" + fragment_shader_path + "]");
+    
+    /* 3. 着色器程序 */
+    ID = glCreateProgram();
+    glAttachShader(ID, vertex_shader);
+    glAttachShader(ID, geometry_shader);
+    glAttachShader(ID, fragment_shader);
+    glLinkProgram(ID);
+    Check(ID, "着色器链接失败");
+
+    /* 4. 删除无用的着色器 */
+    glDeleteShader(vertex_shader);
+    glDeleteShader(geometry_shader);
+    glDeleteShader(fragment_shader);
+}
+
 bool Shader::Check(int shaderID, std::string message) {
     int  success;
     char infoLog[512];

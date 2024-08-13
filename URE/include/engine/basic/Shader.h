@@ -6,9 +6,10 @@ class Shader {
 public:
     /** 着色器程序
      * \param name 着色器名称
+     * \param use_geometry_shader 是否使用几何着色器
      * \param root_directory 根文件夹路径, 含`/`
      */
-    Shader(std::string name, std::string root_directory = root_path_shader);
+    Shader(std::string name, bool use_geometry_shader = false, std::string root_directory = root_path_shader);
     ~Shader();
 public:
     /* 使用着色器 */
@@ -38,6 +39,13 @@ private:
      * \param fragment_shader_path 片段着色器文件路径
      */
     void CreateShader(std::string vertex_shader_path, std::string fragment_shader_path);
+
+    /** 着色器程序
+     * \param vertex_shader_path 顶点着色器文件路径
+     * \param geometry_shader_path 几何着色器文件路径
+     * \param fragment_shader_path 片段着色器文件路径
+     */
+    void CreateShader(std::string vertex_shader_path, std::string geometry_shader_path, std::string fragment_shader_path);
     
     /* 判断 shader 编译是否成功 */
     bool Check(int shaderID, std::string message = "");

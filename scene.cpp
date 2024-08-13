@@ -116,11 +116,15 @@ GameWorld::GameWorld() {
 
     /* 1个反射天空盒的物体 */
     {
-        // // GO* reflect_item = new GOCube("reflect_item", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
-        // GO* reflect_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
-        // reflect_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
-        // reflect_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(2, 0, 0));
-        // all_game_object.push_back(reflect_item);
+        // GO* reflect_item = new GOCube("reflect_item", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
+        GO* reflect_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
+        reflect_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
+        reflect_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(2, 0, 0));
+        all_game_object.push_back(reflect_item);
+        GO* normal_item = new GONanosuit("normal_item", "nanosuit", new MaterialVisualizationBorder());
+        normal_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
+        normal_item->GetComponent<ComponentTransform>()->SetParent(reflect_item);
+        all_game_object.push_back(normal_item);
     }
     
     /* 1个折射天空盒的物体 */
