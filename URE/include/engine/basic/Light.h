@@ -1,6 +1,8 @@
 #pragma once
 #include "Utils.h"
 
+static const int MAX_POINT_LIGHT_COUNT = 4;
+
 class Light {
 public:
     /** 光源
@@ -27,7 +29,7 @@ public:
      * \param diffuse 漫反射光颜色
      * \param specular 高光颜色
      */
-    DirectLight(glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+    DirectLight(glm::vec3 direction = glm::vec3(1), glm::vec3 ambient = glm::vec3(0), glm::vec3 diffuse = glm::vec3(0), glm::vec3 specular = glm::vec3(0));
     virtual ~DirectLight();
 
 public:
@@ -44,7 +46,7 @@ public:
      * \param diffuse 漫反射光颜色
      * \param specular 高光颜色
      */
-    PointLight(glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+    PointLight(glm::vec3 position = glm::vec3(0), glm::vec3 ambient = glm::vec3(0), glm::vec3 diffuse = glm::vec3(0), glm::vec3 specular = glm::vec3(0));
     virtual ~PointLight();
 
 public:
@@ -67,7 +69,7 @@ public:
      * \param inner_cut_off 内切角(角度)
      * \param outer_cut_off 外切角(角度)
      */
-    SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float inner_cut_off = 12.5f, float outer_cut_off = 15.0f);
+    SpotLight(glm::vec3 position = glm::vec3(0), glm::vec3 direction = glm::vec3(1), glm::vec3 ambient = glm::vec3(0), glm::vec3 diffuse = glm::vec3(0), glm::vec3 specular = glm::vec3(0), float inner_cut_off = 12.5f, float outer_cut_off = 15.0f);
     virtual ~SpotLight();
 
 public:

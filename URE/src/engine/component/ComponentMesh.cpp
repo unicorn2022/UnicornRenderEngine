@@ -21,81 +21,18 @@ ComponentMesh::~ComponentMesh() {
     materials.clear();
 }
 
-void ComponentMesh::Draw(std::vector<ComponentLight*> &lights) {
+void ComponentMesh::Draw() {
     if (!enable) return;
     for (int i = 0; i < meshs.size(); i++)
-        DrawOneMesh(lights, meshs[i], materials[i]);
+        DrawOneMesh(meshs[i], materials[i]);
 }
 
-void ComponentMesh::DrawOneMesh(std::vector<ComponentLight*> &lights, Mesh* mesh, Material* material) {
-    /* 使用材质 */
-    // 固定颜色
-    if (dynamic_cast<MaterialConstantColor*>(material) != NULL) {
-        MaterialConstantColor* mat = dynamic_cast<MaterialConstantColor*>(material);
-        /* 变换信息 */
-        mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        /* 使用材质 */
-        mat->Use();
-    }
-    // 深度
-    else if (dynamic_cast<MaterialDepth*>(material) != NULL) {
-        MaterialDepth* mat = dynamic_cast<MaterialDepth*>(material);
-        /* 变换信息 */
-        mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        /* 使用材质 */
-        mat->Use();
-    }
-    // 无光照
-    else if (dynamic_cast<MaterialNoLight*>(material) != NULL) {
-        MaterialNoLight* mat = dynamic_cast<MaterialNoLight*>(material);
-        /* 变换信息 */
-        mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        /* 使用材质 */
-        mat->Use();
-    }
-    // Phong光照
-    else if (dynamic_cast<MaterialPhongLight*>(material) != NULL) {
-        MaterialPhongLight* mat = dynamic_cast<MaterialPhongLight*>(material);
-        /* 变换信息 */
-        mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        /* 光照信息 */
-        int point_light_cnt = 0;
-        for (auto light_component : lights) {
-            if (dynamic_cast<DirectLight*>(light_component->light_data) != NULL) {
-                mat->direct_light = dynamic_cast<DirectLight*>(light_component->light_data);
-            } else if (dynamic_cast<PointLight*>(light_component->light_data) != NULL) {
-                mat->point_lights[point_light_cnt++] = dynamic_cast<PointLight*>(light_component->light_data);
-            }else if (dynamic_cast<SpotLight*>(light_component->light_data) != NULL) {
-                mat->spot_light = dynamic_cast<SpotLight*>(light_component->light_data);
-            }
-        }
-        /* 使用材质 */
-        mat->Use();
-    }
-    // 天空盒
-    else if (dynamic_cast<MaterialSkybox*>(material) != NULL) {
-        MaterialSkybox* mat = dynamic_cast<MaterialSkybox*>(material);
-        /* 使用材质 */
-        mat->Use();
-    }
-    // 反射天空盒
-    else if (dynamic_cast<MaterialSkyboxReflect*>(material) != NULL) {
-        MaterialSkyboxReflect* mat = dynamic_cast<MaterialSkyboxReflect*>(material);
-        /* 变换信息 */
-        mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        /* 使用材质 */
-        mat->Use();
-    }
-    // 折射天空盒
-    else if (dynamic_cast<MaterialSkyboxRefract*>(material) != NULL) {
-        MaterialSkyboxRefract* mat = dynamic_cast<MaterialSkyboxRefract*>(material);
-        /* 变换信息 */
-        mat->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
-        /* 使用材质 */
-        mat->Use();
-    }
-
-    /* 绘制物体 */
+void ComponentMesh::DrawOneMesh(Mesh* mesh, Material* material) {
+    /* 1. 设置变换信息 */
+    material->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
+    /* 2. 使用材质 */
+    material->Use();
+    /* 3. 绘制物体 */
     mesh->Draw();
 }
 

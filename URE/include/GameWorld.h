@@ -19,7 +19,7 @@ public:
     GOSkybox* skybox;
     ComponentCamera* main_camera;
     ComponentCamera* test_camera;
-    ComponentLight* spot_light;
+    SpotLight* spot_light;
 
 public:
     void HandleKeyBoard(GLFWwindow* window, float delta_time);

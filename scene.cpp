@@ -1,12 +1,13 @@
 #include "GameWorld.h"
 #include "GameComponent.h"
+#include "GlobalValue.h"
 #include "engine/material/ALL.h"
+#include "engine/basic/UniformBuffer.h"
 
 void GameWorld::GameTick() {
     /* 设置聚光源属性 */
-    SpotLight* light_data = dynamic_cast<SpotLight*>(spot_light->light_data);
-    light_data->position = main_camera->camera->position;
-    light_data->direction = main_camera->camera->front;
+    spot_light->position = main_camera->camera->position;
+    spot_light->direction = main_camera->camera->front;
     /* 更新相机状态 */
     // test_camera->gameobject->GetComponent<ComponentTransform>()->TransformRotate(glm::vec3(0, 1, 0));
     auto camera_component = GameComponent::GetInstance().GetComponentCamera();
@@ -41,13 +42,30 @@ GameWorld::GameWorld() {
 
     /* 6个灯光 */
     {
-        int cnt = 0;
-        for (auto light_data : light_datas) {
-            GOLight* light = new GOLight("light" + std::to_string(cnt++), light_data);
-            all_game_object.push_back(light);
-            if (dynamic_cast<SpotLight*>(light_data) != NULL)
-                spot_light = light->GetComponent<ComponentLight>();
+        UniformBufferLight::GetInstance().direct_light = DirectLight(
+            glm::vec3(-0.2f, -1.0f, -0.3f),     // 方向
+            glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+            glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
+            glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
+        );
+        for (int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
+            UniformBufferLight::GetInstance().point_lights[i] = PointLight(
+                point_light_position[i],            // 位置
+                glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+                glm::vec3(0.8f, 0.8f, 0.8f),        // 漫反射
+                glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
+            );
         }
+        UniformBufferLight::GetInstance().spot_light = SpotLight(
+            glm::vec3(0.0f, 0.0f, 0.0f),    // 位置
+            glm::vec3(1.0f, 0.0f, 0.0f),    // 方向
+            glm::vec3(1, 0, 0),             // 环境光
+            glm::vec3(0, 1, 0),             // 漫反射
+            glm::vec3(0, 0, 1),             // 高光
+            glm::cos(glm::radians(12.5f)),      // 内切角
+            glm::cos(glm::radians(15.0f))       // 外切角
+        );
+        spot_light = &UniformBufferLight::GetInstance().spot_light;
     }
 
     /* 天空盒 */
@@ -98,19 +116,20 @@ GameWorld::GameWorld() {
 
     /* 1个反射天空盒的物体 */
     {
-        // GO* reflect_item = new GOCube("reflect_item", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
-        GO* reflect_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
-        reflect_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
-        reflect_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(2, 0, 0));
-        all_game_object.push_back(reflect_item);
+        // // GO* reflect_item = new GOCube("reflect_item", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
+        // GO* reflect_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
+        // reflect_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
+        // reflect_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(2, 0, 0));
+        // all_game_object.push_back(reflect_item);
     }
+    
     /* 1个折射天空盒的物体 */
     {
-        // GO* refract_item = new GOCube("refract_item", new MaterialSkyboxRefract(skybox->GetSkyboxTexture()));
-        GO* refract_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxRefract(skybox->GetSkyboxTexture()));
-        refract_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
-        refract_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(-2, 0, 0));
-        all_game_object.push_back(refract_item);
+        // // GO* refract_item = new GOCube("refract_item", new MaterialSkyboxRefract(skybox->GetSkyboxTexture()));
+        // GO* refract_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxRefract(skybox->GetSkyboxTexture()));
+        // refract_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
+        // refract_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(-2, 0, 0));
+        // all_game_object.push_back(refract_item);
     }
 
     

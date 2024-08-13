@@ -2,7 +2,7 @@
 
 # UnicornRenderEngine
 
-基于OpenGL3.3的渲染引擎
+基于OpenGL4.6的渲染引擎
 
 # 一、知识点
 

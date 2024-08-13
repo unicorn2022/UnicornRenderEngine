@@ -15,9 +15,6 @@ public:
     /* 获取所有 camera 组件 */
     std::vector<ComponentCamera*> GetComponentCamera();
     
-    /* 获取所有 light 组件 */
-    std::vector<ComponentLight*> GetComponentLight();
-    
     /* 获取所有 transform 组件 */
     std::vector<ComponentTransform*> GetComponentTransform();
     
@@ -30,7 +27,6 @@ private:
 
 private:
     std::vector<ComponentCamera*> component_cameras;
-    std::vector<ComponentLight*> component_lights;
     std::vector<ComponentMesh*> component_meshs;
     std::vector<ComponentTransform*> component_transforms;
 };

@@ -84,10 +84,14 @@ shader->SetUniform("tex", index);
 
 ### 1.1.7	UniformBuffer.h
 
+> **在`ComponentCamera`中进行渲染时，要先更新`UniformBufferCamera`、 `UniformBufferLight`中的内容**
+
 uniform缓冲类，封装OpenGL中与uniform缓冲对象有关的接口
 
 - 使用单例模式设计，每个uniform缓冲对象对应一个类
-- 在`ComponentCamera`中进行渲染时，要先更新`UniformBufferCamera`中的内容
+
+- **UniformBufferCamera**：管理Camera相关的uniform变量
+- **UniformBufferLight**：管理Light相关的uniform变量
 
 ## 1.2	组件类 Component
 
@@ -112,13 +116,7 @@ uniform缓冲类，封装OpenGL中与uniform缓冲对象有关的接口
 - 每一个`RenderTick`，调用`RenderTick()`进行渲染
 - 处理**滚轮回调**事件时，调用`ProcessMouseScroll()`更新相机的`fov`
 
-### 1.2.3	ComponentLight.h
-
-光源组件，表示光源的功能
-
-- 光源数据`light_data`
-
-### 1.2.4	ComponentMesh.h
+### 1.2.3	ComponentMesh.h
 
 网格体组件，表示游戏对象的可见性
 
@@ -130,7 +128,7 @@ uniform缓冲类，封装OpenGL中与uniform缓冲对象有关的接口
 
 - `Draw()`：绘制该网格体，需要传入光源数据
 
-### 1.2.5	ComponentTransform.h
+### 1.2.4	ComponentTransform.h
 
 变换组件，表示游戏对象的变换信息，提供`model`矩阵
 
@@ -179,28 +177,21 @@ uniform缓冲类，封装OpenGL中与uniform缓冲对象有关的接口
 - 一个`Transform`组件
 - 一个`Mesh`组件，形状为`cube`
 
-### 1.3.5	GOLight.h
-
-光源游戏对象，包含：
-
-- 一个`Transform`组件
-- 一个`Light`组件
-
-### 1.3.6	GONanosuit.h
+### 1.3.5	GONanosuit.h
 
 机器人游戏对象，包含：
 
 - 一个`Transform`组件
 - 一个`Mesh`组件，形状为`nanosuit`
 
-### 1.3.7	GOSkybox.h
+### 1.3.6	GOSkybox.h
 
 天空盒游戏对象，包含：
 
 - 一个`Transform`组件
 - 一个`Mesh`组件，形状为`cube`
 
-### 1.3.8	GOSquare.h
+### 1.3.7	GOSquare.h
 
 长方形游戏对象，包含：
 

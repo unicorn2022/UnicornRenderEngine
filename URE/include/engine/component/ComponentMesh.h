@@ -1,6 +1,5 @@
 #pragma once
 #include "engine/component/ComponentTransform.h"
-#include "engine/component/ComponentLight.h"
 #include "engine/mesh/Mesh.h"
 #include "engine/material/Material.h"
 #include "engine/basic/Camera.h"
@@ -17,20 +16,17 @@ public:
     virtual ~ComponentMesh();
 
 public:
-    /** 渲染该网格体
-     * \param lights 灯光信息
-     */
-    void Draw(std::vector<ComponentLight*> &lights);
+    /* 渲染该网格体 */
+    void Draw();
 
     bool IsTransport() const;
 
 private:
     /** 渲染单个网格体
-     * \param lights 灯光信息
      * \param mesh 网格体
      * \param material 材质
      */
-    void DrawOneMesh(std::vector<ComponentLight*> &lights, Mesh* mesh, Material* material);
+    void DrawOneMesh(Mesh* mesh, Material* material);
 
 
 private:

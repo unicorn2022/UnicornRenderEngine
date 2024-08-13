@@ -10,40 +10,43 @@ struct PhongMaterial {
 /* 定向光源 */
 struct DirectLight {
     // 光源颜色
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec3 ambient;   // 00-04N
+    vec3 diffuse;   // 05-08N
+    vec3 specular;  // 09-12N
     // 光源属性
-    vec3 direction;
+    vec3 direction; // 13-16N
+    // 共16N
 };
 /* 点光源 */
 struct PointLight {
     // 光源颜色
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec3 ambient;   // 00-04N
+    vec3 diffuse;   // 05-08N
+    vec3 specular;  // 09-12N
     // 光源属性
-    vec3 position;
+    vec3 position;  // 13-16N
     // 衰减
-    float constant;
-    float linear;
-    float quadratic;
+    float constant; // 17N
+    float linear;   // 18N
+    float quadratic;// 19N
+    // 共20N
 };
 /* 聚光源 */
 struct SpotLight {
     // 光源颜色
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec3 ambient;   // 00-04N 
+    vec3 diffuse;   // 05-08N
+    vec3 specular;  // 09-12N
     // 光源属性
-    vec3 position;
-    vec3 direction;
-    float inner_cut_off;
-    float outer_cut_off;
+    vec3 position;  // 13-16N
+    vec3 direction; // 17-19N
+    float inner_cut_off; // 20N
+    float outer_cut_off; // 21N   
     // 衰减
-    float constant;
-    float linear;
-    float quadratic;
+    float constant; // 22N
+    float linear;   // 23N
+    float quadratic;// 24N
+    // 共24N
 };
 
 /* 光源计算函数 */
@@ -61,11 +64,12 @@ in VS_OUT {
 } fs_in;
 
 /* uniform 变量 */
-// 光源
-uniform DirectLight direct_light;
 #define MAX_POINT_LIGHT_COUNT 4
-uniform PointLight point_lights[MAX_POINT_LIGHT_COUNT];
-uniform SpotLight spot_light;
+layout (std140, binding = 1) uniform Light {
+    DirectLight direct_light;
+    PointLight point_lights[MAX_POINT_LIGHT_COUNT];
+    SpotLight spot_light;
+};
 // 材质
 uniform PhongMaterial material;
 

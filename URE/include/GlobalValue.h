@@ -53,5 +53,5 @@ private:
 extern std::vector<glm::vec3> container_position;
 // 2. 5个窗户的初始位置
 extern std::vector<glm::vec3> window_position;
-// 3. 1个定向光, 4个点光源, 1个聚光源的属性
-extern Light* light_datas[6];
+// 3. 4个点光源的位置
+extern std::vector<glm::vec3> point_light_position;

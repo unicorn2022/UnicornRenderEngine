@@ -59,7 +59,6 @@ void Run() {
         for (auto camera_component : camera_components) 
             camera_component->RenderTick(
                 GameComponent::GetInstance().GetComponentMesh(camera_component->camera),
-                GameComponent::GetInstance().GetComponentLight(),
                 GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponent<ComponentMesh>() : NULL
             );
 

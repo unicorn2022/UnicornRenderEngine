@@ -1,5 +1,6 @@
 #pragma once
 #include "Utils.h"
+#include "engine/basic/Light.h"
 
 class UniformBuffer {
 public:
@@ -45,4 +46,24 @@ public:
     glm::mat4 view_transform;
     glm::mat4 projection_transform;
     glm::vec3 view_position;
+};
+
+class UniformBufferLight : public UniformBuffer {
+public:
+    /* Light 对应的帧缓冲对象 */
+    static UniformBufferLight& GetInstance() {
+        static UniformBufferLight instance;
+        return instance;
+    }
+
+    /* 更新 uniform 数据 */
+    virtual void UpdateUniformData(); 
+
+private:
+    UniformBufferLight() : UniformBuffer(1, (16 + 20 * MAX_POINT_LIGHT_COUNT + 24) * 4) {}
+
+public:
+    DirectLight direct_light;
+    PointLight point_lights[MAX_POINT_LIGHT_COUNT];
+    SpotLight spot_light;
 };

@@ -12,10 +12,6 @@ public:
 public:
     virtual void Use();
 
-public:
-    /* 变换信息 */
-    glm::mat4 model_transform;
-
 private:
     /* 材质信息 */
     float z_near;

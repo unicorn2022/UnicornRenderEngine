@@ -10,8 +10,6 @@ GameComponent& GameComponent::GetInstance() {
 void GameComponent::AddComponent(Component* component) {
     if (dynamic_cast<ComponentCamera*>(component) != NULL) {
         component_cameras.push_back(dynamic_cast<ComponentCamera*>(component));
-    } else if (dynamic_cast<ComponentLight*>(component) != NULL) {
-        component_lights.push_back(dynamic_cast<ComponentLight*>(component));
     } else if (dynamic_cast<ComponentMesh*>(component) != NULL) {
         component_meshs.push_back(dynamic_cast<ComponentMesh*>(component));
     } else if (dynamic_cast<ComponentTransform*>(component) != NULL) {
@@ -32,15 +30,6 @@ void GameComponent::DeleteComponent(Component* component) {
         for (; index < component_cameras.size() - 1; index++)
             component_cameras[index] = component_cameras[index + 1];
         component_cameras.pop_back();
-    } else if (dynamic_cast<ComponentLight*>(component) != NULL) {
-        ComponentLight* component_light = dynamic_cast<ComponentLight*>(component);
-        int index = 0;
-        for(; index < component_lights.size(); index++)
-            if (component_light == component_lights[index])
-                break;
-        for (; index < component_lights.size() - 1; index++)
-            component_lights[index] = component_lights[index + 1];
-        component_lights.pop_back();
     } else if (dynamic_cast<ComponentMesh*>(component) != NULL) {
         ComponentMesh* component_mesh = dynamic_cast<ComponentMesh*>(component);
         int index = 0;
@@ -67,11 +56,6 @@ void GameComponent::DeleteComponent(Component* component) {
 /* 获取所有 camera 组件 */
 std::vector<ComponentCamera*> GameComponent::GetComponentCamera() { 
     return component_cameras; 
-}
-
-/* 获取所有 light 组件 */
-std::vector<ComponentLight*> GameComponent::GetComponentLight() { 
-    return component_lights; 
 }
 
 /* 获取所有 transform 组件 */

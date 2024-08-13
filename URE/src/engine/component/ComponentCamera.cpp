@@ -27,7 +27,7 @@ void ComponentCamera::ProcessMouseScroll(float yoffset) {
     camera->SetFOV(fov);
 }
 
-void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, std::vector<ComponentLight*> &lights, ComponentMesh* skybox) {
+void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, ComponentMesh* skybox) {
     if (!enable) return;
     /* 1. 预处理 */
     // 1.1 绑定帧缓冲
@@ -38,17 +38,19 @@ void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, st
     UniformBufferCamera::GetInstance().view_transform = camera->GetViewMatrix();
     UniformBufferCamera::GetInstance().projection_transform = camera->GetProjectionMatrix();
     UniformBufferCamera::GetInstance().UpdateUniformData();
+    // 1.4 更新 UniformBufferLight 的值
+    UniformBufferLight::GetInstance().UpdateUniformData();
     /* 2. 清屏: 颜色缓冲, 深度缓冲, 模板缓冲 */
     glClearColor(color_background.x, color_background.y, color_background.z, color_background.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     /* 3. 绘制物体 */ 
     for (auto object : render_objects)
-        object->Draw(lights);
+        object->Draw();
     /* 4. 绘制天空盒 */
     if (skybox != NULL) {
         glDepthFunc(GL_LEQUAL);
         glDisable(GL_CULL_FACE);
-        skybox->Draw(lights);
+        skybox->Draw();
         glEnable(GL_CULL_FACE);
         glDepthFunc(GL_LESS);
     }
