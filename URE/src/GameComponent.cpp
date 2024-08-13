@@ -10,11 +10,17 @@ GameComponent& GameComponent::GetInstance() {
 void GameComponent::AddComponent(Component* component) {
     if (dynamic_cast<ComponentCamera*>(component) != NULL) {
         component_cameras.push_back(dynamic_cast<ComponentCamera*>(component));
-    } else if (dynamic_cast<ComponentMesh*>(component) != NULL) {
+    } 
+    else if (dynamic_cast<ComponentMesh*>(component) != NULL) {
         component_meshs.push_back(dynamic_cast<ComponentMesh*>(component));
-    } else if (dynamic_cast<ComponentTransform*>(component) != NULL) {
+    } 
+    else if (dynamic_cast<ComponentBorder*>(component) != NULL) {
+        component_borders.push_back(dynamic_cast<ComponentBorder*>(component));
+    } 
+    else if (dynamic_cast<ComponentTransform*>(component) != NULL) {
         component_transforms.push_back(dynamic_cast<ComponentTransform*>(component));
-    } else {
+    } 
+    else {
         std::cout << "[ERROR::GameComponent.h::AddComponent()] " << component->gameobject->GetName() << " 组件不是合法类型: " << component->type << "\n";
     }
 }
@@ -30,7 +36,8 @@ void GameComponent::DeleteComponent(Component* component) {
         for (; index < component_cameras.size() - 1; index++)
             component_cameras[index] = component_cameras[index + 1];
         component_cameras.pop_back();
-    } else if (dynamic_cast<ComponentMesh*>(component) != NULL) {
+    } 
+    else if (dynamic_cast<ComponentMesh*>(component) != NULL) {
         ComponentMesh* component_mesh = dynamic_cast<ComponentMesh*>(component);
         int index = 0;
         for(; index < component_meshs.size(); index++)
@@ -39,7 +46,18 @@ void GameComponent::DeleteComponent(Component* component) {
         for (; index < component_meshs.size() - 1; index++)
             component_meshs[index] = component_meshs[index + 1];
         component_meshs.pop_back();
-    } else if (dynamic_cast<ComponentTransform*>(component) != NULL) {
+    } 
+    else if (dynamic_cast<ComponentBorder*>(component) != NULL) {
+        ComponentBorder* component_border = dynamic_cast<ComponentBorder*>(component);
+        int index = 0;
+        for(; index < component_borders.size(); index++)
+            if (component_border == component_borders[index])
+                break;
+        for (; index < component_borders.size() - 1; index++)
+            component_borders[index] = component_borders[index + 1];
+        component_borders.pop_back();
+    }
+    else if (dynamic_cast<ComponentTransform*>(component) != NULL) {
         ComponentTransform* component_transform = dynamic_cast<ComponentTransform*>(component);
         int index = 0;
         for(; index < component_transforms.size(); index++)
@@ -48,8 +66,9 @@ void GameComponent::DeleteComponent(Component* component) {
         for (; index < component_transforms.size() - 1; index++)
             component_transforms[index] = component_transforms[index + 1];
         component_transforms.pop_back();
-    } else {
-        std::cout << "[ERROR::GameComponent.h::AddComponent()] " << component->gameobject->GetName() << " 组件不是合法类型: " << component->type << "\n";
+    } 
+    else {
+        std::cout << "[ERROR::GameComponent.h::DeleteComponent()] " << component->gameobject->GetName() << " 组件不是合法类型: " << component->type << "\n";
     }
 }
 
@@ -61,6 +80,11 @@ std::vector<ComponentCamera*> GameComponent::GetComponentCamera() {
 /* 获取所有 transform 组件 */
 std::vector<ComponentTransform*> GameComponent::GetComponentTransform() { 
     return component_transforms; 
+}
+
+/* 获取所有 border 组件 */
+std::vector<ComponentBorder*> GameComponent::GetComponentBorder() {
+    return component_borders;
 }
 
 /* 获取所有 mesh 组件, 按照 不透明->透明(远->近) 进行排序 */

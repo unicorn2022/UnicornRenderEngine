@@ -59,11 +59,11 @@ GameWorld::GameWorld() {
         UniformBufferLight::GetInstance().spot_light = SpotLight(
             glm::vec3(0.0f, 0.0f, 0.0f),    // 位置
             glm::vec3(1.0f, 0.0f, 0.0f),    // 方向
-            glm::vec3(1, 0, 0),             // 环境光
-            glm::vec3(0, 1, 0),             // 漫反射
-            glm::vec3(0, 0, 1),             // 高光
-            glm::cos(glm::radians(12.5f)),      // 内切角
-            glm::cos(glm::radians(15.0f))       // 外切角
+            glm::vec3(0, 0, 0),             // 环境光
+            glm::vec3(1.0f, 1.0f, 1.0f), // 漫反射
+            glm::vec3(1.0f, 1.0f, 1.0f), // 高光
+            glm::cos(glm::radians(12.5f)),  // 内切角
+            glm::cos(glm::radians(15.0f))   // 外切角
         );
         spot_light = &UniformBufferLight::GetInstance().spot_light;
     }
@@ -86,6 +86,7 @@ GameWorld::GameWorld() {
             );
             container->GetComponent<ComponentTransform>()->TransformTranslate(position);
             container->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5f));
+            container->AddComponent(new ComponentBorder(container, container->GetComponent<ComponentMesh>()));
             all_game_object.push_back(container);
         }
     }
@@ -120,20 +121,17 @@ GameWorld::GameWorld() {
         GO* reflect_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
         reflect_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
         reflect_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(2, 0, 0));
+        reflect_item->AddComponent(new ComponentBorder(reflect_item, reflect_item->GetComponent<ComponentMesh>()));
         all_game_object.push_back(reflect_item);
-        GO* normal_item = new GONanosuit("normal_item", "nanosuit", new MaterialVisualizationBorder());
-        normal_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
-        normal_item->GetComponent<ComponentTransform>()->SetParent(reflect_item);
-        all_game_object.push_back(normal_item);
     }
     
     /* 1个折射天空盒的物体 */
     {
-        // // GO* refract_item = new GOCube("refract_item", new MaterialSkyboxRefract(skybox->GetSkyboxTexture()));
-        // GO* refract_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxRefract(skybox->GetSkyboxTexture()));
-        // refract_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
-        // refract_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(-2, 0, 0));
-        // all_game_object.push_back(refract_item);
+        // GO* refract_item = new GOCube("refract_item", new MaterialSkyboxRefract(skybox->GetSkyboxTexture()));
+        GO* refract_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxRefract(skybox->GetSkyboxTexture()));
+        refract_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
+        refract_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(-2, 0, 0));
+        all_game_object.push_back(refract_item);
     }
 
     

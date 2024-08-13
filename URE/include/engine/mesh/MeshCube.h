@@ -13,7 +13,7 @@ public:
 
 
 private:
-    unsigned int VAO, VBO;
+    unsigned int VAO, VBO, EBO;
 
 private:
     void CreateCube();

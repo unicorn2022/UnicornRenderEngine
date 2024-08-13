@@ -32,14 +32,17 @@ void Run() {
     // 1.1 深度测试
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    // 1.2 混合
+    // 1.2 模板测试
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); // 通过模板&深度测试时, 将模板值设置为 glStencilFunc 指定的 ref 值
+    // 1.3 混合
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // 混合因子: src-源图像alpha值, dst-1-源图像alpha值
-    // 1.3 面剔除
+    // 1.4 面剔除
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);    // 剔除背面
     glFrontFace(GL_CCW);    // 正面为逆时针方向
-    // 1.4 屏幕对象
+    // 1.5 屏幕对象
     MeshSquare* screen = new MeshSquare();
     MaterialPostProcess* screen_mat = new MaterialPostProcess(NULL);
 
@@ -59,6 +62,7 @@ void Run() {
         for (auto camera_component : camera_components) 
             camera_component->RenderTick(
                 GameComponent::GetInstance().GetComponentMesh(camera_component->camera),
+                GameComponent::GetInstance().GetComponentBorder(),
                 GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponent<ComponentMesh>() : NULL
             );
 
@@ -66,7 +70,7 @@ void Run() {
         // 2.3.1 禁用深度测试, 面剔除
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         // 2.3.2 绘制屏幕长方形对象
         glViewport(0, 0, window_width, window_height);
         screen_mat->screen_texture = GameWorld::GetInstance().main_camera->frame_buffer->color_texture;
@@ -138,6 +142,13 @@ void keyboard_callback(GLFWwindow* window) {
     /* ESC 退出程序 */
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+    }
+
+    /* 长按 TAB 显示 Border */
+    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
+        GlobalValue::GetInstance().SetValue("show_border", 1);
+    } else {
+        GlobalValue::GetInstance().SetValue("show_border", 0);
     }
     
     /* 0~9 选择后处理效果 */

@@ -2,7 +2,6 @@
 #include "engine/component/ComponentTransform.h"
 #include "engine/mesh/Mesh.h"
 #include "engine/material/Material.h"
-#include "engine/basic/Camera.h"
 
 class ComponentMesh : public Component {
 public:
@@ -19,7 +18,15 @@ public:
     /* 渲染该网格体 */
     void Draw();
 
+    /** 使用指定材质渲染该网格体
+     * \param material 指定材质 
+     */
+    void Draw(Material* material);
+
+    /* 是否为半透明物体 */
     bool IsTransport() const;
+    /* 是否为基础物体 */
+    bool IsBasicShape() const;
 
 private:
     /** 渲染单个网格体

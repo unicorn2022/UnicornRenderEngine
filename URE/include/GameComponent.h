@@ -12,6 +12,9 @@ public:
     /* 删除组件 */
     void DeleteComponent(Component* component);
 
+    /* 获取所有 border 组件 */
+    std::vector<ComponentBorder*> GetComponentBorder();
+
     /* 获取所有 camera 组件 */
     std::vector<ComponentCamera*> GetComponentCamera();
     
@@ -29,4 +32,5 @@ private:
     std::vector<ComponentCamera*> component_cameras;
     std::vector<ComponentMesh*> component_meshs;
     std::vector<ComponentTransform*> component_transforms;
+    std::vector<ComponentBorder*> component_borders;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/component/ComponentTransform.h"
 #include "engine/component/ComponentMesh.h"
+#include "engine/component/ComponentBorder.h"
 #include "engine/basic/Camera.h"
 #include "engine/basic/FrameBuffer.h"
 
@@ -25,7 +26,7 @@ public:
 
 public:
     /* 渲染逻辑 */
-    void RenderTick(std::vector<ComponentMesh*> &render_objects, ComponentMesh* skybox);
+    void RenderTick(std::vector<ComponentMesh*> &render_objects, std::vector<ComponentBorder*> &border_objects, ComponentMesh* skybox);
 
 public:
     RoamingCameraPerspective* camera;
