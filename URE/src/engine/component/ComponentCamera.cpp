@@ -1,6 +1,7 @@
 #include "engine/component/ComponentCamera.h"
 #include "engine/gameobject/GO.h"
 #include "engine/basic/UniformBuffer.h"
+#include "GameWorld.h"
 
 ComponentCamera::ComponentCamera(GO* gameobject, float fov, float near, float far, int width, int height) : Component(gameobject) {
     this->type = "component_camera";
@@ -29,6 +30,11 @@ void ComponentCamera::ProcessMouseScroll(float yoffset) {
 
 void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, std::vector<ComponentBorder*> &border_objects, ComponentMesh* skybox) {
     if (!enable) return;
+    // 渲染 test_camera 所见景象时禁止 test_camera_screen
+    if (this == GameWorld::GetInstance().test_camera) {
+        GameWorld::GetInstance().test_camera_screen->enable = false;
+    }
+
     /* 1. 预处理 */
     {
         // 1.1 绑定帧缓冲
@@ -49,19 +55,37 @@ void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, st
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
     
-    /* 3.1 绘制物体(1): 更新模板缓冲 */
+    /* 3.1 绘制不透明物体 */
+    {
+        // 3.1.1 绘制不含边框的物体, 不更新模板缓冲
+        {
+            glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
+            glStencilMask(0x00); // 写入的模板值为0
+            for (auto object : render_objects)
+                if (object->IsTransport() == false && object->gameobject->GetComponent<ComponentBorder>() == NULL)
+                    object->Draw();
+        }
+        // 3.1.2 绘制含边框的物体, 更新模板缓冲
+        {
+            glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
+            glStencilMask(0xff); // 写入的模板值不变(即为1)
+            for (auto object : render_objects)
+                if (object->IsTransport() == false && object->gameobject->GetComponent<ComponentBorder>() != NULL)
+                    object->Draw();
+        }
+        // 3.1.3 根据模板缓冲绘制边界
+        if (GlobalValue::GetInstance().GetIntValue("show_border")) {
+            glStencilFunc(GL_NOTEQUAL, 1, 0xff);// 模板值不为1时, 通过测试
+            for (auto border : border_objects)
+                border->Draw();
+        }
+    }
+    /* 3.2 绘制透明物体 */
     {
         glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
-        glStencilMask(0xff); // 写入的模板值不变(即为1)
         for (auto object : render_objects)
-            object->Draw();
-    }
-    
-    /* 3.2 绘制物体(2): 根据模板缓冲绘制边界 */
-    if (GlobalValue::GetInstance().GetIntValue("show_border")) {
-        glStencilFunc(GL_NOTEQUAL, 1, 0xff);// 模板值不为1时, 通过测试
-        for (auto border : border_objects)
-            border->Draw();
+            if (object->IsTransport() == true)
+                object->Draw();
     }
 
     /* 4. 绘制天空盒 */
@@ -72,6 +96,12 @@ void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, st
         glEnable(GL_CULL_FACE);
         glDepthFunc(GL_LESS);
     }
+
     /* 5. 解除绑定帧缓冲 */
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // 渲染 test_camera 所见景象时禁止 test_camera_screen
+    if (this == GameWorld::GetInstance().test_camera) {
+        GameWorld::GetInstance().test_camera_screen->enable = true;
+    }
 }

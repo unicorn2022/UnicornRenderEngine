@@ -19,6 +19,7 @@ public:
     GOSkybox* skybox;
     ComponentCamera* main_camera;
     ComponentCamera* test_camera;
+    ComponentMesh* test_camera_screen;
     SpotLight* spot_light;
 
 public:

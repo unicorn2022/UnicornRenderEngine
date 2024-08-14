@@ -10,8 +10,8 @@ const int window_height = 800;
 const glm::vec3 main_camera_position = glm::vec3(0.0f, 0.0f, 5.0f);
 const float main_camera_znear = 0.1f;
 const float main_camera_zfar = 100.0f;
-const float main_camera_move_speed_min = 2.5f;
-const float main_camera_move_speed_max = 8.0f;
+const float main_camera_move_speed_min = 2.0f;
+const float main_camera_move_speed_max = 20.0f;
 
 /* 颜色信息 */
 const glm::vec4 color_background = glm::vec4(0.2f, 0.3f, 0.3f, 1.0f);

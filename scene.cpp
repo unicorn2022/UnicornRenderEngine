@@ -30,7 +30,7 @@ GameWorld::GameWorld() {
     /* 场景捕获对象 + 相机捕获画面(square) */
     {
         GOCapture2D* capture = new GOCapture2D("camera", 89, main_camera_znear, main_camera_zfar, 1920, 1080);
-        capture->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(0, 0, 3));
+        capture->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(0.0f, 2.0f, 5.0f));
         capture->GetComponent<ComponentTransform>()->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
         all_game_object.push_back(capture);
         test_camera = capture->GetComponent<ComponentCamera>();
@@ -38,6 +38,7 @@ GameWorld::GameWorld() {
         screen->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(0, 0, -50));
         screen->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(16, 9, 1));
         all_game_object.push_back(screen);
+        test_camera_screen = screen->GetComponent<ComponentMesh>();
     }
 
     /* 6个灯光 */
@@ -117,20 +118,18 @@ GameWorld::GameWorld() {
 
     /* 1个反射天空盒的物体 */
     {
-        // GO* reflect_item = new GOCube("reflect_item", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
         GO* reflect_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxReflect(skybox->GetSkyboxTexture()));
         reflect_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
-        reflect_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(2, 0, 0));
+        reflect_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(3, 0, -5));
         reflect_item->AddComponent(new ComponentBorder(reflect_item, reflect_item->GetComponent<ComponentMesh>()));
         all_game_object.push_back(reflect_item);
     }
     
     /* 1个折射天空盒的物体 */
     {
-        // GO* refract_item = new GOCube("refract_item", new MaterialSkyboxRefract(skybox->GetSkyboxTexture()));
         GO* refract_item = new GONanosuit("reflect_item", "nanosuit", new MaterialSkyboxRefract(skybox->GetSkyboxTexture()));
         refract_item->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.5));
-        refract_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(-2, 0, 0));
+        refract_item->GetComponent<ComponentTransform>()->TransformTranslate(glm::vec3(-3, 0, -5));
         all_game_object.push_back(refract_item);
     }
 
