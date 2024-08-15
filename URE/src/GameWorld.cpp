@@ -1,9 +1,12 @@
 #include "GameWorld.h"
 
 GameWorld& GameWorld::GetInstance() {
-    static GameWorld instance;
-    return instance;
+    static GameWorld* instance;
+    if (instance == NULL) instance = new GameWorld(), instance->GameInit();
+    return *instance;
 }
+
+GameWorld::GameWorld() {}
 
 GameWorld::~GameWorld() {
     for (auto game_object : all_game_object) delete game_object;

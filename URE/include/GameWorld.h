@@ -9,6 +9,7 @@ public:
 
 public:
     void GameTick();
+    void GameInit();
 
 private:
     GameWorld();
