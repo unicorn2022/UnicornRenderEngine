@@ -11,7 +11,6 @@ MaterialNoLight::~MaterialNoLight() {
 
 void MaterialNoLight::Use() {
     shader->Use();
-    shader->SetUniform("model_transform", model_transform);
 
     if (diffuse != NULL) {
         diffuse->Use(0);

@@ -6,8 +6,13 @@ class Mesh {
 public:
     virtual ~Mesh() {}
 public:
-    /* 绘制当前网格体, 绘制之前应先调用 Material->Use() */
-    virtual void Draw() = 0;
+    /** 绘制当前网格体, 绘制之前应先调用 Material->Use()
+     * \param num 实例化个数
+     */
+    virtual void Draw(unsigned int num) = 0;
+
+public:
+    unsigned int VAO;
 };
 
 struct Vertex {

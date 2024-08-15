@@ -9,11 +9,11 @@ public:
     ~MeshCube();
 
 public:
-    virtual void Draw();
+    virtual void Draw(unsigned int num);
 
 
 private:
-    unsigned int VAO, VBO, EBO;
+    unsigned int VBO, EBO;
 
 private:
     void CreateCube();

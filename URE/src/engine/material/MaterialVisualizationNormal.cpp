@@ -7,6 +7,5 @@ MaterialVisualizationNormal::MaterialVisualizationNormal(glm::vec4 color) {
 
 void MaterialVisualizationNormal::Use() {
     shader->Use();
-    shader->SetUniform("model_transform", model_transform);
     shader->SetUniform("color", color);
 }

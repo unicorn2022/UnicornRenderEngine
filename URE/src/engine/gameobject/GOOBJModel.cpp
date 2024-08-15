@@ -7,8 +7,9 @@
 #include "engine/mesh/ALL.h"
 #include "engine/material/ALL.h"
 
-GOOBJModel::GOOBJModel(std::string name, std::string file_name, Material* material) : GO(name) {
-    AddComponent(new ComponentTransform(this));
+GOOBJModel::GOOBJModel(std::string name, std::string file_name, Material* material, unsigned int num) : GO(name) {
+    for (int i = 0; i < num; i++)
+        AddComponent(new ComponentTransform(this));
 
     /* 记录OBJ模型的所有 submesh */
     auto model = new OBJModel(root_path_model, file_name);

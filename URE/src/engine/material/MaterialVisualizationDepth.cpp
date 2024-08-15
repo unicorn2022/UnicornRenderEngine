@@ -8,7 +8,6 @@ MaterialVisualizationDepth::MaterialVisualizationDepth(float z_near, float z_far
 
 void MaterialVisualizationDepth::Use() {
     shader->Use();
-    shader->SetUniform("model_transform", model_transform);
     shader->SetUniform("z_near", z_near);
     shader->SetUniform("z_far", z_far);
 }

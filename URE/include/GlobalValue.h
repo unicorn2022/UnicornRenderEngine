@@ -8,9 +8,6 @@ extern const int window_width;
 extern const int window_height;
 
 /* 相机信息 */
-extern const glm::vec3 main_camera_position;
-extern const float main_camera_znear;
-extern const float main_camera_zfar;
 extern const float main_camera_move_speed_min;
 extern const float main_camera_move_speed_max;
 

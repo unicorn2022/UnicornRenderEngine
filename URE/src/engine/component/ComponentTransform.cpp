@@ -15,7 +15,7 @@ ComponentTransform::ComponentTransform(GO* gameobject, ComponentTransform* paren
 ComponentTransform::~ComponentTransform() {}
 
 void ComponentTransform::SetParent(GO* parent) {
-    this->parent = parent->GetComponent<ComponentTransform>();
+    this->parent = parent->GetComponents<ComponentTransform>()[0];
 }
 void ComponentTransform::SetParent(ComponentTransform* parent) {
     this->parent = parent;

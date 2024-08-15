@@ -11,7 +11,6 @@ MaterialSkyboxReflect::~MaterialSkyboxReflect() {
 
 void MaterialSkyboxReflect::Use() {
     shader->Use();
-    shader->SetUniform("model_transform", model_transform);
 
     if (skybox != NULL) {
         skybox->Use(0);

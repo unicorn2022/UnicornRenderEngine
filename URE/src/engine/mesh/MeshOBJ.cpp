@@ -13,9 +13,25 @@ MeshOBJSubMesh::~MeshOBJSubMesh() {
     glDeleteBuffers(1, &EBO);
 }
 
-void MeshOBJSubMesh::Draw() {
+void MeshOBJSubMesh::Draw(unsigned int num) {
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    // 1. 传输: 实例化 model 矩阵 
+    // note: 通过一个buffer更新model矩阵, 在该buffer中, model矩阵的stride为 sizeof(glm::mat4)
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+    // 告诉OpenGL: 在每1次绘制实例时, 需要更新顶点属性3~6
+    glVertexAttribDivisor(3, 1);
+    glVertexAttribDivisor(4, 1);
+    glVertexAttribDivisor(5, 1);
+    glVertexAttribDivisor(6, 1);
+    // 2. 绘制实例
+    glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, num);
 }
 
 void MeshOBJSubMesh::CreateOBJSubMesh() {
@@ -44,6 +60,7 @@ void MeshOBJSubMesh::CreateOBJSubMesh() {
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coords));
     
+
     /* 5. 取消绑定 */
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

@@ -91,8 +91,8 @@ std::vector<ComponentBorder*> GameComponent::GetComponentBorder() {
 std::vector<ComponentMesh*> GameComponent::GetComponentMesh(Camera* camera) { 
     std::sort(component_meshs.begin(), component_meshs.end(), [&](ComponentMesh* &A, ComponentMesh* &B){
         if(A->IsTransport() && B->IsTransport()) {
-            float distA = glm::distance(A->gameobject->GetComponent<ComponentTransform>()->GetPosition(), camera->position);
-            float distB = glm::distance(B->gameobject->GetComponent<ComponentTransform>()->GetPosition(), camera->position);
+            float distA = glm::distance(A->gameobject->GetComponents<ComponentTransform>()[0]->GetPosition(), camera->position);
+            float distB = glm::distance(B->gameobject->GetComponents<ComponentTransform>()[0]->GetPosition(), camera->position);
             return distA > distB;
         }
         else if (!A->IsTransport() && B->IsTransport()) return true;

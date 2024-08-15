@@ -7,6 +7,5 @@ MaterialConstantColor::MaterialConstantColor(glm::vec4 color) {
 
 void MaterialConstantColor::Use() {
     shader->Use();
-    shader->SetUniform("model_transform", model_transform);
     shader->SetUniform("color", color);
 }

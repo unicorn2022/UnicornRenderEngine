@@ -7,6 +7,5 @@ MaterialVisualizationBorder::MaterialVisualizationBorder(glm::vec4 color) {
 
 void MaterialVisualizationBorder::Use() {
     shader->Use();
-    shader->SetUniform("model_transform", model_transform);
     shader->SetUniform("color", color);
 }

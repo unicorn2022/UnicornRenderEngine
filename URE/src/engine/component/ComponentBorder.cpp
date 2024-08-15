@@ -21,9 +21,9 @@ ComponentBorder::~ComponentBorder() {
 
 void ComponentBorder::Draw() {
     if (is_basic_shape) {
-        gameobject->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(1.1f));
+        gameobject->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(1.1f));
         component_mesh->Draw(material);
-        gameobject->GetComponent<ComponentTransform>()->TransformScale(glm::vec3(1.0f / 1.1f));
+        gameobject->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(1.0f / 1.1f));
     } else {
         component_mesh->Draw(material);
     }

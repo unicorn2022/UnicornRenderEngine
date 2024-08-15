@@ -9,6 +9,13 @@ ComponentMesh::ComponentMesh(GO* gameobject, std::vector<Mesh*> meshs, std::vect
     for (auto mesh : meshs) this->meshs.push_back(mesh);
     for (auto material : materials) this->materials.push_back(material);
     this->is_transport = is_transport;
+
+    // 生成实例化VBO
+    num = gameobject->GetComponents<ComponentTransform>().size();
+    glGenBuffers(1, &instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, num * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 ComponentMesh::~ComponentMesh() {
@@ -21,6 +28,7 @@ ComponentMesh::~ComponentMesh() {
         }
     meshs.clear();
     materials.clear();
+    glDeleteBuffers(1, &instanceVBO);
 }
 
 void ComponentMesh::Draw() {
@@ -37,12 +45,19 @@ void ComponentMesh::Draw(Material* material) {
 
 void ComponentMesh::DrawOneMesh(Mesh* mesh, Material* material) {
     // std::cout << "DrawOneMesh\n";
-    /* 1. 设置变换信息 */
-    material->model_transform = gameobject->GetComponent<ComponentTransform>()->GetModelMatrix();
     /* 2. 使用材质 */
     material->Use();
     /* 3. 绘制物体 */
-    mesh->Draw();
+    // 3.1 获取 model 矩阵
+    auto transforms = gameobject->GetComponents<ComponentTransform>();
+    std::vector<glm::mat4> model_transforms;
+    for (auto transform : transforms) 
+        model_transforms.push_back(transform->GetModelMatrix());
+    // 3.2 配置实例化VBO
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, num * sizeof(glm::mat4), &model_transforms[0], GL_STATIC_DRAW);
+    // 3.3 绘制物体
+    mesh->Draw(num);
 }
 
 bool ComponentMesh::IsTransport() const { 

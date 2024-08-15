@@ -40,4 +40,6 @@ private:
     std::vector<Mesh*> meshs;
     std::vector<Material*> materials;
     bool is_transport;
+    unsigned int num;
+    unsigned int instanceVBO;   // 实例化顶点数据
 };

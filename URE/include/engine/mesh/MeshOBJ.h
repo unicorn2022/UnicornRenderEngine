@@ -9,10 +9,10 @@ public:
     ~MeshOBJSubMesh();
 
 public:
-    virtual void Draw();
+    virtual void Draw(unsigned int num);
 
 private:
-    unsigned int VAO, VBO, EBO;
+    unsigned int VBO, EBO;
     std::vector<Vertex> vertices;       // 顶点
     std::vector<unsigned int> indices;  // 索引
 

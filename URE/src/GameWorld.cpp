@@ -16,11 +16,11 @@ GameWorld::~GameWorld() {
 void GameWorld::HandleKeyBoard(GLFWwindow* window, float delta_time) {
     // LShift 加快 main_camera 的移动速度
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        main_camera->gameobject->GetComponent<ComponentTransform>()->MoveSpeedUp();
+        main_camera->gameobject->GetComponents<ComponentTransform>()[0]->MoveSpeedUp();
     } 
     // LCtrl 降低 main_camera 的移动速度
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        main_camera->gameobject->GetComponent<ComponentTransform>()->MoveSpeedDown();
+        main_camera->gameobject->GetComponents<ComponentTransform>()[0]->MoveSpeedDown();
     }
 
     // 判断 main_camera 移动方向
@@ -42,12 +42,12 @@ void GameWorld::HandleKeyBoard(GLFWwindow* window, float delta_time) {
     }
 
     // 更新 main_camera 的位置
-    main_camera->gameobject->GetComponent<ComponentTransform>()->ProcessKeyboard(direction, delta_time);
+    main_camera->gameobject->GetComponents<ComponentTransform>()[0]->ProcessKeyboard(direction, delta_time);
 }
 
 void GameWorld::HandleMouseMovement(float x_offset, float y_offset) {
     // 更新 main_camera 的旋转
-    main_camera->gameobject->GetComponent<ComponentTransform>()->ProcessMouseMovement(x_offset, y_offset);
+    main_camera->gameobject->GetComponents<ComponentTransform>()[0]->ProcessMouseMovement(x_offset, y_offset);
 }
 
 void GameWorld::HandleMouseScroll(float y_offset) {

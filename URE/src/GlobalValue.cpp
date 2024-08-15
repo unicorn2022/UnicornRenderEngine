@@ -6,10 +6,6 @@ const int window_width = 800;
 const int window_height = 800;
 
 /* 相机信息 */
-// const glm::vec3 main_camera_position = glm::vec3(0.0f, 9.0f, 26.0f);
-const glm::vec3 main_camera_position = glm::vec3(0.0f, 0.0f, 5.0f);
-const float main_camera_znear = 0.1f;
-const float main_camera_zfar = 100.0f;
 const float main_camera_move_speed_min = 2.0f;
 const float main_camera_move_speed_max = 20.0f;
 

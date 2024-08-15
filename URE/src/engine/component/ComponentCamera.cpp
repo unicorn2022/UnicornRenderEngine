@@ -15,7 +15,7 @@ ComponentCamera::~ComponentCamera() {
 }
 
 void ComponentCamera::UpdateCameraState() {
-    ComponentTransform* transform = gameobject->GetComponent<ComponentTransform>();
+    ComponentTransform* transform = gameobject->GetComponents<ComponentTransform>()[0];
     camera->SetPosition(transform->GetPosition());
     camera->SetYaw(transform->GetYaw());
     camera->SetPitch(transform->GetPitch());
@@ -62,7 +62,7 @@ void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, st
             glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
             glStencilMask(0x00); // 写入的模板值为0
             for (auto object : render_objects)
-                if (object->IsTransport() == false && object->gameobject->GetComponent<ComponentBorder>() == NULL)
+                if (object->IsTransport() == false && object->gameobject->GetComponents<ComponentBorder>().size() == 0)
                     object->Draw();
         }
         // 3.1.2 绘制含边框的物体, 更新模板缓冲
@@ -70,7 +70,7 @@ void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, st
             glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
             glStencilMask(0xff); // 写入的模板值不变(即为1)
             for (auto object : render_objects)
-                if (object->IsTransport() == false && object->gameobject->GetComponent<ComponentBorder>() != NULL)
+                if (object->IsTransport() == false && object->gameobject->GetComponents<ComponentBorder>().size() != 0)
                     object->Draw();
         }
         // 3.1.3 根据模板缓冲绘制边界

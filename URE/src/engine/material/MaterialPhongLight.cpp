@@ -14,9 +14,6 @@ MaterialPhongLight::~MaterialPhongLight() {
 
 void MaterialPhongLight::Use() {
     shader->Use();
-    /* 变换信息 */
-    shader->SetUniform("model_transform", model_transform);
-
     /* 材质信息 */
     if (diffuse != NULL) {
         diffuse->Use(0);

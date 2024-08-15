@@ -63,20 +63,21 @@ void Run() {
             camera_component->RenderTick(
                 GameComponent::GetInstance().GetComponentMesh(camera_component->camera),
                 GameComponent::GetInstance().GetComponentBorder(),
-                GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponent<ComponentMesh>() : NULL
+                GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponents<ComponentMesh>()[0] : NULL
             );
 
         /* 2.3 将main_camera的帧缓冲绘制到屏幕上 */
         // 2.3.1 禁用深度测试, 面剔除
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
+        glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         // 2.3.2 绘制屏幕长方形对象
         glViewport(0, 0, window_width, window_height);
         screen_mat->screen_texture = GameWorld::GetInstance().main_camera->frame_buffer->color_texture;
         screen_mat->choose_post_process = GlobalValue::GetInstance().GetIntValue("choose_post_process");
         screen_mat->Use();
-        screen->Draw();
+        screen->Draw(1);
         // 2.3.3 重新启用深度测试, 面剔除
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);

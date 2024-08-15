@@ -11,10 +11,6 @@ public:
     /* 使用当前材质绘制网格体, 使用前应保证材质所需参数已经保存到本对象中 */
     virtual void Use() = 0;
 
-public:
-    /* 变换信息 */
-    glm::mat4 model_transform;
-
 protected:
     Shader* shader;
 };

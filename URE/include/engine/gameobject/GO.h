@@ -9,11 +9,12 @@ public:
 
 public:
     template<typename ComponentType>
-    ComponentType* GetComponent() const {
+    std::vector<ComponentType*> GetComponents() const {
+        std::vector<ComponentType*> ans;
         for (auto component : components) 
             if (dynamic_cast<ComponentType*>(component) != NULL)
-                return dynamic_cast<ComponentType*>(component);
-        return NULL;
+                ans.push_back(dynamic_cast<ComponentType*>(component));
+        return ans;
     }
 
     void AddComponent(Component* component);

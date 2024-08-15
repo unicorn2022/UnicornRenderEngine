@@ -7,9 +7,9 @@ GOCapture2D::GOCapture2D(std::string name, float fov, float near, float far, int
     AddComponent(new ComponentTransform(this));
     AddComponent(new ComponentCamera(this, fov, near, far, width, height));
     AddComponent(new ComponentMesh(this, {new MeshCube()}, {new MaterialConstantColor(glm::vec4(1.0, 1.0, 1.0, 1.0))}));
-    GetComponent<ComponentTransform>()->TransformScale(glm::vec3(0.2, 0.05, 0.05));
+    GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(0.2, 0.05, 0.05));
 }
 
 Texture* GOCapture2D::GetCaptureTexture() const {
-    return GetComponent<ComponentCamera>()->frame_buffer->color_texture;
+    return GetComponents<ComponentCamera>()[0]->frame_buffer->color_texture;
 }

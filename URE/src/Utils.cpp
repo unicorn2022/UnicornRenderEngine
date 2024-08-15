@@ -1,6 +1,7 @@
 #include "Utils.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include <random>
 
 std::string Utils::ReadFile(std::string path) {
     std::ifstream file;
@@ -37,4 +38,36 @@ unsigned char* Utils::ReadPicture(std::string path, int& width, int& height, int
 
 void Utils::FreePicture(unsigned char* data) {
     if (data != NULL) stbi_image_free(data);
+}
+
+void Utils::Debug(std::string msg, glm::vec3 data) {
+    printf("%s: (%.3f, %.3f, %.3f)", msg.c_str(), data.x, data.y, data.z);
+}
+void Utils::Debug(std::string msg, glm::vec4 data) {
+    printf("%s: (%.3f, %.3f, %.3f, %.3f)", msg.c_str(), data.x, data.y, data.z, data.w);
+}
+void Utils::Debug(std::string msg, glm::mat4 data) {
+    printf("%s:\n", msg.c_str());
+    for (int i = 0; i < 4; i++) {
+        printf("(");
+        for (int j = 0; j < 4; j++) {
+            printf("%.3f, ", data[i][j]);
+        }
+        printf(")\n");
+    }
+}
+
+
+int Utils::Random(int L, int R) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(L, R);
+    return dist(gen);
+}
+
+float Utils::Random(float L, float R) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dist(L, R);
+    return dist(gen);
 }

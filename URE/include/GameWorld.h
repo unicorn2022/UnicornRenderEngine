@@ -19,9 +19,14 @@ public:
     std::vector<GO*> all_game_object;
     GOSkybox* skybox;
     ComponentCamera* main_camera;
+    SpotLight* spot_light;
+
+    /* Scene_Test_Capture2D */
     ComponentCamera* test_camera;
     ComponentMesh* test_camera_screen;
-    SpotLight* spot_light;
+    
+    /* Scene_Test_Planet */
+    ComponentTransform* planet;
 
 public:
     void HandleKeyBoard(GLFWwindow* window, float delta_time);
