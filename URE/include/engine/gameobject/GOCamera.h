@@ -11,6 +11,7 @@ public:
      * \param far 远平面距离
      * \param width 相机帧缓冲宽度
      * \param height 相机帧缓冲高度
+     * \param samples 采样数
      */
-    GOCamera(std::string name, float fov, float near, float far, int width = window_width, int height = window_height);
+    GOCamera(std::string name, float fov, float near, float far, int width, int height, int samples);
 };

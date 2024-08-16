@@ -14,8 +14,10 @@ in VS_OUT {
  * 4 : 模糊
  * 5 : 边缘检测
 */
-uniform int choose_post_process = 0;
+uniform int choose_post_process;
 uniform sampler2D screen_texture;
+uniform sampler2DMS screen_texture_multisample;
+uniform int samples;
 
 vec3 sample_color[9];
 
@@ -69,7 +71,8 @@ void main() {
 }
 
 void SampleColor() {
-    const float offset = 1.0 / 300.0;  
+    const float offset = 1.0 / 300.0;
+    /* 9 个样本点 */
     const vec2 offsets[9] = vec2[](
         vec2(-offset,  offset), // 左上
         vec2( 0.0f,    offset), // 正上
@@ -81,8 +84,24 @@ void SampleColor() {
         vec2( 0.0f,   -offset), // 正下
         vec2( offset, -offset)  // 右下
     );
-    for (int i = 0; i < 9; i++)
-        sample_color[i] = texture(screen_texture, fs_in.TexCoord + offsets[i]).rgb;
+
+    /* 获取9个样本点的颜色 */
+    ivec2 tex_size = textureSize(screen_texture_multisample);
+    for (int i = 0; i < 9; i++) {
+        /* 源图像 */
+        // vec3 color = texture(screen_texture, fs_in.TexCoord + offsets[i]).rgb;
+        
+        /* MSAA: 颜色为所有采样点的平均值 */
+        vec3 color = vec3(0.0f);
+        for (int j = 0; j < samples; j++) {
+            vec2 tex_coord = fs_in.TexCoord + offsets[i];
+            color += texelFetch(screen_texture_multisample, ivec2(tex_coord * tex_size), j).rgb;
+        }
+        color = color / samples;
+
+        /* 记录样本点颜色 */
+        sample_color[i] = color;
+    }
 }
 
 vec3 UseKernel(float kernel[9]) {

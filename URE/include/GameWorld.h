@@ -8,8 +8,8 @@ public:
     static GameWorld& GetInstance();
 
 public:
+    void SceneCreate();
     void GameTick();
-    void GameInit();
 
 private:
     GameWorld();

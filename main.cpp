@@ -5,6 +5,7 @@
 #include "engine/gameobject/ALL.h"
 #include "GameWorld.h"
 #include "GameComponent.h"
+#include "GlobalValue.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void keyboard_callback(GLFWwindow* window);
@@ -44,7 +45,7 @@ void Run() {
     glFrontFace(GL_CCW);    // 正面为逆时针方向
     // 1.5 屏幕对象
     MeshSquare* screen = new MeshSquare();
-    MaterialPostProcess* screen_mat = new MaterialPostProcess(NULL);
+    MaterialPostProcess* screen_mat = new MaterialPostProcess(NULL, NULL);
 
     /* 2. 渲染循环 */
     while (!glfwWindowShouldClose(window)) {
@@ -75,6 +76,7 @@ void Run() {
         // 2.3.2 绘制屏幕长方形对象
         glViewport(0, 0, window_width, window_height);
         screen_mat->screen_texture = GameWorld::GetInstance().main_camera->frame_buffer->color_texture;
+        screen_mat->screen_texture_multisample = GameWorld::GetInstance().main_camera->frame_buffer->color_texture_multisample;
         screen_mat->choose_post_process = GlobalValue::GetInstance().GetIntValue("choose_post_process");
         screen_mat->Use();
         screen->Draw(1);

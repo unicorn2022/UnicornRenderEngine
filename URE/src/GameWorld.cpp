@@ -2,7 +2,7 @@
 
 GameWorld& GameWorld::GetInstance() {
     static GameWorld* instance;
-    if (instance == NULL) instance = new GameWorld(), instance->GameInit();
+    if (instance == NULL) instance = new GameWorld(), instance->SceneCreate();
     return *instance;
 }
 

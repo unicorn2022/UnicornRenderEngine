@@ -3,10 +3,10 @@
 #include "engine/basic/UniformBuffer.h"
 #include "GameWorld.h"
 
-ComponentCamera::ComponentCamera(GO* gameobject, float fov, float near, float far, int width, int height) : Component(gameobject) {
+ComponentCamera::ComponentCamera(GO* gameobject, float fov, float near, float far, int width, int height, int samples) : Component(gameobject) {
     this->type = "component_camera";
     this->camera = new RoamingCameraPerspective((float)width / (float)height, fov, near, far);
-    this->frame_buffer = new FrameBuffer(width, height);
+    this->frame_buffer = new FrameBuffer(width, height, samples);
 }
 
 ComponentCamera::~ComponentCamera() {
@@ -38,14 +38,12 @@ void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, st
     /* 1. 预处理 */
     {
         // 1.1 绑定帧缓冲
-        glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer->ID);
-        // 1.2 修改视口大小
-        glViewport(0, 0, frame_buffer->width, frame_buffer->height);
-        // 1.3 更新 UniformBufferCamera 的值
+        frame_buffer->Use();
+        // 1.2 更新 UniformBufferCamera 的值
         UniformBufferCamera::GetInstance().view_transform = camera->GetViewMatrix();
         UniformBufferCamera::GetInstance().projection_transform = camera->GetProjectionMatrix();
         UniformBufferCamera::GetInstance().UpdateUniformData();
-        // 1.4 更新 UniformBufferLight 的值
+        // 1.3 更新 UniformBufferLight 的值
         UniformBufferLight::GetInstance().UpdateUniformData();
     }
         
@@ -97,8 +95,8 @@ void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, st
         glDepthFunc(GL_LESS);
     }
 
-    /* 5. 解除绑定帧缓冲 */
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    /* 5. 转换帧缓冲的颜色附件 */
+    frame_buffer->Convert();
 
     // 渲染 test_camera 所见景象时禁止 test_camera_screen
     if (this == GameWorld::GetInstance().test_camera) {

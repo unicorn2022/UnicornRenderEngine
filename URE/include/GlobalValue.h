@@ -2,31 +2,25 @@
 #include "Utils.h"
 #include "engine/basic/Light.h"
 
+/* 路径信息 */
+static const std::string root_path = "E:/MyProject/GameEngine/UnicornRenderEngine/URE/";
+static const std::string root_path_shader = root_path + "shader/";
+static const std::string root_path_resource = root_path + "resource/";
+static const std::string root_path_texture = root_path_resource + "texture/";
+static const std::string root_path_skybox = root_path_resource + "skybox/";
+static const std::string root_path_model = root_path_resource + "model/";
+
 /* 窗口信息 */
 extern const char* window_name;
 extern const int window_width;
 extern const int window_height;
-
-/* 相机信息 */
-extern const float main_camera_move_speed_min;
-extern const float main_camera_move_speed_max;
 
 /* 颜色信息 */
 extern const glm::vec4 color_background;
 extern const glm::vec3 color_border;
 
 /* 后期处理效果个数 */
-extern const int num_post_process;
-
-/* 路径信息 */
-// 所有章节公用资源
-extern const std::string root_path;
-extern const std::string root_path_resource;
-extern const std::string root_path_texture;
-extern const std::string root_path_skybox;
-extern const std::string root_path_model;
-extern const std::string root_path_shader;
-
+static const int num_post_process = 9;
 
 /* 运行时全局变量 */
 class GlobalValue {
