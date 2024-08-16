@@ -4,5 +4,5 @@
 
 class GOCube : public GO {
 public:
-    GOCube(std::string name, Material* material);
+    GOCube(std::string name, Material* material, int num = 1);
 };

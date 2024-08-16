@@ -4,6 +4,13 @@
 #include "engine/material/ALL.h"
 #include "engine/basic/UniformBuffer.h"
 
+enum SceneChoice {
+    Capture2D_Box_Window_Reflect_Refract,
+    Planet,
+};
+const SceneChoice scene = SceneChoice::Capture2D_Box_Window_Reflect_Refract;
+
+/* 游戏逻辑 */
 static void GameTick_Test_Capture2D() {
     GameWorld::GetInstance().test_camera->gameobject->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0, 1, 0));
 }
@@ -11,23 +18,16 @@ static void GameTick_Test_Planet() {
     GameWorld::GetInstance().planet->TransformRotate(glm::vec3(0, 0.5, 0));
 }
 
-
-void GameWorld::GameTick() {
-    /* 设置聚光源属性 */
-    spot_light->position = main_camera->camera->position;
-    spot_light->direction = main_camera->camera->front;
-    /* 更新相机状态 */
-    auto camera_component = GameComponent::GetInstance().GetComponentCamera();
-        for (auto camera_component : camera_component)
-            camera_component->UpdateCameraState();
-    /* 场景 GameTick */
-    // GameTick_Test_Capture2D();
-    GameTick_Test_Planet();
-}
-
+/* 游戏场景 */
 static void Scene_Light_Skybox() {
     /* 6个灯光 */
     {
+        std::vector<glm::vec3> point_light_position {
+            glm::vec3(0.7f,  0.2f,  2.0f),
+            glm::vec3(2.3f, -3.3f, -4.0f),
+            glm::vec3(-4.0f,  2.0f, -12.0f),
+            glm::vec3(0.0f,  0.0f, -3.0f)
+        };
         UniformBufferLight::GetInstance().direct_light = DirectLight(
             glm::vec3(-0.2f, -1.0f, -0.3f),     // 方向
             glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
@@ -60,7 +60,6 @@ static void Scene_Light_Skybox() {
         GameWorld::GetInstance().skybox = new GOSkybox("skybox", new MaterialSkybox(new TextureCube(skybox_file_name, "jpg")));
     }
 }
-
 static void Scene_Test_Capture2D_Box_Window_Reflect_Refract() {
     /* 主相机 */
     {
@@ -88,36 +87,43 @@ static void Scene_Test_Capture2D_Box_Window_Reflect_Refract() {
 
     /* 2个箱子 */
     {
-        int cnt = 0;
-        for (auto position : container_position) {
-            GOCube* container = new GOCube("container[" + std::to_string(cnt++) + "]",
-                new MaterialPhongLight(
-                    new Texture("container_diffuse.png"), 
-                    new Texture("container_specular.png")
-                )
-            );
-            container->GetComponents<ComponentTransform>()[0]->TransformTranslate(position);
-            container->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(0.5f));
-            container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));
-            GameWorld::GetInstance().all_game_object.push_back(container);
+        const std::vector<glm::vec3> container_position {
+            glm::vec3(-1.0f, 0.0f, -1.0f),
+            glm::vec3(2.0f, 0.0f, 0.0f)
+        };
+        GOCube* container = new GOCube("container",
+            new MaterialPhongLight(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
+            container_position.size()
+        );
+        container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));
+        for (int i = 0; i < container_position.size(); i++) {
+            auto position = container_position[i];
+            container->GetComponents<ComponentTransform>()[i]->TransformTranslate(position);
+            container->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.5f));
         }
+        GameWorld::GetInstance().all_game_object.push_back(container);
     }
 
     /* 5个窗户 */
     {
-        int cnt = 0;
-        for (auto position : window_position) {
-            GO* windows = new GOSquare("windows[" + std::to_string(cnt++) + "]",
-                new MaterialPhongLight(
-                    new Texture("window.png"), 
-                    new Texture("window.png")
-                ),
-                true
-            );
-            windows->GetComponents<ComponentTransform>()[0]->TransformTranslate(position);
-            windows->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(0.5f));
-            GameWorld::GetInstance().all_game_object.push_back(windows);
+        const std::vector<glm::vec3> window_position {
+            glm::vec3(-1.5f, 0.0f, -0.48f),
+            glm::vec3( 1.5f, 0.0f, 0.51f),
+            glm::vec3( 0.0f, 0.0f, 0.7f),
+            glm::vec3(-0.3f, 0.0f, -2.3f),
+            glm::vec3( 0.5f, 0.0f, -0.6f)
+        };
+        GO* windows = new GOSquare("windows",
+            new MaterialPhongLight(new Texture("window.png"), new Texture("window.png")),
+            window_position.size(),
+            true
+        );
+        for (int i = 0; i < window_position.size(); i++) {
+            auto position = window_position[i];
+            windows->GetComponents<ComponentTransform>()[i]->TransformTranslate(position);
+            windows->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.5f));
         }
+        GameWorld::GetInstance().all_game_object.push_back(windows);
     }
 
     /* 1个反射天空盒的物体 */
@@ -137,7 +143,6 @@ static void Scene_Test_Capture2D_Box_Window_Reflect_Refract() {
         GameWorld::GetInstance().all_game_object.push_back(refract_item);
     }
 }
-
 static void Scene_Test_Planet() {
     /* 主相机 */
     {
@@ -179,8 +184,47 @@ static void Scene_Test_Planet() {
     }
 }
 
+
+void GameWorld::GameTick() {
+    /* 设置聚光源属性 */
+    spot_light->position = main_camera->camera->position;
+    spot_light->direction = main_camera->camera->front;
+
+    /* 更新相机状态 */
+    auto camera_component = GameComponent::GetInstance().GetComponentCamera();
+        for (auto camera_component : camera_component)
+            camera_component->UpdateCameraState();
+    
+    /* 场景 GameTick */
+    switch (scene) {
+    case SceneChoice::Capture2D_Box_Window_Reflect_Refract: {
+        GameTick_Test_Capture2D();
+        break;
+    }
+    case SceneChoice::Planet: {
+        GameTick_Test_Planet();
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 void GameWorld::GameInit() {
+    /* 灯光、天空盒 */
     Scene_Light_Skybox();
-    // Scene_Test_Capture2D_Box_Window_Reflect_Refract();
-    Scene_Test_Planet();
+
+    /* 场景配置 */
+    switch (scene) {
+    case SceneChoice::Capture2D_Box_Window_Reflect_Refract: {
+        Scene_Test_Capture2D_Box_Window_Reflect_Refract();
+        break;
+    }
+    case SceneChoice::Planet: {
+        Scene_Test_Planet();
+        break;
+    }
+    default:
+        break;
+    }
 }

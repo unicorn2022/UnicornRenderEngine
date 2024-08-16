@@ -4,5 +4,5 @@
 
 class GOSquare : public GO {
 public:
-    GOSquare(std::string name, Material* material, bool is_transport = false);
+    GOSquare(std::string name, Material* material, int num = 1, bool is_transport = false);
 };

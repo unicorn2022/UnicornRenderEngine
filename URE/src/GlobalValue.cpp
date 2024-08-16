@@ -50,26 +50,3 @@ int GlobalValue::GetIntValue(std::string name) {
         int_value[name] = 0;
     return int_value[name];
 }   
-
-
-/* 场景物体信息 */
-// 1. 2个箱子的初始位置
-std::vector<glm::vec3> container_position {
-    glm::vec3(-1.0f, 0.0f, -1.0f),
-    glm::vec3(2.0f, 0.0f, 0.0f)
-};
-// 2. 5个窗户的初始位置
-std::vector<glm::vec3> window_position {
-    glm::vec3(-1.5f, 0.0f, -0.48f),
-    glm::vec3( 1.5f, 0.0f, 0.51f),
-    glm::vec3( 0.0f, 0.0f, 0.7f),
-    glm::vec3(-0.3f, 0.0f, -2.3f),
-    glm::vec3( 0.5f, 0.0f, -0.6f)
-};
-// 3. 4个点光源的位置
-std::vector<glm::vec3> point_light_position {
-    glm::vec3(0.7f,  0.2f,  2.0f),
-    glm::vec3(2.3f, -3.3f, -4.0f),
-    glm::vec3(-4.0f,  2.0f, -12.0f),
-    glm::vec3(0.0f,  0.0f, -3.0f)
-};

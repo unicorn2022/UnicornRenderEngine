@@ -44,11 +44,3 @@ private:
     std::map<std::string, float> float_value;
     std::map<std::string, int> int_value;
 };
-
-/* 场景物体信息 */
-// 1. 2个箱子的初始位置
-extern std::vector<glm::vec3> container_position;
-// 2. 5个窗户的初始位置
-extern std::vector<glm::vec3> window_position;
-// 3. 4个点光源的位置
-extern std::vector<glm::vec3> point_light_position;
