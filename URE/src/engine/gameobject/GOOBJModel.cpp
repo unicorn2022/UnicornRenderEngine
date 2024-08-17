@@ -7,7 +7,7 @@
 #include "engine/mesh/ALL.h"
 #include "engine/material/ALL.h"
 
-GOOBJModel::GOOBJModel(std::string name, std::string file_name, Material* material, unsigned int num) : GO(name) {
+GOOBJModel::GOOBJModel(std::string name, std::string file_name, Material* material, unsigned int num, bool is_debug) : GO(name) {
     for (int i = 0; i < num; i++)
         AddComponent(new ComponentTransform(this));
 
@@ -20,5 +20,5 @@ GOOBJModel::GOOBJModel(std::string name, std::string file_name, Material* materi
         if (material != NULL) materials.push_back(material);
         else materials.push_back(new MaterialPhongLight(model->sub_meshs_diffuse[i], model->sub_meshs_specular[i]));
     }
-    AddComponent(new ComponentMesh(this, meshs, materials));
+    AddComponent(new ComponentMesh(this, meshs, materials, is_debug));
 }

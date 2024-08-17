@@ -23,56 +23,75 @@ enum SceneChoice {
     Planet,
     Blinn_Phong,
 };
-const SceneChoice scene = SceneChoice::Blinn_Phong;
+const SceneChoice scene = SceneChoice::Capture2D_Box_Window_Reflect_Refract;
 
-
-static void Light_Skybox() {
-    /* 6个灯光 */
-    {
-        std::vector<glm::vec3> point_light_position {
-            glm::vec3(0.7f,  0.2f,  2.0f),
-            glm::vec3(2.3f, -3.3f, -4.0f),
-            glm::vec3(-4.0f,  2.0f, -12.0f),
-            glm::vec3(0.0f,  0.0f, -3.0f)
-        };
-        UniformBufferLight::GetInstance().direct_light = DirectLight(
-            glm::vec3(-0.2f, -1.0f, -0.3f),     // 方向
-            glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
-            glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
-            glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
-        );
-        auto point_light_cube = new GOCube("point_light_cube", new MaterialConstantColor(glm::vec4(1.0f)), 4);
-        for (int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
-            UniformBufferLight::GetInstance().point_lights[i] = PointLight(
-                point_light_position[i],            // 位置
-                glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
-                glm::vec3(0.8f, 0.8f, 0.8f),        // 漫反射
-                glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
-            );
-            point_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(point_light_position[i]);
-            point_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.1f));
-        }
-        UniformBufferLight::GetInstance().spot_light = SpotLight(
-            glm::vec3(0.0f, 0.0f, 0.0f),    // 位置
-            glm::vec3(1.0f, 0.0f, 0.0f),    // 方向
-            glm::vec3(0, 0, 0),             // 环境光
-            glm::vec3(1.0f, 1.0f, 1.0f),    // 漫反射
-            glm::vec3(1.0f, 1.0f, 1.0f),    // 高光
-            glm::cos(glm::radians(12.5f)),  // 内切角
-            glm::cos(glm::radians(15.0f))   // 外切角
-        );
-        GameWorld::GetInstance().spot_light = &UniformBufferLight::GetInstance().spot_light;
-    }
-
+/* 基础场景 */
+static void Scene_Skybox() {
     /* 天空盒 */
     {
         std::string skybox_file_name[6] = {"right", "left", "top", "bottom", "front", "back"};
         GameWorld::GetInstance().skybox = new GOSkybox("skybox", new MaterialSkybox(new TextureCube(skybox_file_name, "jpg", true)));
     }
 }
+static void Scene_Light() {
+    /* 6个灯光 */
+    {   
+        // 1. 方向光
+        {
+            UniformBufferLight::GetInstance().direct_light = DirectLight(
+                glm::vec3(-0.2f, -1.0f, -0.3f),     // 方向
+                glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+                glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
+                glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
+            );
+        }
+        // 2. 点光源
+        {
+            // 2.1 点光源位置
+            std::vector<glm::vec3> point_light_position {
+                glm::vec3(0.0f,  0.0f, -3.0f),
+                glm::vec3(0.7f,  0.2f,  2.0f),
+                glm::vec3(2.3f, -3.3f, -4.0f),
+                glm::vec3(-4.0f,  2.0f, -12.0f),
+            };
+            // 2.2 点光源个数
+            int num = UniformBufferLight::GetInstance().use_point_light_num;
+            // 2.3 点光源可视化
+            auto point_light_cube = new GOCube("point_light_cube", new MaterialConstantColor(glm::vec4(1.0f)), num, true);
+            // 2.4 配置点光源
+            for (int i = 0; i < num; i++) {
+                UniformBufferLight::GetInstance().point_lights[i] = PointLight(
+                    point_light_position[i],            // 位置
+                    glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+                    glm::vec3(0.2f, 0.2f, 0.2f),        // 漫反射
+                    glm::vec3(0.5f, 0.5f, 0.5f)         // 高光
+                );
+                point_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(point_light_position[i]);
+                point_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.1f));
+            }
+        }
+        // 3. 聚光源
+        {
+            UniformBufferLight::GetInstance().spot_light = SpotLight(
+                glm::vec3(0.0f, 0.0f, 0.0f),    // 位置
+                glm::vec3(1.0f, 0.0f, 0.0f),    // 方向
+                glm::vec3(0, 0, 0),             // 环境光
+                glm::vec3(1.0f, 1.0f, 1.0f),    // 漫反射
+                glm::vec3(1.0f, 1.0f, 1.0f),    // 高光
+                glm::cos(glm::radians(12.5f)),  // 内切角
+                glm::cos(glm::radians(15.0f))   // 外切角
+            );
+            GameWorld::GetInstance().spot_light = &UniformBufferLight::GetInstance().spot_light;
+        }
+    }
+
+    
+}
+
 
 /* 场景1: 测试场景 */
 static void Test_Capture2D_Blend_Reflect_Scene() {
+    UniformBufferLight::GetInstance().use_point_light_num = MAX_POINT_LIGHT_COUNT;
     /* 主相机 */
     {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
@@ -130,6 +149,7 @@ static void Test_Capture2D_Blend_Reflect_Scene() {
         GO* windows = new GOSquare("windows",
             new MaterialPhongLight(new Texture("window.png"), new Texture("window.png")),
             window_position.size(),
+            false,
             true
         );
         for (int i = 0; i < window_position.size(); i++) {
@@ -161,8 +181,10 @@ static void Test_Capture2D_Blend_Reflect_GameTick() {
     GameWorld::GetInstance().test_camera->gameobject->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0, 1, 0));
 }
 
+
 /* 场景2: 行星带 */
 static void Test_Planet_Scene() {
+    UniformBufferLight::GetInstance().use_point_light_num = MAX_POINT_LIGHT_COUNT;
     /* 主相机 */
     {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
@@ -179,6 +201,7 @@ static void Test_Planet_Scene() {
         GOOBJModel* planet = new GOOBJModel("planet", "planet", NULL);
         planet->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(a, 0.0f, 0.0f));
         planet->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f));
+        planet->AddComponent(new ComponentBorder(planet, planet->GetComponents<ComponentMesh>()[0]));
         GameWorld::GetInstance().all_game_object.push_back(planet);
         GameWorld::GetInstance().planet = planet->GetComponents<ComponentTransform>()[0];
 
@@ -206,13 +229,15 @@ static void Test_Planet_GameTick() {
     GameWorld::GetInstance().planet->TransformRotate(glm::vec3(0, 0.5, 0));
 }
 
+
 /* 场景3: 测试 Blinn-Phong 模型*/
 static void Test_Blinn_Phong_Scene() {
+    UniformBufferLight::GetInstance().use_point_light_num = 1;
     /* 主相机 */
     {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
         camera->GetComponents<ComponentTransform>()[0]->SetMoveSpeedClamp(main_camera_move_speed_min, main_camera_move_speed_max);
-        camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 0.0f, 5.0f));
+        camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 0.0f, 20.0f));
         camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
         GameWorld::GetInstance().all_game_object.push_back(camera);
         GameWorld::GetInstance().main_camera = camera->GetComponents<ComponentCamera>()[0];
@@ -221,7 +246,7 @@ static void Test_Blinn_Phong_Scene() {
     /* 平面 */
     {
         auto plane = new GOSquare("plane", new MaterialPhongLight(new Texture("wood.png"), new Texture("wood.png")));
-        plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(10.0f, 0.5f, 10.0f));
+        plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f, 5.0f, 5.0f));
         GameWorld::GetInstance().all_game_object.push_back(plane);
     }
 }
@@ -230,8 +255,8 @@ static void Test_Blinn_Phong_GameTick() {}
 
 /* 实现 GameWorld 的 GameTick() 和 SceneCreate() */
 void GameWorld::SceneCreate() {
-    /* 灯光、天空盒 */
-    Light_Skybox();
+    /* 天空盒 */
+    Scene_Skybox();
 
     /* 场景配置 */
     switch (scene) {
@@ -250,6 +275,9 @@ void GameWorld::SceneCreate() {
     default:
         break;
     }
+
+    /* 灯光 */
+    Scene_Light();
 }
 void GameWorld::GameTick() {
     /* 设置聚光源属性 */

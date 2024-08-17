@@ -10,5 +10,5 @@ public:
      * \param material 模型材质
      * \param num 模型实例化个数
      */
-    GOOBJModel(std::string name, std::string file_name, Material* material, unsigned int num = 1);
+    GOOBJModel(std::string name, std::string file_name, Material* material, unsigned int num = 1, bool is_debug = false);
 };

@@ -160,6 +160,13 @@ void keyboard_callback(GLFWwindow* window) {
             GlobalValue::GetInstance().SetValue("choose_post_process", i);
     }
 
+    /* G 选择是否显示调试对象 */
+    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
+        GlobalValue::GetInstance().SetValue("debug", 1);
+    } else {
+        GlobalValue::GetInstance().SetValue("debug", 0);
+    }
+
     /* B 选择是否使用 blinn_phong 模型*/
     if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
         GlobalValue::GetInstance().SetValue("use_blinn_phong", 0);

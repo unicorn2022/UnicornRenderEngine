@@ -148,7 +148,7 @@ Texture* OBJModel::ProcessTexture(aiMaterial* mat, aiTextureType type) {
         Texture* texture;
         if (type == aiTextureType_DIFFUSE) {
             texture = new Texture(file_name.C_Str(), true, directory);
-        } else {
+        } else if (type == aiTextureType_SPECULAR) {
             texture = new Texture(file_name.C_Str(), false, directory);
         } 
         if (first_texture == NULL) first_texture = texture;

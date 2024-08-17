@@ -69,6 +69,7 @@ layout (std140, binding = 1) uniform Light {
     DirectLight direct_light;
     PointLight point_lights[MAX_POINT_LIGHT_COUNT];
     SpotLight spot_light;
+    int use_point_light_num;
 };
 // 材质
 uniform PhongMaterial material;
@@ -82,7 +83,7 @@ void main() {
 
     // 计算三种光照
     vec3 color = CalcDirectLight(direct_light, normal_dir, view_dir);
-    for(int i = 0; i < MAX_POINT_LIGHT_COUNT; i++)
+    for(int i = 0; i < use_point_light_num; i++)
         color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir);
     color += CalcSpotLight(spot_light, normal_dir, fs_in.Position, view_dir);
 

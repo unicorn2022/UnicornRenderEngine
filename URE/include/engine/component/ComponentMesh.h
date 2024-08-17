@@ -9,19 +9,17 @@ public:
      * \param gameobject 绑定的游戏对象
      * \param meshs 网格体信息
      * \param materials 材质信息
+     * \param is_debug 是否为调试信息
      * \param is_transport 是否是半透明物体
      */
-    ComponentMesh(GO* gameobject, std::vector<Mesh*> meshs, std::vector<Material*> materials, bool is_transport = false);
+    ComponentMesh(GO* gameobject, std::vector<Mesh*> meshs, std::vector<Material*> materials, bool is_debug = false, bool is_transport = false);
     virtual ~ComponentMesh();
 
 public:
-    /* 渲染该网格体 */
-    void Draw();
-
     /** 使用指定材质渲染该网格体
      * \param material 指定材质 
      */
-    void Draw(Material* material);
+    void Draw(Material* material = NULL);
 
     /* 是否为半透明物体 */
     bool IsTransport() const;
@@ -40,6 +38,7 @@ private:
     std::vector<Mesh*> meshs;
     std::vector<Material*> materials;
     bool is_transport;
+    bool is_debug;
     unsigned int num;
     unsigned int instanceVBO;   // 实例化顶点数据
 };

@@ -115,5 +115,10 @@ void UniformBufferLight::UpdateUniformData() {
         offset += N;
     }
 
+    /* 4. use_point_light_num */
+    {
+        glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(use_point_light_num), &use_point_light_num);
+        offset += N;
+    }
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

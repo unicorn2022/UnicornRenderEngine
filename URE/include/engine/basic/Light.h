@@ -1,8 +1,6 @@
 #pragma once
 #include "Utils.h"
 
-static const int MAX_POINT_LIGHT_COUNT = 4;
-
 class Light {
 public:
     /** 光源

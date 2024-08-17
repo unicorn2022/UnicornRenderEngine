@@ -2,6 +2,8 @@
 #include "Utils.h"
 #include "engine/basic/Light.h"
 
+static const int MAX_POINT_LIGHT_COUNT = 4;
+
 class UniformBuffer {
 public:
     /** Uniform缓冲对象, 用于向所有shader传输公用uniform变量
@@ -60,10 +62,11 @@ public:
     virtual void UpdateUniformData(); 
 
 private:
-    UniformBufferLight() : UniformBuffer(1, (16 + 20 * MAX_POINT_LIGHT_COUNT + 24) * 4) {}
+    UniformBufferLight() : UniformBuffer(1, (16 + 20 * MAX_POINT_LIGHT_COUNT + 24 + 1) * 4) {}
 
 public:
     DirectLight direct_light;
     PointLight point_lights[MAX_POINT_LIGHT_COUNT];
     SpotLight spot_light;
+    int use_point_light_num;
 };

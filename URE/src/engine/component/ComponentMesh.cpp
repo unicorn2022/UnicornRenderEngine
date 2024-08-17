@@ -3,11 +3,13 @@
 #include "engine/material/ALL.h"
 #include "engine/mesh/MeshCube.h"
 #include "engine/mesh/MeshSquare.h"
+#include "GlobalValue.h"
 
-ComponentMesh::ComponentMesh(GO* gameobject, std::vector<Mesh*> meshs, std::vector<Material*> materials, bool is_transport) : Component(gameobject) {
+ComponentMesh::ComponentMesh(GO* gameobject, std::vector<Mesh*> meshs, std::vector<Material*> materials, bool is_debug, bool is_transport) : Component(gameobject) {
     this->type = "component_mesh";
     for (auto mesh : meshs) this->meshs.push_back(mesh);
     for (auto material : materials) this->materials.push_back(material);
+    this->is_debug = is_debug;
     this->is_transport = is_transport;
 
     // 生成实例化VBO
@@ -31,32 +33,29 @@ ComponentMesh::~ComponentMesh() {
     glDeleteBuffers(1, &instanceVBO);
 }
 
-void ComponentMesh::Draw() {
-    if (!enable) return;
-    for (int i = 0; i < meshs.size(); i++)
-        DrawOneMesh(meshs[i], materials[i]);
-}
-
 void ComponentMesh::Draw(Material* material) {
     if (!enable) return;
-    for (int i = 0; i < meshs.size(); i++)
-        DrawOneMesh(meshs[i], material);
+    if (is_debug && GlobalValue::GetInstance().GetIntValue("debug") == 0) return;
+    for (int i = 0; i < meshs.size(); i++) {
+        if (material != NULL) DrawOneMesh(meshs[i], material);
+        else DrawOneMesh(meshs[i], materials[i]);
+    }
 }
 
 void ComponentMesh::DrawOneMesh(Mesh* mesh, Material* material) {
     // std::cout << "DrawOneMesh\n";
-    /* 2. 使用材质 */
+    /* 1. 使用材质 */
     material->Use();
-    /* 3. 绘制物体 */
-    // 3.1 获取 model 矩阵
+    /* 2. 绘制物体 */
+    // 2.1 获取 model 矩阵
     auto transforms = gameobject->GetComponents<ComponentTransform>();
     std::vector<glm::mat4> model_transforms;
     for (auto transform : transforms) 
         model_transforms.push_back(transform->GetModelMatrix());
-    // 3.2 配置实例化VBO
+    // 2.2 配置实例化VBO
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     glBufferData(GL_ARRAY_BUFFER, num * sizeof(glm::mat4), &model_transforms[0], GL_STATIC_DRAW);
-    // 3.3 绘制物体
+    // 2.3 绘制物体
     mesh->Draw(num);
 }
 
