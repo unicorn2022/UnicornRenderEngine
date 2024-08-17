@@ -118,15 +118,18 @@ uniform缓冲类，封装OpenGL中与uniform缓冲对象有关的接口
 
 ### 1.2.3	ComponentMesh.h
 
+> 可以包含多个网格体，对应多个实例，实例之间仅有**model变换**不同
+
 网格体组件，表示游戏对象的可见性
 
-- 网格体的顶点属性：`mesh`
-- 网格体的材质：`material`
+- 多个网格体的顶点属性：`meshs`
+- 多个网格体的材质：`materials`
 - 是否为半透明物体：`is_transport`
+- 实例化个数：`num`
 
 接口信息：
 
-- `Draw()`：绘制该网格体，需要传入光源数据
+- `Draw()`：绘制该网格体，可以传入`material`强制用该材质渲染
 
 ### 1.2.4	ComponentTransform.h
 

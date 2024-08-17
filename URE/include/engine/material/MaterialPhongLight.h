@@ -22,4 +22,7 @@ private:
     Texture* diffuse;
     Texture* specular;
     float shininess;
+
+    /* 光照模型信息 */
+    int use_blinn_phong;
 };

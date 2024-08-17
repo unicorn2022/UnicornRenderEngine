@@ -1,4 +1,5 @@
 #include "engine/material/MaterialPhongLight.h"
+#include "GlobalValue.h"
 
 MaterialPhongLight::MaterialPhongLight(Texture* diffuse, Texture* specular, float shininess) {
     this->shader = new Shader("mesh_phong_light");
@@ -24,4 +25,8 @@ void MaterialPhongLight::Use() {
         shader->SetUniform("material.specular", 1);
     }
     shader->SetUniform("material.shininess", shininess);
+    
+    /* 光照模型信息 */
+    use_blinn_phong = GlobalValue::GetInstance().GetIntValue("use_blinn_phong");
+    shader->SetUniform("use_blinn_phong", use_blinn_phong);
 }

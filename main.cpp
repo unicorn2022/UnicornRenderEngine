@@ -159,6 +159,13 @@ void keyboard_callback(GLFWwindow* window) {
         if (glfwGetKey(window, GLFW_KEY_0 + i) == GLFW_PRESS) 
             GlobalValue::GetInstance().SetValue("choose_post_process", i);
     }
+
+    /* B 选择是否使用 blinn_phong 模型*/
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+        GlobalValue::GetInstance().SetValue("use_blinn_phong", 0);
+    } else {
+        GlobalValue::GetInstance().SetValue("use_blinn_phong", 1);
+    }
     
     /* 控制GO */
     GameWorld::GetInstance().HandleKeyBoard(window, delta_time);

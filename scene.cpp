@@ -21,8 +21,9 @@ static const int main_camera_samples = 8;
 enum SceneChoice {
     Capture2D_Box_Window_Reflect_Refract,
     Planet,
+    Blinn_Phong,
 };
-const SceneChoice scene = SceneChoice::Capture2D_Box_Window_Reflect_Refract;
+const SceneChoice scene = SceneChoice::Blinn_Phong;
 
 
 static void Light_Skybox() {
@@ -40,6 +41,7 @@ static void Light_Skybox() {
             glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
             glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
         );
+        auto point_light_cube = new GOCube("point_light_cube", new MaterialConstantColor(glm::vec4(1.0f)), 4);
         for (int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
             UniformBufferLight::GetInstance().point_lights[i] = PointLight(
                 point_light_position[i],            // 位置
@@ -47,13 +49,15 @@ static void Light_Skybox() {
                 glm::vec3(0.8f, 0.8f, 0.8f),        // 漫反射
                 glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
             );
+            point_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(point_light_position[i]);
+            point_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.1f));
         }
         UniformBufferLight::GetInstance().spot_light = SpotLight(
             glm::vec3(0.0f, 0.0f, 0.0f),    // 位置
             glm::vec3(1.0f, 0.0f, 0.0f),    // 方向
             glm::vec3(0, 0, 0),             // 环境光
-            glm::vec3(1.0f, 1.0f, 1.0f), // 漫反射
-            glm::vec3(1.0f, 1.0f, 1.0f), // 高光
+            glm::vec3(1.0f, 1.0f, 1.0f),    // 漫反射
+            glm::vec3(1.0f, 1.0f, 1.0f),    // 高光
             glm::cos(glm::radians(12.5f)),  // 内切角
             glm::cos(glm::radians(15.0f))   // 外切角
         );
@@ -202,6 +206,27 @@ static void Test_Planet_GameTick() {
     GameWorld::GetInstance().planet->TransformRotate(glm::vec3(0, 0.5, 0));
 }
 
+/* 场景3: 测试 Blinn-Phong 模型*/
+static void Test_Blinn_Phong_Scene() {
+    /* 主相机 */
+    {
+        GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
+        camera->GetComponents<ComponentTransform>()[0]->SetMoveSpeedClamp(main_camera_move_speed_min, main_camera_move_speed_max);
+        camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 0.0f, 5.0f));
+        camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
+        GameWorld::GetInstance().all_game_object.push_back(camera);
+        GameWorld::GetInstance().main_camera = camera->GetComponents<ComponentCamera>()[0];
+    }
+
+    /* 平面 */
+    {
+        auto plane = new GOSquare("plane", new MaterialPhongLight(new Texture("wood.png"), new Texture("wood.png")));
+        plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(10.0f, 0.5f, 10.0f));
+        GameWorld::GetInstance().all_game_object.push_back(plane);
+    }
+}
+static void Test_Blinn_Phong_GameTick() {}
+
 
 /* 实现 GameWorld 的 GameTick() 和 SceneCreate() */
 void GameWorld::SceneCreate() {
@@ -216,6 +241,10 @@ void GameWorld::SceneCreate() {
     }
     case SceneChoice::Planet: {
         Test_Planet_Scene();
+        break;
+    }
+    case SceneChoice::Blinn_Phong: {
+        Test_Blinn_Phong_Scene();
         break;
     }
     default:
@@ -240,6 +269,10 @@ void GameWorld::GameTick() {
     }
     case SceneChoice::Planet: {
         Test_Planet_GameTick();
+        break;
+    }
+    case SceneChoice::Blinn_Phong: {
+        Test_Blinn_Phong_GameTick();
         break;
     }
     default:

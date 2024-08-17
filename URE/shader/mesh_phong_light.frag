@@ -72,6 +72,8 @@ layout (std140, binding = 1) uniform Light {
 };
 // 材质
 uniform PhongMaterial material;
+// 是否使用 Blinn-Phong 模型
+uniform int use_blinn_phong = 1;
 
 void main() {
     vec3 normal_dir = normalize(fs_in.Normal);
@@ -96,8 +98,14 @@ vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir) {
     vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, fs_in.TexCoord).rgb;
 
     // 3. 高光
-    vec3 reflect_dir = reflect(-light_dir, normal_dir);
-    vec3 specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+    vec3 specular;
+    if (use_blinn_phong == 0) {
+        vec3 reflect_dir = reflect(-light_dir, normal_dir);
+        specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+    } else {
+        vec3 half_way_dir = normalize(light_dir + view_dir);
+        specular = pow(max(dot(normal_dir, half_way_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+    }
 
     // 最终颜色
     vec3 color = ambient + diffuse + specular;
@@ -113,9 +121,15 @@ vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 
     vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, fs_in.TexCoord).rgb;
 
     // 3. 高光
-    vec3 reflect_dir = reflect(-light_dir, normal_dir);
-    vec3 specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
-
+    vec3 specular;
+    if (use_blinn_phong == 0) {
+        vec3 reflect_dir = reflect(-light_dir, normal_dir);
+        specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+    } else {
+        vec3 half_way_dir = normalize(light_dir + view_dir);
+        specular = pow(max(dot(normal_dir, half_way_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+    }
+    
     // 4. 衰减
     float dist = length(light.position - frag_position);
     float attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * dist * dist);
@@ -134,8 +148,14 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 vi
     vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, fs_in.TexCoord).rgb;
 
     // 3. 高光
-    vec3 reflect_dir = reflect(-light_dir, normal_dir);
-    vec3 specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+    vec3 specular;
+    if (use_blinn_phong == 0) {
+        vec3 reflect_dir = reflect(-light_dir, normal_dir);
+        specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+    } else {
+        vec3 half_way_dir = normalize(light_dir + view_dir);
+        specular = pow(max(dot(normal_dir, half_way_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+    }
 
     // 4. 衰减
     float dist = length(light.position - frag_position);
