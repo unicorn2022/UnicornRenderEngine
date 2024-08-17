@@ -26,6 +26,16 @@ enum SceneChoice {
 };
 const SceneChoice scene = SceneChoice::Shadow_Map;
 
+glm::vec3 Convert_Direction_To_Euler(glm::vec3 direction) {
+    direction = glm::normalize(direction);
+    float nx = direction.x, ny = direction.y, nz = direction.z;
+    // 计算方向角
+    float yaw = std::atan2(ny, nx) * 180.0 / Utils::PI;
+    float pitch = std::acos(nz) * 180.0 / Utils::PI;
+    float roll = 0.0;
+    return glm::vec3(yaw, pitch, roll);
+}
+
 /* 基础场景 */
 static void Scene_Skybox() {
     /* 天空盒 */
@@ -42,7 +52,7 @@ static void Scene_Light() {
             // 1.1 方向光源方向
             std::vector<glm::vec3> direct_light_direction {
                 glm::normalize(glm::vec3(-2.0f, 4.0f, -1.0f)),
-                glm::normalize(glm::vec3(0.0f,  0.0f, 3.0f)),
+                glm::normalize(glm::vec3(0.0f,  1.0f, 0.0f)),
             };
             // 1.2 方向光源个数
             int num = UniformBufferLight::GetInstance().use_direct_light_num;
@@ -56,9 +66,9 @@ static void Scene_Light() {
                     glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
                     glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
                 );
-                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(glm::vec3(i * 5.0f, 5.0f, 0.0f));
-                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(direct_light_direction[i] * 180.0f);
-                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.5, 0.05, 0.05));
+                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(glm::vec3(((i + 1) / 2) * 2.0f * std::pow(-1, i), 0.0f, 0.0f));
+                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(Convert_Direction_To_Euler(direct_light_direction[i]));
+                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(1.0, 0.05, 0.05));
             }
         }
         // 2. 点光源
@@ -116,8 +126,8 @@ static void Scene_Light() {
                 if (i == 0) spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0));
                 else {
                     spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(spot_light_position[i]);
-                    spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(spot_light_direction[i] * 180.0f);
-                    spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.5, 0.05, 0.05));
+                    spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(Convert_Direction_To_Euler(spot_light_direction[i]));
+                    spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(1.0, 0.05, 0.05));
                 }
             }
             GameWorld::GetInstance().spot_light = &UniformBufferLight::GetInstance().spot_light[0];
