@@ -1,4 +1,5 @@
 #include "engine/material/MaterialPostProcess.h"
+#include "GlobalValue.h"
 
 MaterialPostProcess::MaterialPostProcess(Texture* screen_texture, TextureMultiSample* screen_texture_multisample) {
     this->shader = new Shader("post_process");
@@ -19,4 +20,7 @@ void MaterialPostProcess::Use() {
     }
     shader->SetUniform("choose_post_process", choose_post_process);
     shader->SetUniform("samples", screen_texture_multisample->samples);
+    
+    this->gamma = GlobalValue::GetInstance().GetFloatValue("gamma");
+    shader->SetUniform("gamma", gamma);
 }

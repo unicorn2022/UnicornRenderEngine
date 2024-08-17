@@ -166,6 +166,13 @@ void keyboard_callback(GLFWwindow* window) {
     } else {
         GlobalValue::GetInstance().SetValue("use_blinn_phong", 1);
     }
+
+    /* R 选择是否使用 Gamma 矫正 */
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+        GlobalValue::GetInstance().SetValue("gamma", 1.0f);
+    } else {
+        GlobalValue::GetInstance().SetValue("gamma", 2.2f);
+    }
     
     /* 控制GO */
     GameWorld::GetInstance().HandleKeyBoard(window, delta_time);

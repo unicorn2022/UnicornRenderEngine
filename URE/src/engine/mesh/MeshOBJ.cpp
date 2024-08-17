@@ -145,7 +145,12 @@ Texture* OBJModel::ProcessTexture(aiMaterial* mat, aiTextureType type) {
     for (int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString file_name;
         mat->GetTexture(type, i, &file_name);
-        Texture* texture = new Texture(file_name.C_Str(), directory);
+        Texture* texture;
+        if (type == aiTextureType_DIFFUSE) {
+            texture = new Texture(file_name.C_Str(), true, directory);
+        } else {
+            texture = new Texture(file_name.C_Str(), false, directory);
+        } 
         if (first_texture == NULL) first_texture = texture;
         else std::cout << "[INFO] 舍弃纹理: " << file_name.C_Str() << "\n";
     }

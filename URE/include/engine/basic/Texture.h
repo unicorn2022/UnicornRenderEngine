@@ -12,9 +12,10 @@ public:
 
     /** 从图片中生成纹理
      * \param file_name 文件名
+     * \param sRGB 是否为sRGB纹理
      * \param root_directory 根文件夹路径, 含`/`
      */
-    Texture(std::string file_name, std::string root_directory = root_path_texture);
+    Texture(std::string file_name, bool sRGB = false, std::string root_directory = root_path_texture);
     
     ~Texture();
 
@@ -33,6 +34,8 @@ public:
     std::string path;
     /* 纹理的宽高 */
     int width, height;
+    /* 是否为sRGB纹理 */
+    bool sRGB;
 
 private:
     void CreateTexture();

@@ -18,4 +18,5 @@ public:
     Texture* screen_texture;
     TextureMultiSample* screen_texture_multisample;
     int choose_post_process;
+    float gamma;
 };

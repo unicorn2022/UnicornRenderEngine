@@ -5,14 +5,16 @@ Texture::Texture(int width, int height) {
     this->height = height;
     this->name = "";
     this->path = "";
+    this->sRGB = false;
     CreateTexture();
 }
 
-Texture::Texture(std::string file_name, std::string root_directory) {
+Texture::Texture(std::string file_name, bool sRGB, std::string root_directory) {
     this->width = 0;
     this->height = 0;
     this->name = file_name;
     this->path = root_directory + file_name;
+    this->sRGB = true;
     CreateTexture();
     LoadTextureData();
 }
@@ -54,14 +56,23 @@ void Texture::LoadTextureData() {
     int channel;
     unsigned char *data = Utils::ReadPicture(path, width, height, channel);
     if (data != NULL) {
-        if (channel == 1) 
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_R8, GL_UNSIGNED_BYTE, data);
-        else if (channel == 2)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, width, height, 0, GL_RG, GL_UNSIGNED_BYTE, data);
-        else if (channel == 3)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        else if (channel == 4)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        if (sRGB) {
+            if (channel == 1 || channel == 2) 
+                std::cout << "[ERROR::Texture::LoadTextureData()] SRGB纹理不支持 " << channel << " 通道纹理\n";
+            else if (channel == 3)
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            else if (channel == 4)
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        } else {
+            if (channel == 1) 
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_R8, GL_UNSIGNED_BYTE, data);
+            else if (channel == 2)
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, width, height, 0, GL_RG, GL_UNSIGNED_BYTE, data);
+            else if (channel == 3)
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            else if (channel == 4)
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        }
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     Utils::FreePicture(data);

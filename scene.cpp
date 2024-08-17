@@ -67,7 +67,7 @@ static void Light_Skybox() {
     /* 天空盒 */
     {
         std::string skybox_file_name[6] = {"right", "left", "top", "bottom", "front", "back"};
-        GameWorld::GetInstance().skybox = new GOSkybox("skybox", new MaterialSkybox(new TextureCube(skybox_file_name, "jpg")));
+        GameWorld::GetInstance().skybox = new GOSkybox("skybox", new MaterialSkybox(new TextureCube(skybox_file_name, "jpg", true)));
     }
 }
 

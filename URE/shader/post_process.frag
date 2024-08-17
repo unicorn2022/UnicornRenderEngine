@@ -18,6 +18,7 @@ uniform int choose_post_process;
 uniform sampler2D screen_texture;
 uniform sampler2DMS screen_texture_multisample;
 uniform int samples;
+uniform float gamma;
 
 vec3 sample_color[9];
 
@@ -42,32 +43,35 @@ vec3 UseKernel(float kernel[9]);
 
 void main() {
     SampleColor();
-
+    vec4 color;
     // 1 - 反相
     if (choose_post_process == 1) {
-        FragColor = vec4(1.0 - sample_color[4], 1.0);
+        color = vec4(1.0 - sample_color[4], 1.0);
     }
     // 2 - 灰度
     else if (choose_post_process == 2) {
         float average = 0.2126 * sample_color[4].r + 0.7152 * sample_color[4].g + 0.0722 * sample_color[4].b;
-        FragColor = vec4(average, average, average, 1.0);
+        color = vec4(average, average, average, 1.0);
     } 
     // 3 - 锐化
     else if (choose_post_process == 3) {
-        FragColor = vec4(UseKernel(kernel_sharpen), 1.0);
+        color = vec4(UseKernel(kernel_sharpen), 1.0);
     } 
     // 4 - 模糊
     else if (choose_post_process == 4) {
-        FragColor = vec4(UseKernel(kernel_blur), 1.0);
+        color = vec4(UseKernel(kernel_blur), 1.0);
     }
     // 5 - 模糊
     else if (choose_post_process == 5) {
-        FragColor = vec4(UseKernel(kernel_edge_detection), 1.0);
+        color = vec4(UseKernel(kernel_edge_detection), 1.0);
     }
     // 其他 - 无效果
     else {
-        FragColor = vec4(sample_color[4], 1.0);
+        color = vec4(sample_color[4], 1.0);
     }
+
+    color.rgb = pow(color.rgb, vec3(1.0 / gamma));
+    FragColor = color;
 }
 
 void SampleColor() {
