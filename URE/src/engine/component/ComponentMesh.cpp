@@ -49,6 +49,7 @@ void ComponentMesh::DrawOneMesh(Mesh* mesh, Material* material) {
     /* 2. 绘制物体 */
     // 2.1 获取 model 矩阵
     auto transforms = gameobject->GetComponents<ComponentTransform>();
+    if (transforms.size() == 0) return;
     std::vector<glm::mat4> model_transforms;
     for (auto transform : transforms) 
         model_transforms.push_back(transform->GetModelMatrix());

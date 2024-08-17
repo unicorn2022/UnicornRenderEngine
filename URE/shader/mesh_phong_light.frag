@@ -64,12 +64,16 @@ in VS_OUT {
 } fs_in;
 
 /* uniform 变量 */
+#define MAX_DIRECT_LIGHT_COUNT 2
 #define MAX_POINT_LIGHT_COUNT 4
+#define MAX_SPOT_LIGHT_COUNT 2
 layout (std140, binding = 1) uniform Light {
-    DirectLight direct_light;
+    DirectLight direct_light[MAX_DIRECT_LIGHT_COUNT];
     PointLight point_lights[MAX_POINT_LIGHT_COUNT];
-    SpotLight spot_light;
+    SpotLight spot_light[MAX_SPOT_LIGHT_COUNT];
+    int use_direct_light_num;
     int use_point_light_num;
+    int use_spot_light_num;
 };
 // 材质
 uniform PhongMaterial material;
@@ -81,11 +85,17 @@ void main() {
     vec3 view_dir = normalize(fs_in.ViewPosition - fs_in.Position);
     float alpha = texture(material.diffuse, fs_in.TexCoord).a;
 
-    // 计算三种光照
-    vec3 color = CalcDirectLight(direct_light, normal_dir, view_dir);
+    /* 计算三种光照 */
+    vec3 color = vec3(0.0f);
+    // 1. 方向光
+    for(int i = 0; i < use_direct_light_num; i++)
+        color += CalcDirectLight(direct_light[i], normal_dir, view_dir);
+    // 2. 点光源
     for(int i = 0; i < use_point_light_num; i++)
         color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir);
-    color += CalcSpotLight(spot_light, normal_dir, fs_in.Position, view_dir);
+    // 3. 聚光源
+    for(int i = 0; i < use_spot_light_num; i++)
+        color += CalcSpotLight(spot_light[i], normal_dir, fs_in.Position, view_dir);
 
     FragColor = vec4(color, alpha);
 }

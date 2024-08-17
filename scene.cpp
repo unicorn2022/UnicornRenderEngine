@@ -22,8 +22,9 @@ enum SceneChoice {
     Capture2D_Box_Window_Reflect_Refract,
     Planet,
     Blinn_Phong,
+    Shadow_Map,
 };
-const SceneChoice scene = SceneChoice::Capture2D_Box_Window_Reflect_Refract;
+const SceneChoice scene = SceneChoice::Shadow_Map;
 
 /* 基础场景 */
 static void Scene_Skybox() {
@@ -34,30 +35,45 @@ static void Scene_Skybox() {
     }
 }
 static void Scene_Light() {
-    /* 6个灯光 */
+    /* 3种灯光 */
     {   
         // 1. 方向光
         {
-            UniformBufferLight::GetInstance().direct_light = DirectLight(
-                glm::vec3(-0.2f, -1.0f, -0.3f),     // 方向
-                glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
-                glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
-                glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
-            );
+            // 1.1 方向光源方向
+            std::vector<glm::vec3> direct_light_direction {
+                glm::normalize(glm::vec3(-2.0f, 4.0f, -1.0f)),
+                glm::normalize(glm::vec3(0.0f,  0.0f, 3.0f)),
+            };
+            // 1.2 方向光源个数
+            int num = UniformBufferLight::GetInstance().use_direct_light_num;
+            // 1.3 点光源可视化
+            auto direct_light_cube = new GOCube("direct_light_cube", new MaterialConstantColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)), num, true);
+            // 1.4 配置方向光源
+            for (int i = 0; i < num; i++) {
+                UniformBufferLight::GetInstance().direct_light[i] = DirectLight(
+                    direct_light_direction[i],          // 方向
+                    glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+                    glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
+                    glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
+                );
+                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(glm::vec3(i * 5.0f, 5.0f, 0.0f));
+                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(direct_light_direction[i] * 180.0f);
+                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.5, 0.05, 0.05));
+            }
         }
         // 2. 点光源
         {
             // 2.1 点光源位置
             std::vector<glm::vec3> point_light_position {
-                glm::vec3(0.0f,  0.0f, -3.0f),
-                glm::vec3(0.7f,  0.2f,  2.0f),
+                glm::vec3(0.0f,  0.0f, 3.0f),
+                glm::vec3(0.7f,  0.2f, 2.0f),
                 glm::vec3(2.3f, -3.3f, -4.0f),
                 glm::vec3(-4.0f,  2.0f, -12.0f),
             };
             // 2.2 点光源个数
             int num = UniformBufferLight::GetInstance().use_point_light_num;
             // 2.3 点光源可视化
-            auto point_light_cube = new GOCube("point_light_cube", new MaterialConstantColor(glm::vec4(1.0f)), num, true);
+            auto point_light_cube = new GOCube("point_light_cube", new MaterialConstantColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)), num, true);
             // 2.4 配置点光源
             for (int i = 0; i < num; i++) {
                 UniformBufferLight::GetInstance().point_lights[i] = PointLight(
@@ -71,17 +87,40 @@ static void Scene_Light() {
             }
         }
         // 3. 聚光源
-        {
-            UniformBufferLight::GetInstance().spot_light = SpotLight(
-                glm::vec3(0.0f, 0.0f, 0.0f),    // 位置
-                glm::vec3(1.0f, 0.0f, 0.0f),    // 方向
-                glm::vec3(0, 0, 0),             // 环境光
-                glm::vec3(1.0f, 1.0f, 1.0f),    // 漫反射
-                glm::vec3(1.0f, 1.0f, 1.0f),    // 高光
-                glm::cos(glm::radians(12.5f)),  // 内切角
-                glm::cos(glm::radians(15.0f))   // 外切角
-            );
-            GameWorld::GetInstance().spot_light = &UniformBufferLight::GetInstance().spot_light;
+        {   
+            // 3.1 聚光源位置&方向
+            std::vector<glm::vec3> spot_light_position {
+                glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3(0.0f, 10.0f, 0.0f),
+            };
+            std::vector<glm::vec3> spot_light_direction {
+                glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)),
+                glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f)),
+            };
+            // 3.2 聚光源个数
+            int num = UniformBufferLight::GetInstance().use_spot_light_num;
+            // 3.3 点光源可视化
+            auto spot_light_cube = new GOCube("spot_light_cube", new MaterialConstantColor(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)), num, true);
+            // 3.4 配置聚光源
+            for (int i = 0; i < num; i++) {
+                UniformBufferLight::GetInstance().spot_light[i] = SpotLight(
+                    spot_light_position[i],         // 位置
+                    spot_light_direction[i],        // 方向
+                    glm::vec3(0, 0, 0),             // 环境光
+                    glm::vec3(1.0f, 1.0f, 1.0f),    // 漫反射
+                    glm::vec3(1.0f, 1.0f, 1.0f),    // 高光
+                    glm::cos(glm::radians(12.5f)),  // 内切角
+                    glm::cos(glm::radians(15.0f))   // 外切角
+                );
+                // 第1个 spot light 为相机光源, 不需要可视化
+                if (i == 0) spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0));
+                else {
+                    spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(spot_light_position[i]);
+                    spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(spot_light_direction[i] * 180.0f);
+                    spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.5, 0.05, 0.05));
+                }
+            }
+            GameWorld::GetInstance().spot_light = &UniformBufferLight::GetInstance().spot_light[0];
         }
     }
 
@@ -91,7 +130,9 @@ static void Scene_Light() {
 
 /* 场景1: 测试场景 */
 static void Test_Capture2D_Blend_Reflect_Scene() {
+    UniformBufferLight::GetInstance().use_direct_light_num = MAX_DIRECT_LIGHT_COUNT;
     UniformBufferLight::GetInstance().use_point_light_num = MAX_POINT_LIGHT_COUNT;
+    UniformBufferLight::GetInstance().use_spot_light_num = MAX_SPOT_LIGHT_COUNT;
     /* 主相机 */
     {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
@@ -184,7 +225,9 @@ static void Test_Capture2D_Blend_Reflect_GameTick() {
 
 /* 场景2: 行星带 */
 static void Test_Planet_Scene() {
+    UniformBufferLight::GetInstance().use_direct_light_num = MAX_DIRECT_LIGHT_COUNT;
     UniformBufferLight::GetInstance().use_point_light_num = MAX_POINT_LIGHT_COUNT;
+    UniformBufferLight::GetInstance().use_spot_light_num = MAX_SPOT_LIGHT_COUNT;
     /* 主相机 */
     {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
@@ -230,9 +273,11 @@ static void Test_Planet_GameTick() {
 }
 
 
-/* 场景3: 测试 Blinn-Phong 模型*/
+/* 场景3: 测试 Blinn-Phong 模型 */
 static void Test_Blinn_Phong_Scene() {
-    UniformBufferLight::GetInstance().use_point_light_num = 1;
+    UniformBufferLight::GetInstance().use_direct_light_num = MAX_DIRECT_LIGHT_COUNT;
+    UniformBufferLight::GetInstance().use_point_light_num = MAX_POINT_LIGHT_COUNT;
+    UniformBufferLight::GetInstance().use_spot_light_num = MAX_SPOT_LIGHT_COUNT;
     /* 主相机 */
     {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
@@ -252,6 +297,56 @@ static void Test_Blinn_Phong_Scene() {
 }
 static void Test_Blinn_Phong_GameTick() {}
 
+/* 场景4: 测试 Shadow Map 算法 */
+static void Test_Shadow_Map_Scene() {
+    UniformBufferLight::GetInstance().use_direct_light_num = 1;
+    UniformBufferLight::GetInstance().use_point_light_num = 0;
+    UniformBufferLight::GetInstance().use_spot_light_num = 0;
+    /* 主相机 */
+    {
+        GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
+        camera->GetComponents<ComponentTransform>()[0]->SetMoveSpeedClamp(main_camera_move_speed_min, main_camera_move_speed_max);
+        camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 0.0f, 20.0f));
+        camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
+        GameWorld::GetInstance().all_game_object.push_back(camera);
+        GameWorld::GetInstance().main_camera = camera->GetComponents<ComponentCamera>()[0];
+    }
+
+    /* 平面 */
+    {
+        auto plane = new GOSquare("plane", new MaterialPhongLight(new Texture("wood.png"), new Texture("wood.png")));
+        plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f, 5.0f, 5.0f));
+        GameWorld::GetInstance().all_game_object.push_back(plane);
+    }
+
+    /* 箱子 */
+    {
+        const std::vector<glm::vec3> container_position {
+            glm::vec3(0.0f, 1.5f, 0.0f),
+            glm::vec3(2.0f, 0.0f, 1.0f),
+            glm::vec3(-1.0f, 0.0f, 2.0f)
+        };
+        const std::vector<glm::vec3> container_rotate {
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(60.0f, 0.0f, 60.0f)
+        };
+        GOCube* container = new GOCube("container",
+            new MaterialPhongLight(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
+            container_position.size()
+        );
+        container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));
+        for (int i = 0; i < container_position.size(); i++) {            
+            container->GetComponents<ComponentTransform>()[i]->TransformTranslate(container_position[i]);
+            container->GetComponents<ComponentTransform>()[i]->TransformRotate(container_rotate[i]);
+            container->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.5f));
+        }
+        GameWorld::GetInstance().all_game_object.push_back(container);
+    }
+}
+static void Test_Shadow_Map_GameTick() {}
+
+
 
 /* 实现 GameWorld 的 GameTick() 和 SceneCreate() */
 void GameWorld::SceneCreate() {
@@ -270,6 +365,10 @@ void GameWorld::SceneCreate() {
     }
     case SceneChoice::Blinn_Phong: {
         Test_Blinn_Phong_Scene();
+        break;
+    }
+    case SceneChoice::Shadow_Map: {
+        Test_Shadow_Map_Scene();
         break;
     }
     default:
@@ -301,6 +400,10 @@ void GameWorld::GameTick() {
     }
     case SceneChoice::Blinn_Phong: {
         Test_Blinn_Phong_GameTick();
+        break;
+    }
+    case SceneChoice::Shadow_Map: {
+        Test_Shadow_Map_GameTick();
         break;
     }
     default:

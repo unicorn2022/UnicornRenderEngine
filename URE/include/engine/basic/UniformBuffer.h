@@ -2,7 +2,9 @@
 #include "Utils.h"
 #include "engine/basic/Light.h"
 
+static const int MAX_DIRECT_LIGHT_COUNT = 2;
 static const int MAX_POINT_LIGHT_COUNT = 4;
+static const int MAX_SPOT_LIGHT_COUNT = 2;
 
 class UniformBuffer {
 public:
@@ -62,11 +64,13 @@ public:
     virtual void UpdateUniformData(); 
 
 private:
-    UniformBufferLight() : UniformBuffer(1, (16 + 20 * MAX_POINT_LIGHT_COUNT + 24 + 1) * 4) {}
+    UniformBufferLight() : UniformBuffer(1, (16 * MAX_DIRECT_LIGHT_COUNT + 20 * MAX_POINT_LIGHT_COUNT + 24 * MAX_SPOT_LIGHT_COUNT + 3) * 4) {}
 
 public:
-    DirectLight direct_light;
+    DirectLight direct_light[MAX_DIRECT_LIGHT_COUNT];
     PointLight point_lights[MAX_POINT_LIGHT_COUNT];
-    SpotLight spot_light;
+    SpotLight spot_light[MAX_SPOT_LIGHT_COUNT];
+    int use_direct_light_num;
     int use_point_light_num;
+    int use_spot_light_num;
 };

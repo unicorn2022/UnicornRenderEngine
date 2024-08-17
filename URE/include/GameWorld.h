@@ -21,11 +21,11 @@ public:
     ComponentCamera* main_camera;
     SpotLight* spot_light;
 
-    /* Scene_Test_Capture2D */
+    /* 场景1: 测试场景 */
     ComponentCamera* test_camera;
     ComponentMesh* test_camera_screen;
     
-    /* Scene_Test_Planet */
+    /* 场景2: 行星带 */
     ComponentTransform* planet;
 
 public:
