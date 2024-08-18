@@ -4,6 +4,7 @@
 #include "engine/material/MaterialNoLight.h"
 #include "engine/material/MaterialPhongLight.h"
 #include "engine/material/MaterialPostProcess.h"
+#include "engine/material/MaterialShadowDirectLight.h"
 #include "engine/material/MaterialSkybox.h"
 #include "engine/material/MaterialSkyboxReflect.h"
 #include "engine/material/MaterialSkyboxRefract.h"

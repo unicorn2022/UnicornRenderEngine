@@ -4,5 +4,7 @@
 #include "engine/gameobject/GOCapture2D.h"
 #include "engine/gameobject/GOCube.h"
 #include "engine/gameobject/GOOBJModel.h"
+#include "engine/gameobject/GOScreen.h"
+#include "engine/gameobject/GOShadow.h"
 #include "engine/gameobject/GOSkybox.h"
 #include "engine/gameobject/GOSquare.h"

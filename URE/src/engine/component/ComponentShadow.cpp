@@ -1,0 +1,60 @@
+#include "engine/component/ComponentShadow.h"
+#include "engine/basic/UniformBuffer.h"
+#include "engine/material/MaterialShadowDirectLight.h"
+#include "engine/gameobject/GO.h"
+#include "GameWorld.h"
+
+/* ComponentShadow */
+ComponentShadow::ComponentShadow(GO* gameobject, int width, int height, int samples) : Component(gameobject) {
+    this->type = "component_shadow";
+    this->frame_buffer = new FrameBuffer(width, height, samples);
+}
+ComponentShadow::~ComponentShadow() {
+    delete frame_buffer;
+    delete camera;
+    delete material;
+}
+void ComponentShadow::UpdateCameraState() {
+    ComponentTransform* transform = gameobject->GetComponents<ComponentTransform>()[0];
+    auto position = transform->GetPosition();
+    camera->SetPosition(position);
+    camera->front = -position;
+}
+void ComponentShadow::RenderTick(std::vector<ComponentMesh*> &render_objects) {
+    if (!enable) return;
+
+    /* 1. 预处理 */
+    {
+        // 1.1 绑定帧缓冲
+        frame_buffer->Use();
+        // 1.2 更新 UniformBufferCamera 的值
+        UniformBufferCamera::GetInstance().view_transform = camera->GetViewMatrix();
+        UniformBufferCamera::GetInstance().projection_transform = camera->GetProjectionMatrix();
+        UniformBufferCamera::GetInstance().UpdateUniformData();
+    }
+        
+    /* 2. 清屏: 颜色缓冲, 深度缓冲, 模板缓冲 */
+    {
+        glClearColor(color_background.x, color_background.y, color_background.z, color_background.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
+    
+    /* 3. 使用特定材质, 绘制所有不透明物体 */
+    {
+        glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
+        glStencilMask(0x00); // 写入的模板值为0
+        for (auto object : render_objects)
+            if (object->IsTransport() == false)
+                object->Draw(material);
+    }
+
+    /* 4. 转换帧缓冲的颜色附件 */
+    frame_buffer->Convert();
+}
+
+/* ComponentShadowDirectLight */
+ComponentShadowDirectLight::ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, int width, int height, int samples, float near, float far, float left, float right, float bottom, float top) : ComponentShadow(gameobject, width, height, samples) {
+    this->camera = new RoamingCameraOrtho(left, right, bottom, top, near, far);
+    this->direct_light = direct_light;
+    this->material = new MaterialShadowDirectLight();
+}

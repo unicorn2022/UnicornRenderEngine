@@ -10,7 +10,7 @@ const int window_width = 800;
 const int window_height = 800;
 
 /* 颜色信息 */
-const glm::vec4 color_background = glm::vec4(0.2f, 0.3f, 0.3f, 1.0f);
+const glm::vec4 color_background = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 const glm::vec3 color_border = glm::vec3(1.0f, 0.0f, 0.0f);
 
 /* 相机信息 */
@@ -58,17 +58,28 @@ static void Scene_Light() {
             int num = UniformBufferLight::GetInstance().use_direct_light_num;
             // 1.3 点光源可视化
             auto direct_light_cube = new GOCube("direct_light_cube", new MaterialConstantColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)), num, true);
+            GameWorld::GetInstance().all_game_object.push_back(direct_light_cube);
             // 1.4 配置方向光源
             for (int i = 0; i < num; i++) {
+                // 方向光源属性
                 UniformBufferLight::GetInstance().direct_light[i] = DirectLight(
                     direct_light_direction[i],          // 方向
                     glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
                     glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
                     glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
                 );
+                // 可视化
                 direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(glm::vec3(((i + 1) / 2) * 2.0f * std::pow(-1, i), 0.0f, 0.0f));
                 direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(Convert_Direction_To_Euler(direct_light_direction[i]));
                 direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(1.0, 0.05, 0.05));
+                // 阴影
+                auto direct_light_shadow = new GOShadowDirectLight(
+                    "direct_light_shadow_" + std::to_string(i),
+                    &UniformBufferLight::GetInstance().direct_light[i],
+                    2048, 2048, 1
+                );
+                direct_light_shadow->GetComponents<ComponentTransform>()[0]->TransformTranslate(direct_light_direction[i]);
+                GameWorld::GetInstance().all_game_object.push_back(direct_light_shadow);
             }
         }
         // 2. 点光源
@@ -84,6 +95,7 @@ static void Scene_Light() {
             int num = UniformBufferLight::GetInstance().use_point_light_num;
             // 2.3 点光源可视化
             auto point_light_cube = new GOCube("point_light_cube", new MaterialConstantColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)), num, true);
+            GameWorld::GetInstance().all_game_object.push_back(point_light_cube);
             // 2.4 配置点光源
             for (int i = 0; i < num; i++) {
                 UniformBufferLight::GetInstance().point_lights[i] = PointLight(
@@ -111,6 +123,7 @@ static void Scene_Light() {
             int num = UniformBufferLight::GetInstance().use_spot_light_num;
             // 3.3 点光源可视化
             auto spot_light_cube = new GOCube("spot_light_cube", new MaterialConstantColor(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)), num, true);
+            GameWorld::GetInstance().all_game_object.push_back(spot_light_cube);
             // 3.4 配置聚光源
             for (int i = 0; i < num; i++) {
                 UniformBufferLight::GetInstance().spot_light[i] = SpotLight(
@@ -393,10 +406,15 @@ void GameWorld::GameTick() {
     spot_light->position = main_camera->camera->position;
     spot_light->direction = main_camera->camera->front;
 
-    /* 更新相机状态 */
+    /* 更新 camera 组件中的相机状态 */
     auto camera_component = GameComponent::GetInstance().GetComponentCamera();
         for (auto camera_component : camera_component)
             camera_component->UpdateCameraState();
+
+    /* 更新 shadow 组件中的相机状态 */
+    auto shadow_component = GameComponent::GetInstance().GetComponentShadow();
+        for (auto shadow_component : shadow_component)
+            shadow_component->UpdateCameraState();
     
     /* 场景 GameTick */
     switch (scene) {

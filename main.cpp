@@ -44,52 +44,70 @@ void Run() {
     glCullFace(GL_BACK);    // 剔除背面
     glFrontFace(GL_CCW);    // 正面为逆时针方向
     // 1.5 屏幕对象
-    MeshSquare* screen = new MeshSquare();
-    MaterialPostProcess* screen_mat = new MaterialPostProcess(NULL, NULL);
+    GOScreen* screen = new GOScreen("screen");
 
     /* 2. 渲染循环 */
     while (!glfwWindowShouldClose(window)) {
         /* 2.0 预处理 */
-        float current_time = glfwGetTime();
-        delta_time = current_time - last_time;
-        last_time = current_time;
+        {
+            float current_time = glfwGetTime();
+            delta_time = current_time - last_time;
+            last_time = current_time;
+        }
 
         /* 2.1 处理输入 */ 
-        keyboard_callback(window);
-        GameWorld::GetInstance().GameTick();
+        {
+            keyboard_callback(window);
+            GameWorld::GetInstance().GameTick();
+        }
 
-        /* 2.2 每个相机渲染一次 */ 
-        auto camera_components = GameComponent::GetInstance().GetComponentCamera();
-        for (auto camera_component : camera_components) 
-            camera_component->RenderTick(
-                GameComponent::GetInstance().GetComponentMesh(camera_component->camera),
-                GameComponent::GetInstance().GetComponentBorder(),
-                GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponents<ComponentMesh>()[0] : NULL
-            );
+        /* 2.2 渲染过程 */
+        {
+            // 2.2.1 渲染阴影贴图
+            auto shadow_components = GameComponent::GetInstance().GetComponentShadow();
+            for (auto shadow_component : shadow_components) 
+                shadow_component->RenderTick(GameComponent::GetInstance().GetComponentMesh(shadow_component->camera, false));
+            
+            // 2.2.2 每个相机渲染一次
+            auto camera_components = GameComponent::GetInstance().GetComponentCamera();
+            for (auto camera_component : camera_components) 
+                camera_component->RenderTick(
+                    GameComponent::GetInstance().GetComponentMesh(camera_component->camera, true),
+                    GameComponent::GetInstance().GetComponentBorder(),
+                    GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponents<ComponentMesh>()[0] : NULL
+                );
+        }
 
         /* 2.3 将main_camera的帧缓冲绘制到屏幕上 */
-        // 2.3.1 禁用深度测试, 面剔除
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-        glClearColor(0, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        // 2.3.2 绘制屏幕长方形对象
-        glViewport(0, 0, window_width, window_height);
-        screen_mat->screen_texture = GameWorld::GetInstance().main_camera->frame_buffer->color_texture;
-        screen_mat->screen_texture_multisample = GameWorld::GetInstance().main_camera->frame_buffer->color_texture_multisample;
-        screen_mat->choose_post_process = GlobalValue::GetInstance().GetIntValue("choose_post_process");
-        screen_mat->Use();
-        screen->Draw(1);
-        // 2.3.3 重新启用深度测试, 面剔除
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        {
+            // 2.3.1 禁用深度测试, 面剔除
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_CULL_FACE);
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            
+            // 2.3.2 绘制屏幕对象
+            glViewport(0, 0, window_width, window_height);
+            FrameBuffer* target_frame_buffer;
+            int show_shadow = GlobalValue::GetInstance().GetIntValue("show_shadow");
+            if (show_shadow == 0) {
+                target_frame_buffer = GameWorld::GetInstance().main_camera->frame_buffer;
+            } else {
+                target_frame_buffer = GameComponent::GetInstance().GetComponentShadow()[show_shadow - 1]->frame_buffer;
+            }
+            screen->SetTargetFrameBuffer(target_frame_buffer);
+            screen->Draw();
+            
+            // 2.3.3 重新启用深度测试, 面剔除
+            glEnable(GL_DEPTH_TEST);
+            glEnable(GL_CULL_FACE);
+        }
         
         /* 2.4 检查并调用事件, 交换缓存 */
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
 }
-
 
 void InitOpenGL(){
     /* 初始化窗口, 设置窗口属性 */
@@ -158,6 +176,13 @@ void keyboard_callback(GLFWwindow* window) {
     for (int i = 0; i <= num_post_process; i++) {
         if (glfwGetKey(window, GLFW_KEY_0 + i) == GLFW_PRESS) 
             GlobalValue::GetInstance().SetValue("choose_post_process", i);
+    }
+
+    /* F1 ~ F12 选择显示阴影贴图(F1不显示) */
+    int shadow_count = GameComponent::GetInstance().GetComponentShadow().size();
+    for (int i = 0; i <= shadow_count; i++) {
+        if (glfwGetKey(window, GLFW_KEY_F1 + i) == GLFW_PRESS) 
+            GlobalValue::GetInstance().SetValue("show_shadow", i);
     }
 
     /* G 选择是否显示调试对象 */

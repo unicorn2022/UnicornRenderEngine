@@ -50,3 +50,30 @@ private:
     float near;   // 近平面距离
     float far;    // 远平面距离
 };
+
+class RoamingCameraOrtho : public RoamingCamera {
+public:
+    /** 正交投影相机
+     * \param left 左
+     * \param right 右
+     * \param bottom 下
+     * \param top 上
+     * \param near 近平面距离
+     * \param far 远平面距离
+     */
+    RoamingCameraOrtho(float left, float right, float bottom, float top, float near, float far);
+
+public:
+    /** 设置正交投影相机的投影平面
+     * \param left 左
+     * \param right 右
+     * \param bottom 下
+     * \param top 上
+     */
+    void SetOrthoSquare(float left, float right, float bottom, float top);
+
+private:
+    float left, right, bottom, top;    // 正交平面的左、右、下、上
+    float near;   // 近平面距离
+    float far;    // 远平面距离
+};

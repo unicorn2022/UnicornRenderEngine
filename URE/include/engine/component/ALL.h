@@ -3,4 +3,5 @@
 #include "engine/component/ComponentBorder.h"
 #include "engine/component/ComponentCamera.h"
 #include "engine/component/ComponentMesh.h"
-#include "engine/component/ComponentTransform.h"  
+#include "engine/component/ComponentShadow.h"
+#include "engine/component/ComponentTransform.h"
