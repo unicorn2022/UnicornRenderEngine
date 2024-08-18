@@ -2,7 +2,7 @@
 #include "GlobalValue.h"
 
 MaterialPostProcess::MaterialPostProcess(Texture* screen_texture, TextureMultiSample* screen_texture_multisample) {
-    this->shader = new Shader("post_process");
+    this->shader = new Shader("post_process/post_process");
     this->screen_texture = screen_texture;
     this->screen_texture_multisample = screen_texture_multisample;
     this->choose_post_process = 0;

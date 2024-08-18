@@ -2,7 +2,7 @@
 #include "GlobalValue.h"
 
 MaterialPhongLight::MaterialPhongLight(Texture* diffuse, Texture* specular, float shininess) {
-    this->shader = new Shader("mesh_phong_light");
+    this->shader = new Shader("shading/mesh_phong_light");
     this->diffuse = diffuse;
     this->specular = specular;
     this->shininess = shininess;
