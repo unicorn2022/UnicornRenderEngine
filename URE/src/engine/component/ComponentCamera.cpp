@@ -76,12 +76,11 @@ void ComponentCamera::RenderTick() {
     {
         // 3.1.1 绘制不含边框的物体, 不更新模板缓冲
         {
-            static Material* material = new MaterialShadowDirectLight();
             glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
             glStencilMask(0x00); // 写入的模板值为0
             for (auto object : render_objects)
                 if (object->IsTransport() == false && object->gameobject->GetComponents<ComponentBorder>().size() == 0)
-                    object->Draw(material);
+                    object->Draw();
         }
         // 3.1.2 绘制含边框的物体, 更新模板缓冲
         {

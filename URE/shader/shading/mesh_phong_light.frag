@@ -59,8 +59,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 
 vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, float shadow);
 
 /* 阴影计算函数 */
-const float shadow_bias = 0.005;
-float CalcDirectLightShadow(int index, vec4 light_space_position);
+float CalcDirectLightShadow(int index, vec4 light_space_position, float bias);
 
 /* 输入输出变量 */
 out vec4 FragColor;
@@ -109,7 +108,8 @@ void main() {
     vec3 color = vec3(0.0f);
     // 1. 方向光
     for(int i = 0; i < use_direct_light_num; i++) {
-        float shadow = CalcDirectLightShadow(i, fs_in.direct_light_position[i]);
+        float bias = max(0.05 * (1.0 - dot(normal_dir, direct_lights[i].direction)), 0.005);
+        float shadow = CalcDirectLightShadow(i, fs_in.direct_light_position[i], bias);
         color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, shadow);
     }
     // 2. 点光源
@@ -119,8 +119,6 @@ void main() {
     for(int i = 0; i < use_spot_light_num; i++)
         color += CalcSpotLight(spot_lights[i], normal_dir, fs_in.Position, view_dir, 0.0);
 
-    // color = fs_in.direct_light_position[0];
-    // color = fs_in.debug_color;
     FragColor = vec4(color, alpha);
 }
 
@@ -143,7 +141,8 @@ vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir, float sh
     }
 
     // 最终颜色
-    vec3 color = ambient + (1 - shadow) * (diffuse + specular);
+    vec3 color = ambient + diffuse + specular;
+    color *= 1 - shadow;
     return color;
 }
 
@@ -206,7 +205,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 vi
     return color * attenuation * instensity;
 }
 
-float CalcDirectLightShadow(int index, vec4 light_space_position) {
+float CalcDirectLightShadow(int index, vec4 light_space_position, float bias) {
     // 执行透视除法
     vec3 tex_coord = light_space_position.xyz / light_space_position.w;
     tex_coord = tex_coord * 0.5 + 0.5;
@@ -217,5 +216,5 @@ float CalcDirectLightShadow(int index, vec4 light_space_position) {
 
     float current_depth = tex_coord.z;
     // 计算阴影值
-    return current_depth - shadow_bias > shadow_depth ? 1.0 : 0.0;
+    return current_depth - bias > shadow_depth ? 1.0 : 0.0;
 }

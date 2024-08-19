@@ -13,9 +13,10 @@ GO::~GO() {
     components.clear();
 }
 
-void GO::AddComponent(Component* component) {
+void GO::AddComponent(Component* component, bool add_to_game_component) {
     components.push_back(component);
-    GameComponent::GetInstance().AddComponent(component);
+    if (add_to_game_component) 
+        GameComponent::GetInstance().AddComponent(component);
 }
 
 std::string GO::GetName() const {

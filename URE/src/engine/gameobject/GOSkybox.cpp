@@ -4,8 +4,8 @@
 
 GOSkybox::GOSkybox(std::string name, MaterialSkybox* material) : GO(name) {
     this->material = material;
-    AddComponent(new ComponentTransform(this));
-    AddComponent(new ComponentMesh(this, {new MeshCube()}, {material}));
+    AddComponent(new ComponentTransform(this), false);
+    AddComponent(new ComponentMesh(this, {new MeshCube()}, {material}), false);
 }
 
 TextureCube* GOSkybox::GetSkyboxTexture() const {

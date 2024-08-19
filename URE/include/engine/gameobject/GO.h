@@ -17,7 +17,7 @@ public:
         return ans;
     }
 
-    void AddComponent(Component* component);
+    void AddComponent(Component* component, bool add_to_game_component = true);
     std::string GetName() const;
 
 private:
