@@ -1,6 +1,6 @@
 #include "engine/material/MaterialSkyboxReflect.h"
 
-MaterialSkyboxReflect::MaterialSkyboxReflect(TextureCube* skybox) {
+MaterialSkyboxReflect::MaterialSkyboxReflect(TextureCube* skybox) : Material("MaterialSkyboxReflect") {
     this->shader = new Shader("shading/mesh_skybox_reflect");
     this->skybox = skybox;
 }

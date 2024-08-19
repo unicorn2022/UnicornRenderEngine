@@ -1,6 +1,6 @@
 #include "engine/material/MaterialVisualizationNormal.h"
 
-MaterialVisualizationNormal::MaterialVisualizationNormal(glm::vec4 color) {
+MaterialVisualizationNormal::MaterialVisualizationNormal(glm::vec4 color) : Material("MaterialVisualizationNormal") {
     this->shader = new Shader("visualization/mesh_visualization_normal", true);
     this->color = color;
 }

@@ -54,8 +54,8 @@ public:
     /* 鼠标控制左右+上下移动 */
     void ProcessMouseMovement(float xoffset, float yoffset);
 
-private:
     glm::vec3 position; // 位置
+private:
     glm::vec3 rotate;   // XYZ轴的旋转
     glm::vec3 scale;    // XYZ轴的缩放
     ComponentTransform* parent;

@@ -1,6 +1,6 @@
 #include "engine/material/MaterialSkyboxRefract.h"
 
-MaterialSkyboxRefract::MaterialSkyboxRefract(TextureCube* skybox) {
+MaterialSkyboxRefract::MaterialSkyboxRefract(TextureCube* skybox) : Material("MaterialSkyboxRefract") {
     this->shader = new Shader("shading/mesh_skybox_refract");
     this->skybox = skybox;
 }

@@ -56,7 +56,7 @@ static void Scene_Light() {
             };
             // 1.2 方向光源个数
             int num = UniformBufferLight::GetInstance().use_direct_light_num;
-            // 1.3 点光源可视化
+            // 1.3 方向光源可视化
             auto direct_light_cube = new GOCube("direct_light_cube", new MaterialConstantColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)), num, true);
             GameWorld::GetInstance().all_game_object.push_back(direct_light_cube);
             // 1.4 配置方向光源
@@ -339,10 +339,10 @@ static void Test_Shadow_Map_Scene() {
 
     /* 平面 */
     {
-        auto plane = new GOCube("plane", new MaterialPhongLight(new Texture("wood.png"), new Texture("wood.png")));
-        plane->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, -1.0f, 0.0f));
-        plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f, 0.1f, 5.0f));
-        GameWorld::GetInstance().all_game_object.push_back(plane);
+        // auto plane = new GOCube("plane", new MaterialPhongLight(new Texture("wood.png"), new Texture("wood.png")));
+        // plane->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, -1.0f, 0.0f));
+        // plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f, 0.1f, 5.0f));
+        // GameWorld::GetInstance().all_game_object.push_back(plane);
     }
 
     /* 箱子 */
@@ -357,11 +357,15 @@ static void Test_Shadow_Map_Scene() {
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 0.0f, 0.0f)
         };
+        // GOCube* container = new GOCube("container",
+        //     new MaterialPhongLight(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
+        //     container_position.size()
+        // );
         GOCube* container = new GOCube("container",
-            new MaterialPhongLight(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
+            new MaterialShadowDirectLight(), 
             container_position.size()
         );
-        container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));
+        // container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));
         for (int i = 0; i < container_position.size(); i++) {            
             container->GetComponents<ComponentTransform>()[i]->TransformTranslate(container_position[i]);
             container->GetComponents<ComponentTransform>()[i]->TransformRotate(container_rotate[i]);
@@ -370,7 +374,12 @@ static void Test_Shadow_Map_Scene() {
         GameWorld::GetInstance().all_game_object.push_back(container);
     }
 }
-static void Test_Shadow_Map_GameTick() {}
+static void Test_Shadow_Map_GameTick() {
+    GameWorld::GetInstance().main_camera->gameobject->GetComponents<ComponentTransform>()[0]->position = (10.0f * UniformBufferLight::GetInstance().direct_light[0].direction);
+    // std::cout << "main_camera: " 
+    //           << "yaw:"  << GameWorld::GetInstance().main_camera->gameobject->GetComponents<ComponentTransform>()[0]->GetYaw() << " " 
+    //           << "pitch: " << GameWorld::GetInstance().main_camera->gameobject->GetComponents<ComponentTransform>()[0]->GetPitch() << "\n"; 
+}
 
 
 

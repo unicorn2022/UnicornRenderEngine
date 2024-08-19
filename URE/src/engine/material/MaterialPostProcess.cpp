@@ -1,7 +1,7 @@
 #include "engine/material/MaterialPostProcess.h"
 #include "GlobalValue.h"
 
-MaterialPostProcess::MaterialPostProcess(Texture* screen_texture, TextureMultiSample* screen_texture_multisample) {
+MaterialPostProcess::MaterialPostProcess(Texture* screen_texture, TextureMultiSample* screen_texture_multisample) : Material("MaterialPostProcess") {
     this->shader = new Shader("post_process/post_process");
     this->screen_texture = screen_texture;
     this->screen_texture_multisample = screen_texture_multisample;

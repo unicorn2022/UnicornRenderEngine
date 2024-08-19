@@ -1,6 +1,6 @@
 #include "engine/material/MaterialVisualizationBorder.h"
 
-MaterialVisualizationBorder::MaterialVisualizationBorder(glm::vec4 color) {
+MaterialVisualizationBorder::MaterialVisualizationBorder(glm::vec4 color) : Material("MaterialVisualizationBorder") {
     this->shader = new Shader("visualization/mesh_visualization_border", true);
     this->color = color;
 }

@@ -1,6 +1,6 @@
 #include "engine/material/MaterialSkybox.h"
 
-MaterialSkybox::MaterialSkybox(TextureCube* skybox_texture) {
+MaterialSkybox::MaterialSkybox(TextureCube* skybox_texture) : Material("MaterialSkybox") {
     this->shader = new Shader("skybox/skybox");
     this->skybox_texture = skybox_texture;
 }

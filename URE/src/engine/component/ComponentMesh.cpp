@@ -43,7 +43,6 @@ void ComponentMesh::Draw(Material* material) {
 }
 
 void ComponentMesh::DrawOneMesh(Mesh* mesh, Material* material) {
-    // std::cout << "DrawOneMesh\n";
     /* 1. 使用材质 */
     material->Use();
     /* 2. 绘制物体 */

@@ -30,6 +30,6 @@ public:
     void RenderTick();
 
 public:
-    RoamingCameraPerspective* camera;
+    RoamingCamera* camera;
     FrameBuffer* frame_buffer;
 };

@@ -1,6 +1,6 @@
 #include "engine/material/MaterialConstantColor.h"
 
-MaterialConstantColor::MaterialConstantColor(glm::vec4 color) {
+MaterialConstantColor::MaterialConstantColor(glm::vec4 color) : Material("MaterialConstantColor") {
     this->shader = new Shader("shading/mesh_constant_color");
     this->color = color;
 }

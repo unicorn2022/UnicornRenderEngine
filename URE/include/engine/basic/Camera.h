@@ -3,6 +3,9 @@
 
 class Camera{
 public:
+    virtual ~Camera() {}
+
+public:
     glm::mat4 GetViewMatrix() const;
     glm::mat4 GetProjectionMatrix() const;
     
@@ -17,7 +20,7 @@ class RoamingCamera : public Camera{
 public:
     /* 漫游相机 */
     RoamingCamera();
-    ~RoamingCamera();
+    virtual ~RoamingCamera();
 
 public:
     void SetPosition(glm::vec3 position);
@@ -40,6 +43,7 @@ public:
      * \param far 远平面距离
      */
     RoamingCameraPerspective(float aspect, float fov, float near, float far);
+    virtual ~RoamingCameraPerspective() {}
 
 public:
     float GetFOV() const;
@@ -62,6 +66,7 @@ public:
      * \param far 远平面距离
      */
     RoamingCameraOrtho(float left, float right, float bottom, float top, float near, float far);
+    virtual ~RoamingCameraOrtho() {}
 
 public:
     /** 设置正交投影相机的投影平面

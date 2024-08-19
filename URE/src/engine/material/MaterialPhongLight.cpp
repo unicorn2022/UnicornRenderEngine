@@ -2,7 +2,7 @@
 #include "GlobalValue.h"
 #include "engine/basic/UniformBuffer.h"
 
-MaterialPhongLight::MaterialPhongLight(Texture* diffuse, Texture* specular, float shininess) {
+MaterialPhongLight::MaterialPhongLight(Texture* diffuse, Texture* specular, float shininess) : Material("MaterialPhongLight") {
     this->shader = new Shader("shading/mesh_phong_light");
     this->diffuse = diffuse;
     this->specular = specular;

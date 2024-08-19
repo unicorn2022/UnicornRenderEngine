@@ -51,7 +51,7 @@ public:
      * \param bottom 正交投影相机: 下边界
      * \param top 正交投影相机: 上边界
      */
-    ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near = 0.1f, float far = 100.0f, float left = -100.0f, float right = 100.0f, float bottom = -100.0f, float top = 100.0f);
+    ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near = 0.1f, float far = 100.0f, float left = -10.0f, float right = 10.0f, float bottom = -10.0f, float top = 10.0f);
 
 private:
     DirectLight* direct_light;

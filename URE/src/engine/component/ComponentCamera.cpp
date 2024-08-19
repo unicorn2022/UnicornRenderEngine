@@ -3,10 +3,12 @@
 #include "engine/basic/UniformBuffer.h"
 #include "GameWorld.h"
 #include "GameComponent.h"
+#include "engine/material/ALL.h"
 
 ComponentCamera::ComponentCamera(GO* gameobject, float fov, float near, float far, int width, int height, int samples) : Component(gameobject) {
     this->type = "component_camera";
     this->camera = new RoamingCameraPerspective((float)width / (float)height, fov, near, far);
+    // this->camera = new RoamingCameraOrtho(-10, 10, -10, 10, 0.1, 100);
     this->frame_buffer = new FrameBuffer(width, height, samples);
 }
 
@@ -24,6 +26,8 @@ void ComponentCamera::UpdateCameraState() {
 }
 
 void ComponentCamera::ProcessMouseScroll(float yoffset) {
+    auto camera = dynamic_cast<RoamingCameraPerspective*>(this->camera);
+    if (camera == NULL) return;
     float fov = camera->GetFOV();
     fov -= yoffset;
     camera->SetFOV(fov);
@@ -72,11 +76,12 @@ void ComponentCamera::RenderTick() {
     {
         // 3.1.1 绘制不含边框的物体, 不更新模板缓冲
         {
+            static Material* material = new MaterialShadowDirectLight();
             glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
             glStencilMask(0x00); // 写入的模板值为0
             for (auto object : render_objects)
                 if (object->IsTransport() == false && object->gameobject->GetComponents<ComponentBorder>().size() == 0)
-                    object->Draw();
+                    object->Draw(material);
         }
         // 3.1.2 绘制含边框的物体, 更新模板缓冲
         {

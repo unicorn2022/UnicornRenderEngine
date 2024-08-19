@@ -19,7 +19,7 @@ void ComponentShadow::UpdateCameraState() {
     ComponentTransform* transform = gameobject->GetComponents<ComponentTransform>()[0];
     auto direction = 10.0f * transform->GetPosition();
     camera->SetPosition(direction);
-    camera->front = -direction;
+    camera->front = -direction; // 保证 look-at 的 target 为原点
 }
 void ComponentShadow::RenderTick() {
     if (!enable) return;
@@ -56,8 +56,8 @@ void ComponentShadow::RenderTick() {
 
 /* ComponentShadowDirectLight */
 ComponentShadowDirectLight::ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near, float far, float left, float right, float bottom, float top) : ComponentShadow(gameobject, width, height, samples) {
-    this->camera = new RoamingCameraOrtho(left, right, bottom, top, near, far);
-    // this->camera = new RoamingCameraPerspective((float)width/(float)height, 45, near, far);
+    // this->camera = new RoamingCameraOrtho(left, right, bottom, top, near, far);
+    this->camera = new RoamingCameraPerspective(1.0f, 45, 0.1f, 1000.0f);
     this->direct_light = direct_light;
     this->light_matrix = light_matrix;
     this->shadow_map_index = shadow_map_index;
