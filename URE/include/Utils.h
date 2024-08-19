@@ -53,6 +53,7 @@ namespace Utils {
     void Debug(std::string msg, glm::vec3 data);
     void Debug(std::string msg, glm::vec4 data);
     void Debug(std::string msg, glm::mat4 data);
+    void Check(std::string msg);
 
     int Random(int L, int R);
     float Random(float L, float R);

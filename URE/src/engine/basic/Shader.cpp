@@ -15,32 +15,43 @@ Shader::~Shader() {
 /* 使用着色器 */
 void Shader::Use() {
     glUseProgram(ID);
+    // Utils::Check("[ERROR::Shader::Use()] " + name);
 }
 
 /* 设置 uniform 变量值: bool */
 void Shader::SetUniform(const std::string& name, bool value) const {
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+    auto location = glGetUniformLocation(ID, name.c_str());
+    if (CheckVarLocation(location, name)) glUniform1i(location, (int)value);
 }
+
 /* 设置 uniform 变量值: int */
 void Shader::SetUniform(const std::string& name, int value) const {
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+    auto location = glGetUniformLocation(ID, name.c_str());
+    if (CheckVarLocation(location, name)) glUniform1i(location, value);
 }
+
 /* 设置 uniform 变量值: float */
 void Shader::SetUniform(const std::string& name, float value) const {
-    glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+    auto location = glGetUniformLocation(ID, name.c_str());
+    if (CheckVarLocation(location, name)) glUniform1f(location, value);
 }
+
 /* 设置 uniform 变量值: vec3 */
 void Shader::SetUniform(const std::string& name, glm::vec3 vec) const {
-    glUniform3f(glGetUniformLocation(ID, name.c_str()), vec.x, vec.y, vec.z);
+    auto location = glGetUniformLocation(ID, name.c_str());
+    if (CheckVarLocation(location, name)) glUniform3f(location, vec.x, vec.y, vec.z);
 }
 
 /* 设置 uniform 变量值: vec4 */
 void Shader::SetUniform(const std::string& name, glm::vec4 vec) const {
-    glUniform4f(glGetUniformLocation(ID, name.c_str()), vec.x, vec.y, vec.z, vec.w);
+    auto location = glGetUniformLocation(ID, name.c_str());
+    if (CheckVarLocation(location, name)) glUniform4f(location, vec.x, vec.y, vec.z, vec.w);
 }
+
 /* 设置 uniform 变量值: mat4 */
 void Shader::SetUniform(const std::string& name, glm::mat4& mat) const {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
+    auto location = glGetUniformLocation(ID, name.c_str());
+    if (CheckVarLocation(location, name)) glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 void Shader::CreateShader(std::string vertex_shader_path, std::string fragment_shader_path) {
@@ -115,7 +126,7 @@ void Shader::CreateShader(std::string vertex_shader_path, std::string geometry_s
     glDeleteShader(fragment_shader);
 }
 
-bool Shader::Check(int shaderID, std::string message) {
+bool Shader::Check(int shaderID, std::string message) const {
     int  success;
     char infoLog[512];
     glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
@@ -124,4 +135,11 @@ bool Shader::Check(int shaderID, std::string message) {
         std::cout << "[ERROR::Shader.h::Check()] " << message << infoLog << std::endl;
     }
     return success;
+}
+
+bool Shader::CheckVarLocation(GLint location, const std::string& var_name) const {
+    if (location == -1) {
+        // std::cout << "[ERROR::Shader.h::CheckVarLocation()] " << name << " 中不存在 " << var_name << " 变量\n" ;
+        return false;
+    } else return true;
 }

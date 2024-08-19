@@ -1,6 +1,10 @@
 #version 460 core
 #extension GL_ARB_shading_language_include : enable
 
+#define MAX_DIRECT_LIGHT_COUNT 2
+#define MAX_POINT_LIGHT_COUNT 4
+#define MAX_SPOT_LIGHT_COUNT 2
+
 /* Phong 材质*/
 struct PhongMaterial {
     sampler2D diffuse;
@@ -50,9 +54,13 @@ struct SpotLight {
 };
 
 /* 光源计算函数 */
-vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir);
-vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir);
-vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir);
+vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir, float shadow);
+vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, float shadow);
+vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, float shadow);
+
+/* 阴影计算函数 */
+const float shadow_bias = 0.005;
+float CalcDirectLightShadow(int index, vec4 light_space_position);
 
 /* 输入输出变量 */
 out vec4 FragColor;
@@ -61,20 +69,32 @@ in VS_OUT {
     vec3 Normal;
     vec2 TexCoord;
     vec3 ViewPosition;
+    // 光源视角的坐标
+    vec4 direct_light_position[MAX_DIRECT_LIGHT_COUNT];
+    vec4 point_light_position[MAX_POINT_LIGHT_COUNT];
+    vec3 debug_color;
 } fs_in;
 
 /* uniform 变量 */
-#define MAX_DIRECT_LIGHT_COUNT 2
-#define MAX_POINT_LIGHT_COUNT 4
-#define MAX_SPOT_LIGHT_COUNT 2
 layout (std140, binding = 1) uniform Light {
-    DirectLight direct_light[MAX_DIRECT_LIGHT_COUNT];
+    // 1. 光源数据
+    DirectLight direct_lights[MAX_DIRECT_LIGHT_COUNT];
     PointLight point_lights[MAX_POINT_LIGHT_COUNT];
-    SpotLight spot_light[MAX_SPOT_LIGHT_COUNT];
+    SpotLight spot_lights[MAX_SPOT_LIGHT_COUNT];
+    // 2. 使用的光源个数
     int use_direct_light_num;
     int use_point_light_num;
     int use_spot_light_num;
 };
+
+// 阴影贴图
+uniform sampler2D direct_light_shadow_map_0;
+uniform sampler2D direct_light_shadow_map_1;
+uniform sampler2D point_light_shadow_map_0;
+uniform sampler2D point_light_shadow_map_1;
+uniform sampler2D point_light_shadow_map_2;
+uniform sampler2D point_light_shadow_map_3;
+
 // 材质
 uniform PhongMaterial material;
 // 是否使用 Blinn-Phong 模型
@@ -88,19 +108,23 @@ void main() {
     /* 计算三种光照 */
     vec3 color = vec3(0.0f);
     // 1. 方向光
-    for(int i = 0; i < use_direct_light_num; i++)
-        color += CalcDirectLight(direct_light[i], normal_dir, view_dir);
+    for(int i = 0; i < use_direct_light_num; i++) {
+        float shadow = CalcDirectLightShadow(i, fs_in.direct_light_position[i]);
+        color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, shadow);
+    }
     // 2. 点光源
     for(int i = 0; i < use_point_light_num; i++)
-        color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir);
+        color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir, 0.0);
     // 3. 聚光源
     for(int i = 0; i < use_spot_light_num; i++)
-        color += CalcSpotLight(spot_light[i], normal_dir, fs_in.Position, view_dir);
+        color += CalcSpotLight(spot_lights[i], normal_dir, fs_in.Position, view_dir, 0.0);
 
+    // color = fs_in.direct_light_position[0];
+    // color = fs_in.debug_color;
     FragColor = vec4(color, alpha);
 }
 
-vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir) {
+vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir, float shadow) {
     // 1. 环境光
     vec3 ambient = light.ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
 
@@ -119,11 +143,11 @@ vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir) {
     }
 
     // 最终颜色
-    vec3 color = ambient + diffuse + specular;
+    vec3 color = ambient + (1 - shadow) * (diffuse + specular);
     return color;
 }
 
-vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir) {
+vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, float shadow) {
     // 1. 环境光
     vec3 ambient = light.ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
 
@@ -150,7 +174,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 
     return color * attenuation;
 }
 
-vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir) {
+vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, float shadow) {
     // 1. 环境光
     vec3 ambient = light.ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
 
@@ -180,4 +204,18 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 vi
     // 最终颜色
     vec3 color = ambient + diffuse + specular;
     return color * attenuation * instensity;
+}
+
+float CalcDirectLightShadow(int index, vec4 light_space_position) {
+    // 执行透视除法
+    vec3 tex_coord = light_space_position.xyz / light_space_position.w;
+    tex_coord = tex_coord * 0.5 + 0.5;
+    // 取得最近点的深度
+    float shadow_depth;
+    if (index == 0) shadow_depth = texture(direct_light_shadow_map_0, tex_coord.xy).r;
+    else if(index == 1) shadow_depth = texture(direct_light_shadow_map_1, tex_coord.xy).r;
+
+    float current_depth = tex_coord.z;
+    // 计算阴影值
+    return current_depth - shadow_bias > shadow_depth ? 1.0 : 0.0;
 }

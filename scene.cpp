@@ -51,8 +51,8 @@ static void Scene_Light() {
         {
             // 1.1 方向光源方向
             std::vector<glm::vec3> direct_light_direction {
-                glm::normalize(glm::vec3(-2.0f, 4.0f, -1.0f)),
                 glm::normalize(glm::vec3(0.0f,  1.0f, 0.0f)),
+                glm::normalize(glm::vec3(-2.0f, 4.0f, -1.0f)),
             };
             // 1.2 方向光源个数
             int num = UniformBufferLight::GetInstance().use_direct_light_num;
@@ -71,11 +71,13 @@ static void Scene_Light() {
                 // 可视化
                 direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(glm::vec3(((i + 1) / 2) * 2.0f * std::pow(-1, i), 0.0f, 0.0f));
                 direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(Convert_Direction_To_Euler(direct_light_direction[i]));
-                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(1.0, 0.05, 0.05));
+                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(2, 0.05, 0.05));
                 // 阴影
                 auto direct_light_shadow = new GOShadowDirectLight(
                     "direct_light_shadow_" + std::to_string(i),
                     &UniformBufferLight::GetInstance().direct_light[i],
+                    &UniformBufferShadow::GetInstance().direct_light_matrix[i],
+                    &UniformBufferShadow::GetInstance().direct_light_shadow_map_index[i],
                     2048, 2048, 1
                 );
                 direct_light_shadow->GetComponents<ComponentTransform>()[0]->TransformTranslate(direct_light_direction[i]);
@@ -329,7 +331,7 @@ static void Test_Shadow_Map_Scene() {
     {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
         camera->GetComponents<ComponentTransform>()[0]->SetMoveSpeedClamp(main_camera_move_speed_min, main_camera_move_speed_max);
-        camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 0.0f, 20.0f));
+        camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 5.0f, 10.0f));
         camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
         GameWorld::GetInstance().all_game_object.push_back(camera);
         GameWorld::GetInstance().main_camera = camera->GetComponents<ComponentCamera>()[0];
@@ -337,22 +339,23 @@ static void Test_Shadow_Map_Scene() {
 
     /* 平面 */
     {
-        auto plane = new GOSquare("plane", new MaterialPhongLight(new Texture("wood.png"), new Texture("wood.png")));
-        plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f, 5.0f, 5.0f));
+        auto plane = new GOCube("plane", new MaterialPhongLight(new Texture("wood.png"), new Texture("wood.png")));
+        plane->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, -1.0f, 0.0f));
+        plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f, 0.1f, 5.0f));
         GameWorld::GetInstance().all_game_object.push_back(plane);
     }
 
     /* 箱子 */
     {
         const std::vector<glm::vec3> container_position {
-            glm::vec3(0.0f, 1.5f, 0.0f),
-            glm::vec3(2.0f, 0.0f, 1.0f),
-            glm::vec3(-1.0f, 0.0f, 2.0f)
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(2.0f, 0.0f, 0.0f),
+            glm::vec3(-2.0f, 0.0f, 0.0f)
         };
         const std::vector<glm::vec3> container_rotate {
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(60.0f, 0.0f, 60.0f)
+            glm::vec3(0.0f, 0.0f, 0.0f)
         };
         GOCube* container = new GOCube("container",
             new MaterialPhongLight(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 

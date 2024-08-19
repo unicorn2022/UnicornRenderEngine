@@ -27,7 +27,7 @@ public:
 
 public:
     /* 渲染逻辑 */
-    void RenderTick(std::vector<ComponentMesh*> &render_objects, std::vector<ComponentBorder*> &border_objects, ComponentMesh* skybox);
+    void RenderTick();
 
 public:
     RoamingCameraPerspective* camera;

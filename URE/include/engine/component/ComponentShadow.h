@@ -24,19 +24,23 @@ public:
 
 public:
     /* 渲染逻辑 */
-    void RenderTick(std::vector<ComponentMesh*> &render_objects);
+    void RenderTick();
 
 public:
     RoamingCamera* camera;
     FrameBuffer* frame_buffer;
     Material* material;
+    glm::mat4* light_matrix;
+    int* shadow_map_index;
 };
 
 class ComponentShadowDirectLight : public ComponentShadow {
 public:
     /** 阴影组件: GO可以产生阴影
      * \param gameobject 绑定的游戏对象
-     * \param direct_light 对应的方向光
+     * \param direct_light 对应UniformBuffer中的方向光
+     * \param light_matrix 对应UniformBuffer中的光源变换矩阵
+     * \param shadow_map_index 对应UniformBuffer中的阴影贴图索引
      * \param width 相机帧缓冲宽度
      * \param height 相机帧缓冲高度
      * \param samples 采样数
@@ -47,7 +51,7 @@ public:
      * \param bottom 正交投影相机: 下边界
      * \param top 正交投影相机: 上边界
      */
-    ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, int width, int height, int samples, float near = 1.0f, float far = 7.5f, float left = -10.0f, float right = 10.0f, float bottom = -10.0f, float top = 10.0f);
+    ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near = 0.1f, float far = 100.0f, float left = -100.0f, float right = 100.0f, float bottom = -100.0f, float top = 100.0f);
 
 private:
     DirectLight* direct_light;

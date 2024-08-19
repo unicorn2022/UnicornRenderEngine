@@ -93,15 +93,15 @@ void SampleColor() {
     ivec2 tex_size = textureSize(screen_texture_multisample);
     for (int i = 0; i < 9; i++) {
         /* 源图像 */
-        // vec3 color = texture(screen_texture, fs_in.TexCoord + offsets[i]).rgb;
+        vec3 color = texture(screen_texture, fs_in.TexCoord + offsets[i]).rgb;
         
         /* MSAA: 颜色为所有采样点的平均值 */
-        vec3 color = vec3(0.0f);
+        // vec3 color = vec3(0.0f);
         for (int j = 0; j < samples; j++) {
             vec2 tex_coord = fs_in.TexCoord + offsets[i];
             color += texelFetch(screen_texture_multisample, ivec2(tex_coord * tex_size), j).rgb;
         }
-        color = color / samples;
+        color = color / (samples + 1);
 
         /* 记录样本点颜色 */
         sample_color[i] = color;

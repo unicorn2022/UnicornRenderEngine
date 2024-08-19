@@ -71,3 +71,42 @@ float Utils::Random(float L, float R) {
     std::uniform_real_distribution<> dist(L, R);
     return dist(gen);
 }
+
+void Utils::Check(std::string msg) {
+    auto code = glGetError();
+    switch (code) {
+    case 0: break;
+    case 1280: {
+        std::cout << msg << "\t1280:枚举参数不合法\n";
+        break;
+    }
+    case 1281: {
+        std::cout << msg << "\t1281:值参数不合法\n";
+        break;
+    }
+    case 1282: {
+        std::cout << msg << "\t1282:一个指令的状态对指令的参数不合法\n";
+        break;
+    }
+    case 1283: {
+        std::cout << msg << "\t1283:push操作造成栈溢出\n";
+        break;
+    }
+    case 1284: {
+        std::cout << msg << "\t1284:pop操作时栈在最低点\n";
+        break;
+    }
+    case 1285: {
+        std::cout << msg << "\t1285:内存调用操作无法调用（足够的）内存\n";
+        break;
+    }
+    case 1286: {
+        std::cout << msg << "\t1286:读取或写入一个不完整的帧缓冲\n";
+        break;
+    }
+    default: {
+        std::cout << msg << "\t" << code << "\n";
+        break;
+    }
+    }
+}

@@ -2,6 +2,7 @@
 #include "engine/gameobject/GO.h"
 #include "engine/basic/UniformBuffer.h"
 #include "GameWorld.h"
+#include "GameComponent.h"
 
 ComponentCamera::ComponentCamera(GO* gameobject, float fov, float near, float far, int width, int height, int samples) : Component(gameobject) {
     this->type = "component_camera";
@@ -28,8 +29,13 @@ void ComponentCamera::ProcessMouseScroll(float yoffset) {
     camera->SetFOV(fov);
 }
 
-void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, std::vector<ComponentBorder*> &border_objects, ComponentMesh* skybox) {
+void ComponentCamera::RenderTick() {
     if (!enable) return;
+    std::vector<ComponentMesh*> render_objects = GameComponent::GetInstance().GetComponentMesh(this->camera, true);
+    std::vector<ComponentBorder*> border_components = GameComponent::GetInstance().GetComponentBorder();
+    std::vector<ComponentShadow*> shadow_components = GameComponent::GetInstance().GetComponentShadow();
+    ComponentMesh* skybox = GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponents<ComponentMesh>()[0] : NULL;
+
     // 渲染 test_camera 所见景象时禁止 test_camera_screen
     if (this == GameWorld::GetInstance().test_camera) {
         GameWorld::GetInstance().test_camera_screen->enable = false;
@@ -45,6 +51,15 @@ void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, st
         UniformBufferCamera::GetInstance().UpdateUniformData();
         // 1.3 更新 UniformBufferLight 的值
         UniformBufferLight::GetInstance().UpdateUniformData();
+        // 1.4 更新 UniformBufferShadow 的值
+        int texture_index = 2;
+        for (auto shadow_component : shadow_components) {
+            shadow_component->frame_buffer->color_texture->Use(texture_index);
+            *(shadow_component->light_matrix) = shadow_component->camera->GetProjectionMatrix() * shadow_component->camera->GetViewMatrix();
+            *(shadow_component->shadow_map_index) = texture_index;
+            texture_index++;
+        }
+        UniformBufferShadow::GetInstance().UpdateUniformData();
     }
         
     /* 2. 清屏: 颜色缓冲, 深度缓冲, 模板缓冲 */
@@ -74,7 +89,7 @@ void ComponentCamera::RenderTick(std::vector<ComponentMesh*> &render_objects, st
         // 3.1.3 根据模板缓冲绘制边界
         if (GlobalValue::GetInstance().GetIntValue("show_border")) {
             glStencilFunc(GL_NOTEQUAL, 1, 0xff);// 模板值不为1时, 通过测试
-            for (auto border : border_objects)
+            for (auto border : border_components)
                 border->Draw();
         }
     }

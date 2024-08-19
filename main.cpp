@@ -66,16 +66,12 @@ void Run() {
             // 2.2.1 渲染阴影贴图
             auto shadow_components = GameComponent::GetInstance().GetComponentShadow();
             for (auto shadow_component : shadow_components) 
-                shadow_component->RenderTick(GameComponent::GetInstance().GetComponentMesh(shadow_component->camera, false));
+                shadow_component->RenderTick();
             
             // 2.2.2 每个相机渲染一次
             auto camera_components = GameComponent::GetInstance().GetComponentCamera();
             for (auto camera_component : camera_components) 
-                camera_component->RenderTick(
-                    GameComponent::GetInstance().GetComponentMesh(camera_component->camera, true),
-                    GameComponent::GetInstance().GetComponentBorder(),
-                    GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponents<ComponentMesh>()[0] : NULL
-                );
+                camera_component->RenderTick();
         }
 
         /* 2.3 将main_camera的帧缓冲绘制到屏幕上 */
@@ -153,6 +149,14 @@ void InitOpenGL(){
             }
         }
     }
+
+    /* 检查最大 inout 变量个数 */
+    GLint max_vertex_output_component;
+    glGetIntegerv(GL_MAX_VERTEX_OUTPUT_COMPONENTS, &max_vertex_output_component);
+    std::cout << "顶点着色器输出最大为: " << max_vertex_output_component << "N\n"; 
+    GLint max_fragment_input_component;
+    glGetIntegerv(GL_MAX_FRAGMENT_INPUT_COMPONENTS, &max_fragment_input_component);
+    std::cout << "片段着色器输入最大为: " << max_fragment_input_component << "N\n"; 
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {

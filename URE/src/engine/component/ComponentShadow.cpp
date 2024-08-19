@@ -1,8 +1,9 @@
 #include "engine/component/ComponentShadow.h"
 #include "engine/basic/UniformBuffer.h"
-#include "engine/material/MaterialShadowDirectLight.h"
+#include "engine/material/ALL.h"
 #include "engine/gameobject/GO.h"
 #include "GameWorld.h"
+#include "GameComponent.h"
 
 /* ComponentShadow */
 ComponentShadow::ComponentShadow(GO* gameobject, int width, int height, int samples) : Component(gameobject) {
@@ -16,12 +17,13 @@ ComponentShadow::~ComponentShadow() {
 }
 void ComponentShadow::UpdateCameraState() {
     ComponentTransform* transform = gameobject->GetComponents<ComponentTransform>()[0];
-    auto position = transform->GetPosition();
-    camera->SetPosition(position);
-    camera->front = -position;
+    auto direction = 10.0f * transform->GetPosition();
+    camera->SetPosition(direction);
+    camera->front = -direction;
 }
-void ComponentShadow::RenderTick(std::vector<ComponentMesh*> &render_objects) {
+void ComponentShadow::RenderTick() {
     if (!enable) return;
+    std::vector<ComponentMesh*> render_objects = GameComponent::GetInstance().GetComponentMesh(this->camera, false);
 
     /* 1. 预处理 */
     {
@@ -35,7 +37,7 @@ void ComponentShadow::RenderTick(std::vector<ComponentMesh*> &render_objects) {
         
     /* 2. 清屏: 颜色缓冲, 深度缓冲, 模板缓冲 */
     {
-        glClearColor(color_background.x, color_background.y, color_background.z, color_background.w);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
     
@@ -53,8 +55,11 @@ void ComponentShadow::RenderTick(std::vector<ComponentMesh*> &render_objects) {
 }
 
 /* ComponentShadowDirectLight */
-ComponentShadowDirectLight::ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, int width, int height, int samples, float near, float far, float left, float right, float bottom, float top) : ComponentShadow(gameobject, width, height, samples) {
+ComponentShadowDirectLight::ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near, float far, float left, float right, float bottom, float top) : ComponentShadow(gameobject, width, height, samples) {
     this->camera = new RoamingCameraOrtho(left, right, bottom, top, near, far);
+    // this->camera = new RoamingCameraPerspective((float)width/(float)height, 45, near, far);
     this->direct_light = direct_light;
+    this->light_matrix = light_matrix;
+    this->shadow_map_index = shadow_map_index;
     this->material = new MaterialShadowDirectLight();
 }

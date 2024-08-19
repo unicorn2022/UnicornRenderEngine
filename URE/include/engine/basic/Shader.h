@@ -48,5 +48,7 @@ private:
     void CreateShader(std::string vertex_shader_path, std::string geometry_shader_path, std::string fragment_shader_path);
     
     /* 判断 shader 编译是否成功 */
-    bool Check(int shaderID, std::string message = "");
+    bool Check(int shaderID, std::string message = "") const;
+
+    bool CheckVarLocation(GLint location, const std::string& var_name) const;
 };
