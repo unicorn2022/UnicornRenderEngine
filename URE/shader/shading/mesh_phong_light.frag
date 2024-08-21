@@ -99,8 +99,8 @@ uniform PhongMaterial material;
 // 是否使用 Blinn-Phong 模型
 uniform int use_blinn_phong = 1;
 
-const float SHADOW_BIAS_MIN = 0.00001; // 阴影计算 bias: 最小值
-const float SHADOW_BIAS_MAX = 0.00001; // 阴影计算 bias: 最大值
+const float SHADOW_BIAS_MIN = 0.0001; // 阴影计算 bias: 最小值
+const float SHADOW_BIAS_MAX = 0.0002; // 阴影计算 bias: 最大值
 const int PCF_SAMPLE_RANGE = 1;      // PCF采样范围 [-x, x]
 const int PCF_SAMPLE_NUM = (PCF_SAMPLE_RANGE * 2 + 1) * (PCF_SAMPLE_RANGE * 2 + 1); // PCF采样点个数
 

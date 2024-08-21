@@ -68,7 +68,9 @@ static void Scene_Light() {
                     &UniformBufferLight::GetInstance().direct_light[i],
                     &UniformBufferShadow::GetInstance().direct_light_matrix[i],
                     &UniformBufferShadow::GetInstance().direct_light_shadow_map_index[i],
-                    512, 512, 1
+                    2048, 2048, 1,
+                    0.1, 100.0,
+                    -5.0f, 5.0f, -5.0f, 5.0f
                 );
                 direct_light_shadow->GetComponents<ComponentTransform>()[0]->TransformTranslate(direct_light_direction[i]);
                 GameWorld::GetInstance().all_game_object.push_back(direct_light_shadow);
