@@ -24,7 +24,7 @@ enum SceneChoice {
     Blinn_Phong,
     Shadow_Map,
 };
-const SceneChoice scene = SceneChoice::Shadow_Map;
+const SceneChoice scene = SceneChoice::Capture2D_Box_Window_Reflect_Refract;
 
 /* 基础场景 */
 static void Scene_Skybox() {

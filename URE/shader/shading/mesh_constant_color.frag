@@ -9,8 +9,12 @@ in vec3 local_position;
 uniform vec4 color;
 
 void main() {
-    FragColor = color;
-    // x轴为指向轴
-    if (local_position.x > 0.5f) FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    else FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    // 绿色(点光源可视化颜色)
+    if (color == vec4(0.0f, 1.0f, 0.0f, 1.0f)) {
+        FragColor = color;
+    } else {
+        // x轴为指向轴
+        if (local_position.x > 0.5f) FragColor = color;
+        else FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    }
 }
