@@ -99,8 +99,11 @@ uniform PhongMaterial material;
 // 是否使用 Blinn-Phong 模型
 uniform int use_blinn_phong = 1;
 
-const float SHADOW_BIAS_MIN = 0.002;
-const float SHADOW_BIAS_MAX = 0.002;
+const float SHADOW_BIAS_MIN = 0.00001; // 阴影计算 bias: 最小值
+const float SHADOW_BIAS_MAX = 0.00001; // 阴影计算 bias: 最大值
+const int PCF_SAMPLE_RANGE = 1;      // PCF采样范围 [-x, x]
+const int PCF_SAMPLE_NUM = (PCF_SAMPLE_RANGE * 2 + 1) * (PCF_SAMPLE_RANGE * 2 + 1); // PCF采样点个数
+
 
 void main() {
     vec3 normal_dir = normalize(fs_in.Normal);
@@ -209,17 +212,29 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 vi
 }
 
 float CalcDirectLightShadow(int index, vec4 light_space_position, float bias) {
-    // 执行透视除法
+    /* 执行透视除法, 计算像素点在光源视角下的坐标 */
     vec3 tex_coord = light_space_position.xyz / light_space_position.w;
     tex_coord = tex_coord * 0.5 + 0.5;
-    // 取得最近点的深度
-    float shadow_depth;
-    if (index == 0) shadow_depth = texture(direct_light_shadow_map_0, tex_coord.xy).r;
-    else if(index == 1) shadow_depth = texture(direct_light_shadow_map_1, tex_coord.xy).r;
-
     float current_depth = tex_coord.z;
-    // 计算阴影值
-    float shadow = current_depth - bias > shadow_depth ? 1.0 : 0.0;
-    if (current_depth > 1.0) shadow = 0.0;
+    if (current_depth > 1.0) return 0.0;
+
+    /* 计算阴影值 */
+    // 1.1 计算阴影贴图的单个像素大小
+    vec2 texel_size = vec2(1.0);
+    if (index == 0) texel_size = 1.0 / textureSize(direct_light_shadow_map_0, 0);
+    else if(index == 1) texel_size = 1.0 / textureSize(direct_light_shadow_map_1, 0);
+    // 1.2 PCF采样阴影贴图
+    float shadow = 0.0;
+    for (int x = -PCF_SAMPLE_RANGE; x <= PCF_SAMPLE_RANGE; x++) {
+        for (int y = -PCF_SAMPLE_RANGE; y <= PCF_SAMPLE_RANGE; y++) {
+            // 取得当前点的深度
+            float shadow_depth;
+            if (index == 0) shadow_depth = texture(direct_light_shadow_map_0, tex_coord.xy + vec2(x, y) * texel_size).r;
+            else if(index == 1) shadow_depth = texture(direct_light_shadow_map_1, tex_coord.xy + vec2(x, y) * texel_size).r;
+            shadow += current_depth - bias > shadow_depth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= PCF_SAMPLE_NUM;
+    // FragColor = vec4(shadow, texel_size.x, texel_size.y, 1.0);
     return shadow;
 }
