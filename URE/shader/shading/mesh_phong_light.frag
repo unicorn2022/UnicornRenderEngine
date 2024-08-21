@@ -108,7 +108,9 @@ void main() {
     vec3 color = vec3(0.0f);
     // 1. 方向光
     for(int i = 0; i < use_direct_light_num; i++) {
-        float bias = max(0.05 * (1.0 - dot(normal_dir, direct_lights[i].direction)), 0.005);
+        vec3 light_dir = normalize(direct_lights[i].direction);
+        float bias = max(0.005 * (1.0 - dot(normal_dir, light_dir)), 0.0005);
+
         float shadow = CalcDirectLightShadow(i, fs_in.direct_light_position[i], bias);
         color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, shadow);
     }
@@ -216,5 +218,7 @@ float CalcDirectLightShadow(int index, vec4 light_space_position, float bias) {
 
     float current_depth = tex_coord.z;
     // 计算阴影值
-    return current_depth - bias > shadow_depth ? 1.0 : 0.0;
+    float shadow = current_depth - bias > shadow_depth ? 1.0 : 0.0;
+    // FragColor = vec4(bias, current_depth, shadow_depth, 1.0);
+    return shadow;
 }

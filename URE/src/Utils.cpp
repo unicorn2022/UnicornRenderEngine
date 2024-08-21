@@ -110,3 +110,21 @@ void Utils::Check(std::string msg) {
     }
     }
 }
+
+glm::vec3 Utils::Convert_Direction_To_Euler(glm::vec3 direction) {
+    direction = glm::normalize(direction);
+    float nx = direction.x, ny = direction.y, nz = direction.z;
+    glm::vec3 rotate;
+    rotate.x = 0;
+    rotate.y = std::asin(nz) * 180.0 / PI;
+    rotate.z = std::atan2(ny, nx) * 180.0 / PI;
+    return rotate;
+}
+
+bool Utils::IsSameDirection(glm::vec3 dir1, glm::vec3 dir2) {
+    dir1 = glm::normalize(dir1);
+    dir2 = glm::normalize(dir2);
+    float dot = glm::dot(dir1, dir2);
+    if (std::abs(std::abs(dot) - 1.0) < 1e-5) return true;
+    return false;
+}

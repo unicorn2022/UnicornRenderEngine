@@ -11,7 +11,11 @@ layout (std140, binding = 0) uniform CameraMatrix {
     vec3 view_position;
 };
 
+/* inout变量 */
+out vec3 local_position;
+
 void main() {
+    local_position = aPos;
     vec3 position = vec3(model_transform * vec4(aPos, 1.0)); // 世界坐标下的顶点位置
 
     gl_Position = projection_transform * view_transform * vec4(position, 1.0);

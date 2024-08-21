@@ -55,7 +55,7 @@ glm::vec3 ComponentTransform::GetPosition() const {
 }
 /* 获取相机GO的偏航角 */ 
 float ComponentTransform::GetYaw() const { 
-    return rotate.y; 
+    return rotate.z; 
 }   
 /* 获取相机GO的俯仰角 */ 
 float ComponentTransform::GetPitch() const { 
@@ -114,7 +114,7 @@ void ComponentTransform::ProcessKeyboard(MovementDirection direction, float delt
 
 /* 鼠标控制左右+上下移动 */
 void ComponentTransform::ProcessMouseMovement(float xoffset, float yoffset) {
-    rotate.y += xoffset;
+    rotate.z += xoffset;
     rotate.x += yoffset;
     if (rotate.x > 89.0f) rotate.x = 89.0f;
     if (rotate.x < -89.0f) rotate.x = -89.0f;

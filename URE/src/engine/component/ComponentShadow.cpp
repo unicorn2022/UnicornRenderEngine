@@ -20,7 +20,8 @@ void ComponentShadow::UpdateCameraState() {
     auto direction = 10.0f * transform->GetPosition();
     camera->SetPosition(-direction);
     camera->front = direction; // 保证 look-at 的 target 为原点
-    camera->up = glm::vec3(0.0, 1.0, 0.0);
+    if (Utils::IsSameDirection(direction, glm::vec3(0, 1, 0))) camera->up = glm::vec3(0, 0, 1);
+    else camera->up = glm::vec3(0, 1, 0);
 }
 void ComponentShadow::RenderTick() {
     if (!enable) return;

@@ -58,5 +58,11 @@ namespace Utils {
     int Random(int L, int R);
     float Random(float L, float R);
 
+    /* 将 (1, 0, 0), 旋转 (x, y, z) 后, 结果为 direction */
+    glm::vec3 Convert_Direction_To_Euler(glm::vec3 direction);
+    
+    /* 判断两个向量是否共线 */
+    bool IsSameDirection(glm::vec3 dir1, glm::vec3 dir2);
+
     const float PI = 3.1415926535;
 };

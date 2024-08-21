@@ -26,16 +26,6 @@ enum SceneChoice {
 };
 const SceneChoice scene = SceneChoice::Shadow_Map;
 
-glm::vec3 Convert_Direction_To_Euler(glm::vec3 direction) {
-    direction = glm::normalize(direction);
-    float nx = direction.x, ny = direction.y, nz = direction.z;
-    // 计算方向角
-    float yaw = std::atan2(ny, nx) * 180.0 / Utils::PI;
-    float pitch = std::acos(nz) * 180.0 / Utils::PI;
-    float roll = 0.0;
-    return glm::vec3(yaw, pitch, roll);
-}
-
 /* 基础场景 */
 static void Scene_Skybox() {
     /* 天空盒 */
@@ -51,8 +41,8 @@ static void Scene_Light() {
         {
             // 1.1 方向光源方向
             std::vector<glm::vec3> direct_light_direction {
+                glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f)),
                 glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)),
-                glm::normalize(glm::vec3(2.0f, -4.0f, 1.0f)),
             };
             // 1.2 方向光源个数
             int num = UniformBufferLight::GetInstance().use_direct_light_num;
@@ -69,8 +59,8 @@ static void Scene_Light() {
                     glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
                 );
                 // 可视化
-                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(glm::vec3(((i + 1) / 2) * 2.0f * std::pow(-1, i), 0.0f, 0.0f));
-                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(Convert_Direction_To_Euler(direct_light_direction[i]));
+                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(glm::vec3(0.0f, 5.0f, 0.0f));
+                direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(Utils::Convert_Direction_To_Euler(direct_light_direction[i]));
                 direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(2, 0.05, 0.05));
                 // 阴影
                 auto direct_light_shadow = new GOShadowDirectLight(
@@ -141,7 +131,7 @@ static void Scene_Light() {
                 if (i == 0) spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0));
                 else {
                     spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(spot_light_position[i]);
-                    spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(Convert_Direction_To_Euler(spot_light_direction[i]));
+                    spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformRotate(Utils::Convert_Direction_To_Euler(spot_light_direction[i]));
                     spot_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(1.0, 0.05, 0.05));
                 }
             }
@@ -163,7 +153,7 @@ static void Test_Capture2D_Blend_Reflect_Scene() {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
         camera->GetComponents<ComponentTransform>()[0]->SetMoveSpeedClamp(main_camera_move_speed_min, main_camera_move_speed_max);
         camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 0.0f, 20.0f));
-        camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
+        camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, 0.0f, -90.0f));
         GameWorld::GetInstance().all_game_object.push_back(camera);
         GameWorld::GetInstance().main_camera = camera->GetComponents<ComponentCamera>()[0];
     }
@@ -258,7 +248,7 @@ static void Test_Planet_Scene() {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
         camera->GetComponents<ComponentTransform>()[0]->SetMoveSpeedClamp(main_camera_move_speed_min, main_camera_move_speed_max);
         camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 0.0f, 100.0f));
-        camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
+        camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, 0.0f, -90.0f));
         GameWorld::GetInstance().all_game_object.push_back(camera);
         GameWorld::GetInstance().main_camera = camera->GetComponents<ComponentCamera>()[0];
     }
@@ -308,7 +298,7 @@ static void Test_Blinn_Phong_Scene() {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
         camera->GetComponents<ComponentTransform>()[0]->SetMoveSpeedClamp(main_camera_move_speed_min, main_camera_move_speed_max);
         camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 0.0f, 20.0f));
-        camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
+        camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, 0.0f, -90.0f));
         GameWorld::GetInstance().all_game_object.push_back(camera);
         GameWorld::GetInstance().main_camera = camera->GetComponents<ComponentCamera>()[0];
     }
@@ -331,8 +321,8 @@ static void Test_Shadow_Map_Scene() {
     {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
         camera->GetComponents<ComponentTransform>()[0]->SetMoveSpeedClamp(main_camera_move_speed_min, main_camera_move_speed_max);
-        camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 5.0f, 10.0f));
-        camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, -90.0f, 0.0f));
+        camera->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 2.5f, 10.0f));
+        camera->GetComponents<ComponentTransform>()[0]->TransformRotate(glm::vec3(0.0f, 0.0f, -90.0f));
         GameWorld::GetInstance().all_game_object.push_back(camera);
         GameWorld::GetInstance().main_camera = camera->GetComponents<ComponentCamera>()[0];
     }
@@ -348,9 +338,9 @@ static void Test_Shadow_Map_Scene() {
     /* 箱子 */
     {
         const std::vector<glm::vec3> container_position {
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(2.0f, 0.0f, 0.0f),
-            glm::vec3(-2.0f, 0.0f, 0.0f)
+            glm::vec3(0.0f, 2.0f, 0.0f),
+            glm::vec3(2.0f, 2.0f, 0.0f),
+            glm::vec3(-2.0f, 2.0f, 0.0f)
         };
         const std::vector<glm::vec3> container_rotate {
             glm::vec3(0.0f, 0.0f, 0.0f),
