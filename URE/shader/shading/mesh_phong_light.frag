@@ -99,6 +99,9 @@ uniform PhongMaterial material;
 // 是否使用 Blinn-Phong 模型
 uniform int use_blinn_phong = 1;
 
+const float SHADOW_BIAS_MIN = 0.002;
+const float SHADOW_BIAS_MAX = 0.002;
+
 void main() {
     vec3 normal_dir = normalize(fs_in.Normal);
     vec3 view_dir = normalize(fs_in.ViewPosition - fs_in.Position);
@@ -109,8 +112,7 @@ void main() {
     // 1. 方向光
     for(int i = 0; i < use_direct_light_num; i++) {
         vec3 light_dir = normalize(direct_lights[i].direction);
-        float bias = max(0.005 * (1.0 - dot(normal_dir, light_dir)), 0.0005);
-
+        float bias = (SHADOW_BIAS_MAX - SHADOW_BIAS_MIN) * abs(1.0 - dot(normal_dir, light_dir)) + SHADOW_BIAS_MIN;
         float shadow = CalcDirectLightShadow(i, fs_in.direct_light_position[i], bias);
         color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, shadow);
     }
@@ -143,8 +145,7 @@ vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir, float sh
     }
 
     // 最终颜色
-    vec3 color = ambient + diffuse + specular;
-    color *= 1 - shadow;
+    vec3 color = ambient + (1 - shadow) * (diffuse + specular);
     return color;
 }
 
@@ -219,6 +220,6 @@ float CalcDirectLightShadow(int index, vec4 light_space_position, float bias) {
     float current_depth = tex_coord.z;
     // 计算阴影值
     float shadow = current_depth - bias > shadow_depth ? 1.0 : 0.0;
-    // FragColor = vec4(bias, current_depth, shadow_depth, 1.0);
+    if (current_depth > 1.0) shadow = 0.0;
     return shadow;
 }

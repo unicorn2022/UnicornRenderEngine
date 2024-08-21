@@ -63,11 +63,13 @@ void Run() {
 
         /* 2.2 渲染过程 */
         {
-            // 2.2.1 渲染阴影贴图
+            // 2.2.1 渲染阴影贴图 (正面剔除)
+            glCullFace(GL_FRONT);
             auto shadow_components = GameComponent::GetInstance().GetComponentShadow();
             for (auto shadow_component : shadow_components) 
                 shadow_component->RenderTick();
-            
+            glCullFace(GL_BACK);
+
             // 2.2.2 每个相机渲染一次
             auto camera_components = GameComponent::GetInstance().GetComponentCamera();
             for (auto camera_component : camera_components) 

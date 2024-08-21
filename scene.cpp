@@ -41,7 +41,7 @@ static void Scene_Light() {
         {
             // 1.1 方向光源方向
             std::vector<glm::vec3> direct_light_direction {
-                glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f)),
+                glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f)),
                 glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)),
             };
             // 1.2 方向光源个数
@@ -54,7 +54,7 @@ static void Scene_Light() {
                 // 方向光源属性
                 UniformBufferLight::GetInstance().direct_light[i] = DirectLight(
                     direct_light_direction[i],          // 方向
-                    glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
+                    glm::vec3(0.01f, 0.01f, 0.01f),     // 环境光
                     glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
                     glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
                 );
@@ -68,7 +68,7 @@ static void Scene_Light() {
                     &UniformBufferLight::GetInstance().direct_light[i],
                     &UniformBufferShadow::GetInstance().direct_light_matrix[i],
                     &UniformBufferShadow::GetInstance().direct_light_shadow_map_index[i],
-                    2048, 2048, 1
+                    512, 512, 1
                 );
                 direct_light_shadow->GetComponents<ComponentTransform>()[0]->TransformTranslate(direct_light_direction[i]);
                 GameWorld::GetInstance().all_game_object.push_back(direct_light_shadow);
@@ -330,7 +330,7 @@ static void Test_Shadow_Map_Scene() {
     /* 平面 */
     {
         auto plane = new GOCube("plane", new MaterialPhongLight(new Texture("wood.png"), new Texture("wood.png")));
-        plane->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, -1.0f, 0.0f));
+        plane->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, -0.6f, 0.0f));
         plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f, 0.1f, 5.0f));
         GameWorld::GetInstance().all_game_object.push_back(plane);
     }
@@ -338,9 +338,9 @@ static void Test_Shadow_Map_Scene() {
     /* 箱子 */
     {
         const std::vector<glm::vec3> container_position {
-            glm::vec3(0.0f, 2.0f, 0.0f),
-            glm::vec3(2.0f, 2.0f, 0.0f),
-            glm::vec3(-2.0f, 2.0f, 0.0f)
+            glm::vec3(-2.0f, 1.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.5f),
+            glm::vec3(0.0f, 0.0f, -0.5f)
         };
         const std::vector<glm::vec3> container_rotate {
             glm::vec3(0.0f, 0.0f, 0.0f),
