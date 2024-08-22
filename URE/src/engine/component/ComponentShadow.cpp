@@ -8,7 +8,6 @@
 /* ComponentShadow */
 ComponentShadow::ComponentShadow(GO* gameobject, int width, int height, int samples) : Component(gameobject) {
     this->type = "component_shadow";
-    this->frame_buffer = new FrameBuffer(width, height, samples);
 }
 ComponentShadow::~ComponentShadow() {
     delete frame_buffer;
@@ -23,7 +22,19 @@ void ComponentShadow::UpdateCameraState() {
     if (Utils::IsSameDirection(direction, glm::vec3(0, 1, 0))) camera->up = glm::vec3(0, 0, 1);
     else camera->up = glm::vec3(0, 1, 0);
 }
-void ComponentShadow::RenderTick() {
+
+
+/* ComponentShadowDirectLight */
+ComponentShadowDirectLight::ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near, float far, float left, float right, float bottom, float top) : ComponentShadow(gameobject, width, height, samples) {
+    this->camera = new RoamingCameraOrtho(left, right, bottom, top, near, far);
+    // this->camera = new RoamingCameraPerspective(1.0f, 45, 0.1f, 1000.0f);
+    this->direct_light = direct_light;
+    this->light_matrix = light_matrix;
+    this->shadow_map_index = shadow_map_index;
+    this->material = new MaterialShadowDirectLight();
+    this->frame_buffer = new FrameBuffer2D(width, height, samples);
+}
+void ComponentShadowDirectLight::RenderTick() {
     if (!enable) return;
     std::vector<ComponentMesh*> render_objects = GameComponent::GetInstance().GetComponentMesh(this->camera, false);
 
@@ -54,14 +65,4 @@ void ComponentShadow::RenderTick() {
 
     /* 4. 转换帧缓冲的颜色附件 */
     frame_buffer->Convert();
-}
-
-/* ComponentShadowDirectLight */
-ComponentShadowDirectLight::ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near, float far, float left, float right, float bottom, float top) : ComponentShadow(gameobject, width, height, samples) {
-    this->camera = new RoamingCameraOrtho(left, right, bottom, top, near, far);
-    // this->camera = new RoamingCameraPerspective(1.0f, 45, 0.1f, 1000.0f);
-    this->direct_light = direct_light;
-    this->light_matrix = light_matrix;
-    this->shadow_map_index = shadow_map_index;
-    this->material = new MaterialShadowDirectLight();
 }

@@ -3,9 +3,7 @@
 
 class MaterialShadowDirectLight : public Material {
 public:
-    /** 材质: 固定颜色
-     * \param color 物体颜色
-     */
+    /* 材质: 定向光源阴影 */
     MaterialShadowDirectLight();
 
 public:

@@ -1,5 +1,12 @@
 #include "engine/basic/TextureCube.h"
 
+TextureCube::TextureCube(int width, int height) {
+    this->width = width;
+    this->height = height;
+    this->sRGB = false;
+    CreateTextureCube();
+}
+
 TextureCube::TextureCube(std::string file_name[6], std::string type,bool sRGB, std::string root_directory) {
     for (int i = 0; i < 6; i++)
         this->path[i] = root_directory + file_name[i] + "." + type;
@@ -27,6 +34,10 @@ void TextureCube::CreateTextureCube() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);// R轴环绕方式: 插值到边界
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);   // 缩小过滤方式: 线性
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   // 放大过滤方式: 线性
+    /* 3. 如果已经有宽高信息, 则申请空间 */
+    if (width != 0 && height != 0)
+        for (int i = 0; i < 6; i++)
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 }
 
 void TextureCube::LoadTextureCubeData() {
@@ -55,4 +66,6 @@ void TextureCube::LoadTextureCubeData() {
         }
         Utils::FreePicture(data);
     }
+    this->width = width;
+    this->height = height;
 }

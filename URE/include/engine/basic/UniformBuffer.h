@@ -6,6 +6,7 @@ static const int MAX_DIRECT_LIGHT_COUNT = 2;
 static const int MAX_POINT_LIGHT_COUNT = 4;
 static const int MAX_SPOT_LIGHT_COUNT = 2;
 static const int N = 4;
+static const float POINT_LIGHT_SHADOW_ZFAR = 100.0f;
 
 class UniformBuffer {
 public:
@@ -90,19 +91,16 @@ public:
     virtual void UpdateUniformData(); 
 
 private:
-    UniformBufferShadow() : UniformBuffer(2, sizeof(direct_light_matrix) + sizeof(point_light_matrix) + 2 * N) {}
+    UniformBufferShadow() : UniformBuffer(2, sizeof(direct_light_matrix) + N) {}
 
 public:
     glm::mat4 direct_light_matrix[MAX_DIRECT_LIGHT_COUNT];
-    glm::mat4 point_light_matrix[MAX_POINT_LIGHT_COUNT];
 
 private:
     int use_direct_light_num;
-    int use_point_light_num;
     
 public:
     // 阴影贴图索引
     int direct_light_shadow_map_index[MAX_DIRECT_LIGHT_COUNT];
     int point_light_shadow_map_index[MAX_POINT_LIGHT_COUNT];
-
 };

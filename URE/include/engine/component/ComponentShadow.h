@@ -24,7 +24,7 @@ public:
 
 public:
     /* 渲染逻辑 */
-    void RenderTick();
+    virtual void RenderTick() = 0;
 
 public:
     RoamingCamera* camera;
@@ -52,6 +52,9 @@ public:
      * \param top 正交投影相机: 上边界
      */
     ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near = 0.1f, float far = 100.0f, float left = -10.0f, float right = 10.0f, float bottom = -10.0f, float top = 10.0f);
+
+public:
+    virtual void RenderTick();
 
 private:
     DirectLight* direct_light;

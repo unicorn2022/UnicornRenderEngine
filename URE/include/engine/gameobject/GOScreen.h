@@ -10,7 +10,7 @@ public:
     ~GOScreen();
 
 public:
-    void SetTargetFrameBuffer(FrameBuffer* frame_buffer);
+    void SetTargetFrameBuffer2D(FrameBuffer2D* frame_buffer);
     void Draw();
 
 private:

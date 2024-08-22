@@ -138,27 +138,18 @@ void UniformBufferShadow::UpdateUniformData() {
     glBindBuffer(GL_UNIFORM_BUFFER, ID);
     unsigned int offset = 0;
     use_direct_light_num = UniformBufferLight::GetInstance().use_direct_light_num;
-    use_point_light_num = UniformBufferLight::GetInstance().use_point_light_num;
 
     /* 1. 光源矩阵 */
     {
-        /* 1. direct_light */
         for (int i = 0; i < MAX_DIRECT_LIGHT_COUNT; i++) {
             glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(direct_light_matrix[i]), glm::value_ptr(direct_light_matrix[i]));
             offset += sizeof(direct_light_matrix[i]);
-        }
-        /* 2. point_light */
-        for (int i = 0; i < MAX_POINT_LIGHT_COUNT; i++) {
-            glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(point_light_matrix[i]), glm::value_ptr(point_light_matrix[i]));
-            offset += sizeof(point_light_matrix[i]);
         }
     }
     
     /* 2. 使用的光源个数 */
     {
         glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(use_direct_light_num), &use_direct_light_num);
-        offset += N;
-        glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(use_point_light_num), &use_point_light_num);
         offset += N;
     }
     glBindBuffer(GL_UNIFORM_BUFFER, 0);

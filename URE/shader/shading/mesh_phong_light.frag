@@ -60,6 +60,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 vi
 
 /* 阴影计算函数 */
 float CalcDirectLightShadow(int index, vec4 light_space_position, float bias);
+float CalcPointLightShadow(int index, float bias);
 
 /* 输入输出变量 */
 out vec4 FragColor;
@@ -70,7 +71,6 @@ in VS_OUT {
     vec3 ViewPosition;
     // 光源视角的坐标
     vec4 direct_light_position[MAX_DIRECT_LIGHT_COUNT];
-    vec4 point_light_position[MAX_POINT_LIGHT_COUNT];
     vec3 debug_color;
 } fs_in;
 
@@ -89,10 +89,10 @@ layout (std140, binding = 1) uniform Light {
 // 阴影贴图
 uniform sampler2D direct_light_shadow_map_0;
 uniform sampler2D direct_light_shadow_map_1;
-uniform sampler2D point_light_shadow_map_0;
-uniform sampler2D point_light_shadow_map_1;
-uniform sampler2D point_light_shadow_map_2;
-uniform sampler2D point_light_shadow_map_3;
+uniform samplerCube point_light_shadow_map_0;
+uniform samplerCube point_light_shadow_map_1;
+uniform samplerCube point_light_shadow_map_2;
+uniform samplerCube point_light_shadow_map_3;
 
 // 材质
 uniform PhongMaterial material;
@@ -103,6 +103,7 @@ const float SHADOW_BIAS_MIN = 0.0001; // 阴影计算 bias: 最小值
 const float SHADOW_BIAS_MAX = 0.0002; // 阴影计算 bias: 最大值
 const int PCF_SAMPLE_RANGE = 1;      // PCF采样范围 [-x, x]
 const int PCF_SAMPLE_NUM = (PCF_SAMPLE_RANGE * 2 + 1) * (PCF_SAMPLE_RANGE * 2 + 1); // PCF采样点个数
+const float POINT_LIGHT_SHADOW_ZFAR = 100.0f;
 
 
 void main() {
@@ -120,8 +121,11 @@ void main() {
         color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, shadow);
     }
     // 2. 点光源
-    for(int i = 0; i < use_point_light_num; i++)
-        color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir, 0.0);
+    for(int i = 0; i < use_point_light_num; i++) {
+        float bias = SHADOW_BIAS_MIN;
+        float shadow = CalcPointLightShadow(i, bias);
+        color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir, shadow);
+    }
     // 3. 聚光源
     for(int i = 0; i < use_spot_light_num; i++)
         color += CalcSpotLight(spot_lights[i], normal_dir, fs_in.Position, view_dir, 0.0);
@@ -175,7 +179,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 
     float attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * dist * dist);
 
     // 最终颜色
-    vec3 color = ambient + diffuse + specular;
+    vec3 color = ambient + (1 - shadow) * (diffuse + specular);
     return color * attenuation;
 }
 
@@ -236,5 +240,21 @@ float CalcDirectLightShadow(int index, vec4 light_space_position, float bias) {
     }
     shadow /= PCF_SAMPLE_NUM;
     // FragColor = vec4(shadow, texel_size.x, texel_size.y, 1.0);
+    return shadow;
+}
+
+float CalcPointLightShadow(int index, float bias) {
+    vec3 frag_to_light = fs_in.Position - point_lights[index].position;
+    float current_depth = length(frag_to_light);
+
+    // 取得当前点的深度
+    float shadow_depth = 1.0;
+    // if (index == 0) shadow_depth = texture(point_light_shadow_map_0, frag_to_light).r;
+    // else if(index == 1) shadow_depth = texture(point_light_shadow_map_1, frag_to_light).r;
+    // else if(index == 2) shadow_depth = texture(point_light_shadow_map_2, frag_to_light).r;
+    // else if(index == 3) shadow_depth = texture(point_light_shadow_map_3, frag_to_light).r;
+    shadow_depth *= POINT_LIGHT_SHADOW_ZFAR;
+    // 计算阴影值
+    float shadow = current_depth - bias > shadow_depth ? 1.0 : 0.0;
     return shadow;
 }

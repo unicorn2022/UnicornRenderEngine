@@ -4,6 +4,12 @@
 
 class TextureCube {
 public:
+    /** 空纹理
+     * \param width 纹理的宽度
+     * \param height 纹理的高度
+    */
+    TextureCube(int width, int height);
+
     /** 从图片中生成立方纹理
      * \param file_name 文件名(右,左,上,下,前,后)
      * \param type 纹理类型, 即文件后缀名
@@ -25,6 +31,8 @@ public:
     unsigned int ID;
     /* 纹理路径 */
     std::string path[6];
+    /* 纹理的宽高 */
+    int width, height;
     /* 是否为sRGB纹理 */
     bool sRGB;
 

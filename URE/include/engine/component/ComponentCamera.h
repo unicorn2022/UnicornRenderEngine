@@ -31,5 +31,5 @@ public:
 
 public:
     RoamingCamera* camera;
-    FrameBuffer* frame_buffer;
+    FrameBuffer2D* frame_buffer;
 };

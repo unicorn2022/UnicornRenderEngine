@@ -1,35 +1,32 @@
 #include "engine/basic/FrameBuffer.h"
 
-FrameBuffer::FrameBuffer(int width, int height, int samples) {
+/* FrameBuffer2D */
+FrameBuffer2D::FrameBuffer2D(int width, int height, int samples) {
     this->width = width;
     this->height = height;
     this->samples = samples;
-    CreateFrameBuffer();
+    CreateFrameBuffer2D();
 }
-
-FrameBuffer::~FrameBuffer() {
+FrameBuffer2D::~FrameBuffer2D() {
     glDeleteRenderbuffers(1, &RBO);
     glDeleteFramebuffers(1, &ID);
     glDeleteFramebuffers(1, &convertID);
     delete color_texture_multisample;
     delete color_texture;
 }
-
-void FrameBuffer::Use() {
+void FrameBuffer2D::Use() {
     // 1.1 绑定帧缓冲
     glBindFramebuffer(GL_FRAMEBUFFER, ID);
     // 1.2 修改视口大小
     glViewport(0, 0, width, height);
 }
-
-void FrameBuffer::Convert() {
+void FrameBuffer2D::Convert() {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, ID);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, convertID);
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
-void FrameBuffer::CreateFrameBuffer() {
+void FrameBuffer2D::CreateFrameBuffer2D() {
     /* 1. 生成帧缓冲 */
     {
         // 1.1 帧缓冲对象

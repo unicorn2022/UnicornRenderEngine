@@ -5,18 +5,26 @@
 
 class FrameBuffer {
 public:
+    virtual ~FrameBuffer() {}
+
+public:
+    virtual void Use() = 0;
+    virtual void Convert() = 0;
+};
+
+class FrameBuffer2D : public FrameBuffer {
+public:
     /** 帧缓冲对象, 包含一个颜色附件, 一个深度模板附件
      * \param width 宽度
      * \param height 高度
      * \param samples 采样数
      */ 
-    FrameBuffer(int width, int height, int samples);
-    ~FrameBuffer();
+    FrameBuffer2D(int width, int height, int samples);
+    virtual ~FrameBuffer2D();
 
 public:
-    void Use();
-    void Convert();
-
+    virtual void Use();
+    virtual void Convert();
 
 private:
     /* 帧缓冲ID */
@@ -39,5 +47,5 @@ public:
     TextureMultiSample* color_texture_multisample;
 
 private:
-    void CreateFrameBuffer();
+    void CreateFrameBuffer2D();
 };

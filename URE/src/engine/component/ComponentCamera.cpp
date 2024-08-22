@@ -9,7 +9,7 @@ ComponentCamera::ComponentCamera(GO* gameobject, float fov, float near, float fa
     this->type = "component_camera";
     this->camera = new RoamingCameraPerspective((float)width / (float)height, fov, near, far);
     // this->camera = new RoamingCameraOrtho(-10, 10, -10, 10, 0.1, 100);
-    this->frame_buffer = new FrameBuffer(width, height, samples);
+    this->frame_buffer = new FrameBuffer2D(width, height, samples);
 }
 
 ComponentCamera::~ComponentCamera() {
@@ -57,11 +57,19 @@ void ComponentCamera::RenderTick() {
         UniformBufferLight::GetInstance().UpdateUniformData();
         // 1.4 更新 UniformBufferShadow 的值
         int texture_index = 2;
-        for (auto shadow_component : shadow_components) {
-            shadow_component->frame_buffer->color_texture->Use(texture_index);
+        // 1.4.1 定向光源阴影
+        int use_direct_light_num = UniformBufferLight::GetInstance().use_direct_light_num;
+        for (int i = 0; i < use_direct_light_num; i++) {
+            auto shadow_component = shadow_components[i];
+            dynamic_cast<FrameBuffer2D*>(shadow_component->frame_buffer)->color_texture->Use(texture_index);
             *(shadow_component->light_matrix) = shadow_component->camera->GetProjectionMatrix() * shadow_component->camera->GetViewMatrix();
             *(shadow_component->shadow_map_index) = texture_index;
             texture_index++;
+        }
+        // 1.4.2 点光源阴影
+        int use_point_light_num = UniformBufferLight::GetInstance().use_point_light_num;
+        for (int i = 0; i < use_point_light_num; i++) {
+            // auto shadow_component = shadow_components[i + use_direct_light_num];
         }
         UniformBufferShadow::GetInstance().UpdateUniformData();
     }

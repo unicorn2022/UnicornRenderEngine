@@ -10,7 +10,7 @@ GOScreen::~GOScreen() {
 }
 
 
-void GOScreen::SetTargetFrameBuffer(FrameBuffer* frame_buffer) {
+void GOScreen::SetTargetFrameBuffer2D(FrameBuffer2D* frame_buffer) {
     screen_mat->screen_texture = frame_buffer->color_texture;
     screen_mat->screen_texture_multisample = frame_buffer->color_texture_multisample;
 }

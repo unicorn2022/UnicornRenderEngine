@@ -24,7 +24,7 @@ enum SceneChoice {
     Blinn_Phong,
     Shadow_Map,
 };
-const SceneChoice scene = SceneChoice::Capture2D_Box_Window_Reflect_Refract;
+const SceneChoice scene = SceneChoice::Shadow_Map;
 
 /* 基础场景 */
 static void Scene_Skybox() {
@@ -98,8 +98,10 @@ static void Scene_Light() {
                     glm::vec3(0.2f, 0.2f, 0.2f),        // 漫反射
                     glm::vec3(0.5f, 0.5f, 0.5f)         // 高光
                 );
+                // 可视化
                 point_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(point_light_position[i]);
                 point_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.1f));
+                // 阴影
             }
         }
         // 3. 聚光源
@@ -317,7 +319,7 @@ static void Test_Blinn_Phong_GameTick() {}
 /* 场景4: 测试 Shadow Map 算法 */
 static void Test_Shadow_Map_Scene() {
     UniformBufferLight::GetInstance().use_direct_light_num = 1;
-    UniformBufferLight::GetInstance().use_point_light_num = 0;
+    UniformBufferLight::GetInstance().use_point_light_num = 1;
     UniformBufferLight::GetInstance().use_spot_light_num = 0;
     /* 主相机 */
     {

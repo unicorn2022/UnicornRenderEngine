@@ -14,7 +14,7 @@ Texture::Texture(std::string file_name, bool sRGB, std::string root_directory) {
     this->height = 0;
     this->name = file_name;
     this->path = root_directory + file_name;
-    this->sRGB = true;
+    this->sRGB = sRGB;
     CreateTexture();
     LoadTextureData();
 }

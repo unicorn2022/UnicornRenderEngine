@@ -16,7 +16,6 @@ out VS_OUT {
     vec3 ViewPosition;
     // 光源视角的坐标
     vec4 direct_light_position[MAX_DIRECT_LIGHT_COUNT];
-    vec4 point_light_position[MAX_POINT_LIGHT_COUNT];
     vec3 debug_color;
 } vs_out;
 
@@ -28,9 +27,7 @@ layout (std140, binding = 0) uniform CameraMatrix {
 };
 layout (std140, binding = 2) uniform ShadowMatrix {
     mat4 direct_light_matrix[MAX_DIRECT_LIGHT_COUNT];
-    mat4 point_light_matrix[MAX_POINT_LIGHT_COUNT];
     int use_direct_light_num_vert;
-    int use_point_light_num_vert;
 };
 
 void main() {
@@ -38,12 +35,8 @@ void main() {
     vs_out.Normal = mat3(transpose(inverse(model_transform))) * aNormal; // 保证法向量垂直平面
     vs_out.TexCoord = vec2(aTexCoord.x, aTexCoord.y);
     vs_out.ViewPosition = view_position;
-    /* 计算三种光照对应的顶点坐标 */
-    // 1. 方向光
+    /* 计算定向光照对应的顶点坐标 */
     for(int i = 0; i < use_direct_light_num_vert; i++)
         vs_out.direct_light_position[i] = direct_light_matrix[i] * vec4(vs_out.Position, 1.0);
-    // 2. 点光源
-    for(int i = 0; i < use_point_light_num_vert; i++)
-        vs_out.point_light_position[i] = point_light_matrix[i] * vec4(vs_out.Position, 1.0);
     gl_Position = projection_transform * view_transform * vec4(vs_out.Position, 1.0);
 }
