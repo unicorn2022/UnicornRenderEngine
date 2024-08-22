@@ -7,34 +7,7 @@
 #include "engine/basic/FrameBuffer.h"
 #include "engine/basic/Light.h"
 
-class ComponentShadow : public Component {
-public:
-    /** 阴影组件: GO可以产生阴影
-     * \param gameobject 绑定的游戏对象
-     * \param width 相机帧缓冲宽度
-     * \param height 相机帧缓冲高度
-     * \param samples 采样数
-     */
-    ComponentShadow(GO* gameobject, int width, int height, int samples);
-
-    virtual ~ComponentShadow();
-
-public:
-    void UpdateCameraState();
-
-public:
-    /* 渲染逻辑 */
-    virtual void RenderTick() = 0;
-
-public:
-    RoamingCamera* camera;
-    FrameBuffer* frame_buffer;
-    Material* material;
-    glm::mat4* light_matrix;
-    int* shadow_map_index;
-};
-
-class ComponentShadowDirectLight : public ComponentShadow {
+class ComponentShadowDirectLight : public Component {
 public:
     /** 阴影组件: GO可以产生阴影
      * \param gameobject 绑定的游戏对象
@@ -52,9 +25,18 @@ public:
      * \param top 正交投影相机: 上边界
      */
     ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near = 0.1f, float far = 100.0f, float left = -10.0f, float right = 10.0f, float bottom = -10.0f, float top = 10.0f);
+    ~ComponentShadowDirectLight();
 
 public:
-    virtual void RenderTick();
+    void RenderTick();
+    void UpdateCameraState();
+
+public:
+    RoamingCamera* camera;
+    FrameBuffer* frame_buffer;
+    Material* material;
+    glm::mat4* light_matrix;
+    int* shadow_map_index;
 
 private:
     DirectLight* direct_light;

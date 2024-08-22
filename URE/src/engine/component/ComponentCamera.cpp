@@ -35,9 +35,9 @@ void ComponentCamera::ProcessMouseScroll(float yoffset) {
 
 void ComponentCamera::RenderTick() {
     if (!enable) return;
-    std::vector<ComponentMesh*> render_objects = GameComponent::GetInstance().GetComponentMesh(this->camera, true);
-    std::vector<ComponentBorder*> border_components = GameComponent::GetInstance().GetComponentBorder();
-    std::vector<ComponentShadow*> shadow_components = GameComponent::GetInstance().GetComponentShadow();
+    std::vector<ComponentMesh*> component_meshs = GameComponent::GetInstance().GetComponentMesh(this->camera, true);
+    std::vector<ComponentBorder*> component_borders = GameComponent::GetInstance().GetComponentBorder();
+    std::vector<ComponentShadowDirectLight*> component_shadow_direct_lights = GameComponent::GetInstance().GetComponentShadowDirectLight();
     ComponentMesh* skybox = GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponents<ComponentMesh>()[0] : NULL;
 
     // 渲染 test_camera 所见景象时禁止 test_camera_screen
@@ -60,7 +60,7 @@ void ComponentCamera::RenderTick() {
         // 1.4.1 定向光源阴影
         int use_direct_light_num = UniformBufferLight::GetInstance().use_direct_light_num;
         for (int i = 0; i < use_direct_light_num; i++) {
-            auto shadow_component = shadow_components[i];
+            auto shadow_component = component_shadow_direct_lights[i];
             dynamic_cast<FrameBuffer2D*>(shadow_component->frame_buffer)->color_texture->Use(texture_index);
             *(shadow_component->light_matrix) = shadow_component->camera->GetProjectionMatrix() * shadow_component->camera->GetViewMatrix();
             *(shadow_component->shadow_map_index) = texture_index;
@@ -86,7 +86,7 @@ void ComponentCamera::RenderTick() {
         {
             glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
             glStencilMask(0x00); // 写入的模板值为0
-            for (auto object : render_objects)
+            for (auto object : component_meshs)
                 if (object->IsTransport() == false && object->gameobject->GetComponents<ComponentBorder>().size() == 0)
                     object->Draw();
         }
@@ -94,21 +94,21 @@ void ComponentCamera::RenderTick() {
         {
             glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
             glStencilMask(0xff); // 写入的模板值不变(即为1)
-            for (auto object : render_objects)
+            for (auto object : component_meshs)
                 if (object->IsTransport() == false && object->gameobject->GetComponents<ComponentBorder>().size() != 0)
                     object->Draw();
         }
         // 3.1.3 根据模板缓冲绘制边界
         if (GlobalValue::GetInstance().GetIntValue("show_border")) {
             glStencilFunc(GL_NOTEQUAL, 1, 0xff);// 模板值不为1时, 通过测试
-            for (auto border : border_components)
+            for (auto border : component_borders)
                 border->Draw();
         }
     }
     /* 3.2 绘制透明物体 */
     {
         glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
-        for (auto object : render_objects)
+        for (auto object : component_meshs)
             if (object->IsTransport() == true)
                 object->Draw();
     }

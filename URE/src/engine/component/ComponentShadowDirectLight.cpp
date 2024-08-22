@@ -1,31 +1,12 @@
-#include "engine/component/ComponentShadow.h"
+#include "engine/component/ComponentShadowDirectLight.h"
 #include "engine/basic/UniformBuffer.h"
 #include "engine/material/ALL.h"
 #include "engine/gameobject/GO.h"
 #include "GameWorld.h"
 #include "GameComponent.h"
 
-/* ComponentShadow */
-ComponentShadow::ComponentShadow(GO* gameobject, int width, int height, int samples) : Component(gameobject) {
-    this->type = "component_shadow";
-}
-ComponentShadow::~ComponentShadow() {
-    delete frame_buffer;
-    delete camera;
-    delete material;
-}
-void ComponentShadow::UpdateCameraState() {
-    ComponentTransform* transform = gameobject->GetComponents<ComponentTransform>()[0];
-    auto direction = 10.0f * transform->GetPosition();
-    camera->SetPosition(-direction);
-    camera->front = direction; // 保证 look-at 的 target 为原点
-    if (Utils::IsSameDirection(direction, glm::vec3(0, 1, 0))) camera->up = glm::vec3(0, 0, 1);
-    else camera->up = glm::vec3(0, 1, 0);
-}
-
-
-/* ComponentShadowDirectLight */
-ComponentShadowDirectLight::ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near, float far, float left, float right, float bottom, float top) : ComponentShadow(gameobject, width, height, samples) {
+ComponentShadowDirectLight::ComponentShadowDirectLight(GO* gameobject, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near, float far, float left, float right, float bottom, float top) : Component(gameobject) {
+    this->type = "component_shadow_direct_light";
     this->camera = new RoamingCameraOrtho(left, right, bottom, top, near, far);
     // this->camera = new RoamingCameraPerspective(1.0f, 45, 0.1f, 1000.0f);
     this->direct_light = direct_light;
@@ -34,6 +15,22 @@ ComponentShadowDirectLight::ComponentShadowDirectLight(GO* gameobject, DirectLig
     this->material = new MaterialShadowDirectLight();
     this->frame_buffer = new FrameBuffer2D(width, height, samples);
 }
+
+ComponentShadowDirectLight::~ComponentShadowDirectLight() {
+    delete frame_buffer;
+    delete camera;
+    delete material;
+}
+
+void ComponentShadowDirectLight::UpdateCameraState() {
+    ComponentTransform* transform = gameobject->GetComponents<ComponentTransform>()[0];
+    auto direction = 10.0f * transform->GetPosition();
+    camera->SetPosition(-direction);
+    camera->front = direction; // 保证 look-at 的 target 为原点
+    if (Utils::IsSameDirection(direction, glm::vec3(0, 1, 0))) camera->up = glm::vec3(0, 0, 1);
+    else camera->up = glm::vec3(0, 1, 0);
+}
+
 void ComponentShadowDirectLight::RenderTick() {
     if (!enable) return;
     std::vector<ComponentMesh*> render_objects = GameComponent::GetInstance().GetComponentMesh(this->camera, false);

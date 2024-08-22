@@ -1,4 +1,4 @@
-#include "engine/gameobject/GOShadow.h"
+#include "engine/gameobject/GOShadowDirectLight.h"
 #include "engine/component/ALL.h"
 
 GOShadowDirectLight::GOShadowDirectLight(std::string name, DirectLight* direct_light, glm::mat4* light_matrix, int* shadow_map_index, int width, int height, int samples, float near, float far, float left, float right, float bottom, float top) : GO(name) {

@@ -8,19 +8,19 @@ GameComponent& GameComponent::GetInstance() {
 
 /* 添加组件 */
 void GameComponent::AddComponent(Component* component) {
-    if (dynamic_cast<ComponentBorder*>(component) != NULL) {
+    if (component->type == "component_border") {
         component_borders.push_back(dynamic_cast<ComponentBorder*>(component));
     } 
-    else if (dynamic_cast<ComponentCamera*>(component) != NULL) {
+    else if (component->type == "component_camera") {
         component_cameras.push_back(dynamic_cast<ComponentCamera*>(component));
     } 
-    else if (dynamic_cast<ComponentMesh*>(component) != NULL) {
+    else if (component->type == "component_mesh") {
         component_meshs.push_back(dynamic_cast<ComponentMesh*>(component));
     } 
-    else if (dynamic_cast<ComponentShadow*>(component) != NULL) {
-        component_shadows.push_back(dynamic_cast<ComponentShadow*>(component));
+    else if (component->type == "component_shadow_direct_light") {
+        component_shadow_direct_lights.push_back(dynamic_cast<ComponentShadowDirectLight*>(component));
     } 
-    else if (dynamic_cast<ComponentTransform*>(component) != NULL) {
+    else if (component->type == "component_transform") {
         component_transforms.push_back(dynamic_cast<ComponentTransform*>(component));
     } 
     else {
@@ -30,7 +30,7 @@ void GameComponent::AddComponent(Component* component) {
 
 /* 删除组件 */
 void GameComponent::DeleteComponent(Component* component) {
-    if (dynamic_cast<ComponentBorder*>(component) != NULL) {
+    if (component->type == "component_border") {
         ComponentBorder* component_border = dynamic_cast<ComponentBorder*>(component);
         int index = 0;
         for(; index < component_borders.size(); index++)
@@ -40,7 +40,7 @@ void GameComponent::DeleteComponent(Component* component) {
             component_borders[index] = component_borders[index + 1];
         component_borders.pop_back();
     }
-    else if (dynamic_cast<ComponentCamera*>(component) != NULL) {
+    else if (component->type == "component_camera") {
         ComponentCamera* component_camera = dynamic_cast<ComponentCamera*>(component);
         int index = 0;
         for(; index < component_cameras.size(); index++)
@@ -50,7 +50,7 @@ void GameComponent::DeleteComponent(Component* component) {
             component_cameras[index] = component_cameras[index + 1];
         component_cameras.pop_back();
     } 
-    else if (dynamic_cast<ComponentMesh*>(component) != NULL) {
+    else if (component->type == "component_mesh") {
         ComponentMesh* component_mesh = dynamic_cast<ComponentMesh*>(component);
         int index = 0;
         for(; index < component_meshs.size(); index++)
@@ -60,17 +60,17 @@ void GameComponent::DeleteComponent(Component* component) {
             component_meshs[index] = component_meshs[index + 1];
         component_meshs.pop_back();
     } 
-    else if (dynamic_cast<ComponentShadow*>(component) != NULL) {
-        ComponentShadow* component_shadow = dynamic_cast<ComponentShadow*>(component);
+    else if (component->type == "component_shadow_direct_light") {
+        ComponentShadowDirectLight* component_shadow_direct_light = dynamic_cast<ComponentShadowDirectLight*>(component);
         int index = 0;
-        for(; index < component_shadows.size(); index++)
-            if (component_shadow == component_shadows[index])
+        for(; index < component_shadow_direct_lights.size(); index++)
+            if (component_shadow_direct_light == component_shadow_direct_lights[index])
                 break;
-        for (; index < component_shadows.size() - 1; index++)
-            component_shadows[index] = component_shadows[index + 1];
-        component_shadows.pop_back();
+        for (; index < component_shadow_direct_lights.size() - 1; index++)
+            component_shadow_direct_lights[index] = component_shadow_direct_lights[index + 1];
+        component_shadow_direct_lights.pop_back();
     } 
-    else if (dynamic_cast<ComponentTransform*>(component) != NULL) {
+    else if (component->type == "component_transform") {
         ComponentTransform* component_transform = dynamic_cast<ComponentTransform*>(component);
         int index = 0;
         for(; index < component_transforms.size(); index++)
@@ -92,8 +92,8 @@ std::vector<ComponentBorder*> GameComponent::GetComponentBorder() {
 std::vector<ComponentCamera*> GameComponent::GetComponentCamera() { 
     return component_cameras; 
 }
-std::vector<ComponentShadow*> GameComponent::GetComponentShadow() { 
-    return component_shadows; 
+std::vector<ComponentShadowDirectLight*> GameComponent::GetComponentShadowDirectLight() { 
+    return component_shadow_direct_lights; 
 }
 std::vector<ComponentTransform*> GameComponent::GetComponentTransform() { 
     return component_transforms; 

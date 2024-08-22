@@ -65,8 +65,8 @@ void Run() {
         {
             // 2.2.1 渲染阴影贴图 (正面剔除)
             glCullFace(GL_FRONT);
-            auto shadow_components = GameComponent::GetInstance().GetComponentShadow();
-            for (auto shadow_component : shadow_components) 
+            auto component_shadow_direct_lights = GameComponent::GetInstance().GetComponentShadowDirectLight();
+            for (auto shadow_component : component_shadow_direct_lights) 
                 shadow_component->RenderTick();
             glCullFace(GL_BACK);
 
@@ -91,7 +91,7 @@ void Run() {
             if (show_shadow == 0) {
                 target_frame_buffer = GameWorld::GetInstance().main_camera->frame_buffer;
             } else if (show_shadow < UniformBufferLight::GetInstance().use_direct_light_num) {
-                target_frame_buffer = dynamic_cast<FrameBuffer2D*>(GameComponent::GetInstance().GetComponentShadow()[show_shadow - 1]->frame_buffer);
+                target_frame_buffer = dynamic_cast<FrameBuffer2D*>(GameComponent::GetInstance().GetComponentShadowDirectLight()[show_shadow - 1]->frame_buffer);
             }
             screen->SetTargetFrameBuffer2D(target_frame_buffer);
             screen->Draw();
@@ -185,7 +185,7 @@ void keyboard_callback(GLFWwindow* window) {
     }
 
     /* F1 ~ F12 选择显示阴影贴图(F1不显示) */
-    int shadow_count = GameComponent::GetInstance().GetComponentShadow().size();
+    int shadow_count = GameComponent::GetInstance().GetComponentShadowDirectLight().size();
     for (int i = 0; i <= shadow_count; i++) {
         if (glfwGetKey(window, GLFW_KEY_F1 + i) == GLFW_PRESS) 
             GlobalValue::GetInstance().SetValue("show_shadow", i);

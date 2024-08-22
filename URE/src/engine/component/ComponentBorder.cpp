@@ -6,6 +6,7 @@
 #include "engine/gameobject/GO.h"
 
 ComponentBorder::ComponentBorder(GO* gameobject, ComponentMesh* component_mesh, glm::vec4 border_color) : Component(gameobject) {
+    this->type = "component_border";
     this->component_mesh = component_mesh;
     this->is_basic_shape = component_mesh->IsBasicShape();
     if (is_basic_shape) {

@@ -1,15 +1,24 @@
 #pragma once
 #include "Utils.h"
 #include "engine/basic/Texture.h"
-#include "engine/Basic/TextureMultiSample.h"
+#include "engine/basic/TextureCube.h"
+#include "engine/basic/TextureMultiSample.h"
 
 class FrameBuffer {
 public:
+    FrameBuffer(int width, int height);
     virtual ~FrameBuffer() {}
 
 public:
-    virtual void Use() = 0;
+    virtual void Use();
     virtual void Convert() = 0;
+
+protected:
+    /* 帧缓冲ID */
+    unsigned int ID;
+
+    /* 帧缓冲的宽高 */
+    int width, height;
 };
 
 class FrameBuffer2D : public FrameBuffer {
@@ -23,17 +32,11 @@ public:
     virtual ~FrameBuffer2D();
 
 public:
-    virtual void Use();
     virtual void Convert();
 
 private:
-    /* 帧缓冲ID */
-    unsigned int ID;
     /* 用于转换的帧缓冲ID */
     unsigned int convertID;
-
-    /* 帧缓冲的宽高 */
-    int width, height;
     
     /* 深度模板附件(渲染缓冲对象) ID */
     unsigned int RBO;
@@ -48,4 +51,24 @@ public:
 
 private:
     void CreateFrameBuffer2D();
+};
+
+class FrameBufferCube : public FrameBuffer {
+public:
+    /** 帧缓冲对象, 包含一个颜色附件(立方纹理)
+     * \param width 宽度
+     * \param height 高度
+     */ 
+    FrameBufferCube(int width, int height);
+    virtual ~FrameBufferCube();
+
+public:
+    virtual void Convert() {}
+
+public:
+    /* 颜色附件(立方纹理) */
+    TextureCube* color_texture;
+
+private:
+    void CreateFrameBufferCube();
 };

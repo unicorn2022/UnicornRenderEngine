@@ -25,7 +25,7 @@ public:
     std::vector<ComponentMesh*> GetComponentMesh(Camera* camera, bool sorted);
 
     /* 获取所有 shadow 组件 */
-    std::vector<ComponentShadow*> GetComponentShadow();
+    std::vector<ComponentShadowDirectLight*> GetComponentShadowDirectLight();
 
     /* 获取所有 transform 组件 */
     std::vector<ComponentTransform*> GetComponentTransform();
@@ -38,6 +38,6 @@ private:
     std::vector<ComponentBorder*> component_borders;
     std::vector<ComponentCamera*> component_cameras;
     std::vector<ComponentMesh*> component_meshs;
-    std::vector<ComponentShadow*> component_shadows;
+    std::vector<ComponentShadowDirectLight*> component_shadow_direct_lights;
     std::vector<ComponentTransform*> component_transforms;
 };

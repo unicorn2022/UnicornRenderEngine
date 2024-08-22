@@ -414,8 +414,8 @@ void GameWorld::GameTick() {
             camera_component->UpdateCameraState();
 
     /* 更新 shadow 组件中的相机状态 */
-    auto shadow_component = GameComponent::GetInstance().GetComponentShadow();
-        for (auto shadow_component : shadow_component)
+    auto component_shadow_direct_lights = GameComponent::GetInstance().GetComponentShadowDirectLight();
+        for (auto shadow_component : component_shadow_direct_lights)
             shadow_component->UpdateCameraState();
     
     /* 场景 GameTick */
