@@ -13,11 +13,11 @@ ComponentShadowDirectLight::ComponentShadowDirectLight(GO* gameobject, DirectLig
     this->light_matrix = light_matrix;
     this->shadow_map_index = shadow_map_index;
     this->material = new MaterialShadowDirectLight();
-    this->frame_buffer = new FrameBuffer2D(width, height, samples);
+    this->frame_buffer_2D = new FrameBuffer2D(width, height, samples);
 }
 
 ComponentShadowDirectLight::~ComponentShadowDirectLight() {
-    delete frame_buffer;
+    delete frame_buffer_2D;
     delete camera;
     delete material;
 }
@@ -38,7 +38,7 @@ void ComponentShadowDirectLight::RenderTick() {
     /* 1. 预处理 */
     {
         // 1.1 绑定帧缓冲
-        frame_buffer->Use();
+        frame_buffer_2D->Use();
         // 1.2 更新 UniformBufferCamera 的值
         UniformBufferCamera::GetInstance().view_transform = camera->GetViewMatrix();
         UniformBufferCamera::GetInstance().projection_transform = camera->GetProjectionMatrix();
@@ -61,5 +61,5 @@ void ComponentShadowDirectLight::RenderTick() {
     }
 
     /* 4. 转换帧缓冲的颜色附件 */
-    frame_buffer->Convert();
+    frame_buffer_2D->Convert();
 }

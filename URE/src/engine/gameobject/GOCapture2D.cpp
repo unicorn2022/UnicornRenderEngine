@@ -11,5 +11,5 @@ GOCapture2D::GOCapture2D(std::string name, float fov, float near, float far, int
 }
 
 Texture* GOCapture2D::GetCaptureTexture() const {
-    return GetComponents<ComponentCamera>()[0]->frame_buffer->color_texture;
+    return GetComponents<ComponentCamera>()[0]->frame_buffer_2D->color_texture;
 }

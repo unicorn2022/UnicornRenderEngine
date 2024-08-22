@@ -33,7 +33,7 @@ public:
 
 public:
     RoamingCamera* camera;
-    FrameBuffer* frame_buffer;
+    FrameBuffer2D* frame_buffer_2D;
     Material* material;
     glm::mat4* light_matrix;
     int* shadow_map_index;

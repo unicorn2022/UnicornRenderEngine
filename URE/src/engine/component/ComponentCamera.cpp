@@ -9,11 +9,11 @@ ComponentCamera::ComponentCamera(GO* gameobject, float fov, float near, float fa
     this->type = "component_camera";
     this->camera = new RoamingCameraPerspective((float)width / (float)height, fov, near, far);
     // this->camera = new RoamingCameraOrtho(-10, 10, -10, 10, 0.1, 100);
-    this->frame_buffer = new FrameBuffer2D(width, height, samples);
+    this->frame_buffer_2D = new FrameBuffer2D(width, height, samples);
 }
 
 ComponentCamera::~ComponentCamera() {
-    delete frame_buffer;
+    delete frame_buffer_2D;
     delete camera;
 }
 
@@ -48,7 +48,7 @@ void ComponentCamera::RenderTick() {
     /* 1. 预处理 */
     {
         // 1.1 绑定帧缓冲
-        frame_buffer->Use();
+        frame_buffer_2D->Use();
         // 1.2 更新 UniformBufferCamera 的值
         UniformBufferCamera::GetInstance().view_transform = camera->GetViewMatrix();
         UniformBufferCamera::GetInstance().projection_transform = camera->GetProjectionMatrix();
@@ -61,7 +61,7 @@ void ComponentCamera::RenderTick() {
         int use_direct_light_num = UniformBufferLight::GetInstance().use_direct_light_num;
         for (int i = 0; i < use_direct_light_num; i++) {
             auto shadow_component = component_shadow_direct_lights[i];
-            dynamic_cast<FrameBuffer2D*>(shadow_component->frame_buffer)->color_texture->Use(texture_index);
+            dynamic_cast<FrameBuffer2D*>(shadow_component->frame_buffer_2D)->color_texture->Use(texture_index);
             *(shadow_component->light_matrix) = shadow_component->camera->GetProjectionMatrix() * shadow_component->camera->GetViewMatrix();
             *(shadow_component->shadow_map_index) = texture_index;
             texture_index++;
@@ -123,7 +123,7 @@ void ComponentCamera::RenderTick() {
     }
 
     /* 5. 转换帧缓冲的颜色附件 */
-    frame_buffer->Convert();
+    frame_buffer_2D->Convert();
 
     // 渲染 test_camera 所见景象时禁止 test_camera_screen
     if (this == GameWorld::GetInstance().test_camera) {

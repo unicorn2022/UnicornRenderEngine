@@ -86,14 +86,14 @@ void Run() {
             
             // 2.3.2 绘制屏幕对象
             glViewport(0, 0, window_width, window_height);
-            FrameBuffer2D* target_frame_buffer;
+            FrameBuffer2D* target_frame_buffer_2D;
             int show_shadow = GlobalValue::GetInstance().GetIntValue("show_shadow");
             if (show_shadow == 0) {
-                target_frame_buffer = GameWorld::GetInstance().main_camera->frame_buffer;
+                target_frame_buffer_2D = GameWorld::GetInstance().main_camera->frame_buffer_2D;
             } else if (show_shadow < UniformBufferLight::GetInstance().use_direct_light_num) {
-                target_frame_buffer = dynamic_cast<FrameBuffer2D*>(GameComponent::GetInstance().GetComponentShadowDirectLight()[show_shadow - 1]->frame_buffer);
+                target_frame_buffer_2D = GameComponent::GetInstance().GetComponentShadowDirectLight()[show_shadow - 1]->frame_buffer_2D;
             }
-            screen->SetTargetFrameBuffer2D(target_frame_buffer);
+            screen->SetTargetFrameBuffer2D(target_frame_buffer_2D);
             screen->Draw();
             
             // 2.3.3 重新启用深度测试, 面剔除
