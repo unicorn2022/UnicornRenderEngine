@@ -19,8 +19,13 @@ extern const int window_height;
 extern const glm::vec4 color_background;
 extern const glm::vec3 color_border;
 
+/* 是否使用OpenGL功能 */
+extern const bool use_opengl_blend;         // 混合
+extern const bool use_opengl_cull_face;    // 面剔除
+
 /* 后期处理效果个数 */
 static const int num_post_process = 9;
+
 
 /* 运行时全局变量 */
 class GlobalValue {

@@ -13,10 +13,15 @@ const int window_height = 800;
 const glm::vec4 color_background = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 const glm::vec3 color_border = glm::vec3(1.0f, 0.0f, 0.0f);
 
+/* 是否使用OpenGL功能 */
+const bool use_opengl_blend = true;         // 混合
+const bool use_opengl_cull_face = true;    // 面剔除
+
 /* 相机信息 */
 static const float main_camera_move_speed_min = 2.0f;
 static const float main_camera_move_speed_max = 20.0f;
 static const int main_camera_samples = 8;
+
 
 enum SceneChoice {
     Capture2D_Box_Window_Reflect_Refract,

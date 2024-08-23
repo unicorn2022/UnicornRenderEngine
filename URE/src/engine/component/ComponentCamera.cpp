@@ -116,9 +116,9 @@ void ComponentCamera::RenderTick() {
     /* 4. 绘制天空盒 */
     if (skybox != NULL) {
         glDepthFunc(GL_LEQUAL);
-        glDisable(GL_CULL_FACE);
+        if (use_opengl_cull_face) glDisable(GL_CULL_FACE);
         skybox->Draw();
-        glEnable(GL_CULL_FACE);
+        if (use_opengl_cull_face) glEnable(GL_CULL_FACE);
         glDepthFunc(GL_LESS);
     }
 

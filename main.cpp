@@ -37,12 +37,16 @@ void Run() {
     glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); // 通过模板&深度测试时, 将模板值设置为 glStencilFunc 指定的 ref 值
     // 1.3 混合
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // 混合因子: src-源图像alpha值, dst-1-源图像alpha值
+    if (use_opengl_blend) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // 混合因子: src-源图像alpha值, dst-1-源图像alpha值
+    }
     // 1.4 面剔除
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);    // 剔除背面
-    glFrontFace(GL_CCW);    // 正面为逆时针方向
+    if (use_opengl_cull_face) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);    // 剔除背面
+        glFrontFace(GL_CCW);    // 正面为逆时针方向
+    }
     // 1.5 屏幕对象
     GOScreen* screen = new GOScreen("screen");
 
@@ -64,11 +68,11 @@ void Run() {
         /* 2.2 渲染过程 */
         {
             // 2.2.1 渲染阴影贴图 (正面剔除)
-            glCullFace(GL_FRONT);
+            if (use_opengl_cull_face) glCullFace(GL_FRONT);
             auto component_shadow_direct_lights = GameComponent::GetInstance().GetComponentShadowDirectLight();
             for (auto shadow_component : component_shadow_direct_lights) 
                 shadow_component->RenderTick();
-            glCullFace(GL_BACK);
+            if (use_opengl_cull_face) glCullFace(GL_BACK);
 
             // 2.2.2 每个相机渲染一次
             auto camera_components = GameComponent::GetInstance().GetComponentCamera();
@@ -79,8 +83,8 @@ void Run() {
         /* 2.3 将main_camera的帧缓冲绘制到屏幕上 */
         {
             // 2.3.1 禁用深度测试, 面剔除
+            if (use_opengl_cull_face) glDisable(GL_CULL_FACE);
             glDisable(GL_DEPTH_TEST);
-            glDisable(GL_CULL_FACE);
             glClearColor(0, 0, 0, 1);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             
@@ -88,17 +92,17 @@ void Run() {
             glViewport(0, 0, window_width, window_height);
             FrameBuffer2D* target_frame_buffer_2D;
             int show_shadow = GlobalValue::GetInstance().GetIntValue("show_shadow");
-            if (show_shadow == 0) {
+            if (show_shadow < UniformBufferLight::GetInstance().use_direct_light_num) {
+                target_frame_buffer_2D = GameComponent::GetInstance().GetComponentShadowDirectLight()[show_shadow]->frame_buffer_2D;
+            } else {
                 target_frame_buffer_2D = GameWorld::GetInstance().main_camera->frame_buffer_2D;
-            } else if (show_shadow < UniformBufferLight::GetInstance().use_direct_light_num) {
-                target_frame_buffer_2D = GameComponent::GetInstance().GetComponentShadowDirectLight()[show_shadow - 1]->frame_buffer_2D;
             }
             screen->SetTargetFrameBuffer2D(target_frame_buffer_2D);
             screen->Draw();
             
             // 2.3.3 重新启用深度测试, 面剔除
             glEnable(GL_DEPTH_TEST);
-            glEnable(GL_CULL_FACE);
+            if (use_opengl_cull_face) glEnable(GL_CULL_FACE);
         }
         
         /* 2.4 检查并调用事件, 交换缓存 */
@@ -159,6 +163,8 @@ void InitOpenGL(){
     GLint max_fragment_input_component;
     glGetIntegerv(GL_MAX_FRAGMENT_INPUT_COMPONENTS, &max_fragment_input_component);
     std::cout << "片段着色器输入最大为: " << max_fragment_input_component << "N\n"; 
+
+    GlobalValue::GetInstance().SetValue("show_shadow", 12);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -184,9 +190,8 @@ void keyboard_callback(GLFWwindow* window) {
             GlobalValue::GetInstance().SetValue("choose_post_process", i);
     }
 
-    /* F1 ~ F12 选择显示阴影贴图(F1不显示) */
-    int shadow_count = GameComponent::GetInstance().GetComponentShadowDirectLight().size();
-    for (int i = 0; i <= shadow_count; i++) {
+    /* F1 ~ F12 选择显示阴影贴图 */
+    for (int i = 0; i < 12; i++) {
         if (glfwGetKey(window, GLFW_KEY_F1 + i) == GLFW_PRESS) 
             GlobalValue::GetInstance().SetValue("show_shadow", i);
     }
