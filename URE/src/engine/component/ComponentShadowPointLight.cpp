@@ -5,9 +5,9 @@
 #include "GameWorld.h"
 #include "GameComponent.h"
 
-ComponentShadowPointLight::ComponentShadowPointLight(GO* gameobject, PointLight* point_light, int* shadow_map_index, int width, int height, float near, float far) : Component(gameobject) {
+ComponentShadowPointLight::ComponentShadowPointLight(GO* gameobject, PointLight* point_light, int* shadow_map_index, int width, int height) : Component(gameobject) {
     this->type = "component_shadow_point_light";
-    this->camera = new RoamingCameraPerspective((float)width/(float)height, 90, near, far);
+    this->camera = new RoamingCameraPerspective((float)width/(float)height, 90, 0.1f, POINT_LIGHT_SHADOW_ZFAR);
     this->point_light = point_light;
     this->shadow_map_index = shadow_map_index;
     this->material = new MaterialShadowPointLight(point_light->position);

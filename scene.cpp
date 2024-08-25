@@ -112,8 +112,7 @@ static void Scene_Light() {
                     "point_light_shadow_" + std::to_string(i),
                     &UniformBufferLight::GetInstance().point_lights[i],
                     &UniformBufferShadow::GetInstance().point_light_shadow_map_index[i],
-                    2048, 2048,
-                    0.1, 100.0
+                    2048, 2048
                 );
                 point_light_shadow->GetComponents<ComponentTransform>()[0]->TransformTranslate(point_light_position[i]);
                 GameWorld::GetInstance().all_game_object.push_back(point_light_shadow);
@@ -358,8 +357,8 @@ static void Test_Shadow_Map_Scene() {
     {
         const std::vector<glm::vec3> container_position {
             glm::vec3(-2.0f, 1.0f, 0.0f),
-            glm::vec3(0.0f, 0.0f, 0.5f),
-            glm::vec3(0.0f, 0.0f, -0.5f)
+            glm::vec3(3.0f, 0.0f, 0.5f),
+            glm::vec3(3.0f, 0.0f, -0.5f)
         };
         const std::vector<glm::vec3> container_rotate {
             glm::vec3(0.0f, 0.0f, 0.0f),

@@ -16,6 +16,7 @@ GameWorld::~GameWorld() {
 
 void GameWorld::RenderTick() {
     /* 1. 渲染阴影贴图 */
+    ShowAllObject();
     // 1.1 正面剔除
     if (use_opengl_cull_face) glCullFace(GL_FRONT);
     // 1.2 定向光源阴影
@@ -30,6 +31,7 @@ void GameWorld::RenderTick() {
     if (use_opengl_cull_face) glCullFace(GL_BACK);
 
     /* 2. 每个相机渲染一次 */ 
+    if (show_only_skybox) ShowOnlySkybox();
     auto camera_components = GameComponent::GetInstance().GetComponentCamera();
     for (auto camera_component : camera_components) 
         camera_component->RenderTick();
@@ -76,7 +78,6 @@ void GameWorld::HandleMouseScroll(float y_offset) {
     // 更新 main_camera 的视野
     main_camera->ProcessMouseScroll(y_offset);
 }
-
 
 void GameWorld::ShowOnlySkybox() {
     auto mesh_components = GameComponent::GetInstance().GetComponentMesh(NULL, false);

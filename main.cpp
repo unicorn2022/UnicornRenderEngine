@@ -84,21 +84,23 @@ void Run() {
                 // 方向光源阴影
                 if (show_shadow < use_direct_light_num) {
                     GameWorld::GetInstance().ResetSkyboxTexture();
-                    GameWorld::GetInstance().ShowAllObject();
+                    GameWorld::GetInstance().show_only_skybox = false;
                     auto shadow_component = GameComponent::GetInstance().GetComponentShadowDirectLight()[show_shadow];
                     target_frame_buffer_2D = shadow_component->frame_buffer_2D;
                 } 
                 // 点光源阴影
                 else if (show_shadow < use_direct_light_num + use_point_light_num) {
-                    auto shadow_component = GameComponent::GetInstance().GetComponentShadowPointLight()[show_shadow - use_direct_light_num];
+                    int index = show_shadow - use_direct_light_num;
+                    auto shadow_component = GameComponent::GetInstance().GetComponentShadowPointLight()[index];
                     GameWorld::GetInstance().skybox->SetSkyboxTexture(shadow_component->frame_buffer_cube->color_texture);
-                    GameWorld::GetInstance().ShowOnlySkybox();
+                    // GameWorld::GetInstance().show_only_skybox = true;
+                    // GameWorld::GetInstance().main_camera->gameobject->GetComponents<ComponentTransform>()[0]->position = UniformBufferLight::GetInstance().point_lights[index].position;
                     target_frame_buffer_2D = GameWorld::GetInstance().main_camera->frame_buffer_2D;
                 } 
                 // 显示渲染画面
                 else {
                     GameWorld::GetInstance().ResetSkyboxTexture();
-                    GameWorld::GetInstance().ShowAllObject();
+                    GameWorld::GetInstance().show_only_skybox = false;
                     target_frame_buffer_2D = GameWorld::GetInstance().main_camera->frame_buffer_2D;
                 }
             }

@@ -1,5 +1,7 @@
 #include "engine/basic/Shader.h"
 
+static const bool show_shader_error = true;
+
 Shader::Shader(std::string name, bool use_geometry_shader, std::string root_directory){
     this->name = name;
     if (use_geometry_shader) 
@@ -15,7 +17,7 @@ Shader::~Shader() {
 /* 使用着色器 */
 void Shader::Use() {
     glUseProgram(ID);
-    // Utils::Check("[ERROR::Shader::Use()] " + name);
+    if(show_shader_error) Utils::Check("[ERROR::Shader::Use()] " + name);
 }
 
 /* 设置 uniform 变量值: bool */
@@ -139,7 +141,7 @@ bool Shader::Check(int shaderID, std::string message) const {
 
 bool Shader::CheckVarLocation(GLint location, const std::string& var_name) const {
     if (location == -1) {
-        // std::cout << "[ERROR::Shader.h::CheckVarLocation()] " << name << " 中不存在 " << var_name << " 变量\n" ;
+        // if(show_shader_error) std::cout << "[ERROR::Shader.h::CheckVarLocation()] " << name << " 中不存在 " << var_name << " 变量\n" ;
         return false;
     } else return true;
 }

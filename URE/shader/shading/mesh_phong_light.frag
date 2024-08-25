@@ -253,6 +253,7 @@ float CalcPointLightShadow(int index, float bias) {
     // else if(index == 1) shadow_depth = texture(point_light_shadow_map_1, frag_to_light).r;
     // else if(index == 2) shadow_depth = texture(point_light_shadow_map_2, frag_to_light).r;
     // else if(index == 3) shadow_depth = texture(point_light_shadow_map_3, frag_to_light).r;
+    // FragColor = vec4(current_depth / POINT_LIGHT_SHADOW_ZFAR, shadow_depth, 0, 1);
     shadow_depth *= POINT_LIGHT_SHADOW_ZFAR;
     // 计算阴影值
     float shadow = current_depth - bias > shadow_depth ? 1.0 : 0.0;

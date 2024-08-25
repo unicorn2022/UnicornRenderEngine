@@ -35,9 +35,10 @@ void ComponentCamera::ProcessMouseScroll(float yoffset) {
 
 void ComponentCamera::RenderTick() {
     if (!enable) return;
-    std::vector<ComponentMesh*> component_meshs = GameComponent::GetInstance().GetComponentMesh(this->camera, true);
-    std::vector<ComponentBorder*> component_borders = GameComponent::GetInstance().GetComponentBorder();
-    std::vector<ComponentShadowDirectLight*> component_shadow_direct_lights = GameComponent::GetInstance().GetComponentShadowDirectLight();
+    auto component_meshs = GameComponent::GetInstance().GetComponentMesh(this->camera, true);
+    auto component_borders = GameComponent::GetInstance().GetComponentBorder();
+    auto component_shadow_direct_lights = GameComponent::GetInstance().GetComponentShadowDirectLight();
+    auto component_shadow_point_lights = GameComponent::GetInstance().GetComponentShadowPointLight();
     ComponentMesh* skybox = GameWorld::GetInstance().skybox != NULL ? GameWorld::GetInstance().skybox->GetComponents<ComponentMesh>()[0] : NULL;
 
     // 渲染 test_camera 所见景象时禁止 test_camera_screen
@@ -69,7 +70,10 @@ void ComponentCamera::RenderTick() {
         // 1.4.2 点光源阴影
         int use_point_light_num = UniformBufferLight::GetInstance().use_point_light_num;
         for (int i = 0; i < use_point_light_num; i++) {
-            // auto shadow_component = shadow_components[i + use_direct_light_num];
+            auto shadow_component = component_shadow_point_lights[i];
+            dynamic_cast<FrameBufferCube*>(shadow_component->frame_buffer_cube)->color_texture->Use(texture_index);
+            *(shadow_component->shadow_map_index) = texture_index;
+            texture_index++;
         }
         UniformBufferShadow::GetInstance().UpdateUniformData();
     }

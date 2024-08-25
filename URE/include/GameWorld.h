@@ -13,8 +13,6 @@ public:
     void RenderTick();
 
 public:
-    void ShowOnlySkybox();
-    void ShowAllObject();
     void ResetSkyboxTexture();
 
 private:
@@ -22,6 +20,7 @@ private:
     ~GameWorld();
 
 public:
+    bool show_only_skybox;
     std::vector<GO*> all_game_object;
     GOSkybox* skybox;
     TextureCube* skybox_texture;
@@ -41,4 +40,8 @@ public:
     void HandleMouseMovement(float x_offset, float y_offset);
     
     void HandleMouseScroll(float y_offset);
+
+private:
+    void ShowOnlySkybox();
+    void ShowAllObject();
 };
