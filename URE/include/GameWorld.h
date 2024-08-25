@@ -10,6 +10,12 @@ public:
 public:
     void SceneCreate();
     void GameTick();
+    void RenderTick();
+
+public:
+    void ShowOnlySkybox();
+    void ShowAllObject();
+    void ResetSkyboxTexture();
 
 private:
     GameWorld();
@@ -18,6 +24,7 @@ private:
 public:
     std::vector<GO*> all_game_object;
     GOSkybox* skybox;
+    TextureCube* skybox_texture;
     ComponentCamera* main_camera;
     SpotLight* spot_light;
 

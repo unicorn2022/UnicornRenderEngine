@@ -9,7 +9,7 @@
 
 class ComponentShadowDirectLight : public Component {
 public:
-    /** 阴影组件: GO可以产生阴影
+    /** 定向光阴影组件: GO可以产生定向光阴影
      * \param gameobject 绑定的游戏对象
      * \param direct_light 对应UniformBuffer中的方向光
      * \param light_matrix 对应UniformBuffer中的光源变换矩阵

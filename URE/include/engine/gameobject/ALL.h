@@ -6,5 +6,6 @@
 #include "engine/gameobject/GOOBJModel.h"
 #include "engine/gameobject/GOScreen.h"
 #include "engine/gameobject/GOShadowDirectLight.h"
+#include "engine/gameobject/GOShadowPointLight.h"
 #include "engine/gameobject/GOSkybox.h"
 #include "engine/gameobject/GOSquare.h"

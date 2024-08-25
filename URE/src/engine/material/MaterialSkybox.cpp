@@ -20,3 +20,7 @@ void MaterialSkybox::Use() {
 TextureCube* MaterialSkybox::GetSkyboxTexture() const {
     return skybox_texture;
 }
+
+void MaterialSkybox::SetSkyboxTexture(TextureCube* texture_cube) {
+    skybox_texture = texture_cube;
+}

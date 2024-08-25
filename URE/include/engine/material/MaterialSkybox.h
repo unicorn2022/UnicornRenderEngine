@@ -14,6 +14,7 @@ public:
 public:
     virtual void Use();
     TextureCube* GetSkyboxTexture() const;
+    void SetSkyboxTexture(TextureCube* texture_cube);
 
 private:
     /* 材质信息 */

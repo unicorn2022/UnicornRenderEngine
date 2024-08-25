@@ -11,3 +11,7 @@ GOSkybox::GOSkybox(std::string name, MaterialSkybox* material) : GO(name) {
 TextureCube* GOSkybox::GetSkyboxTexture() const {
     return material->GetSkyboxTexture();
 }
+
+void GOSkybox::SetSkyboxTexture(TextureCube* texture_cube) {
+    material->SetSkyboxTexture(texture_cube);
+}

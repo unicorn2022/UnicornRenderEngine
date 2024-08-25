@@ -19,16 +19,18 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+/* 移动方向 */
 enum MovementDirection {
-    FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN,
-    NONE
+    FORWARD,    // 前
+    BACKWARD,   // 后
+    LEFT,       // 左
+    RIGHT,      // 右
+    UP,         // 上
+    DOWN,       // 下
+    NONE        // 无
 };
 
+/* 读写文件相关 */
 namespace Utils {
     /**
      * 从文件中读取内容
@@ -49,13 +51,25 @@ namespace Utils {
      * \param data stbi_image读取到的图片数据
      */
     void FreePicture(unsigned char* data);
+}
 
+/* 调试相关 */
+namespace Utils {
     void Debug(std::string msg, glm::vec3 data);
     void Debug(std::string msg, glm::vec4 data);
     void Debug(std::string msg, glm::mat4 data);
+    /* 判断当前OpenGL调用是否存在问题 */
     void Check(std::string msg);
+}
 
+/* 数学相关 */
+namespace Utils {
+    const float PI = 3.1415926535;
+
+    /* 生成 [L, R] 的随机数 */
     int Random(int L, int R);
+
+    /* 生成 [L, R] 的随机数 */
     float Random(float L, float R);
 
     /* 将 (1, 0, 0), 旋转 (x, y, z) 后, 结果为 direction */
@@ -63,6 +77,27 @@ namespace Utils {
     
     /* 判断两个向量是否共线 */
     bool IsSameDirection(glm::vec3 dir1, glm::vec3 dir2);
+}
 
-    const float PI = 3.1415926535;
-};
+/* 其他模板工具函数 */
+namespace Utils {
+    /** 从一个vector中删除一个item
+     * \param vec 待删除元素的vector
+     * \param item 待删除元素
+     * \return 原vec中是否存在item
+     */
+    template<typename T>
+    bool RemoveItemInVector(std::vector<T> vec, T item) {
+        int index = 0;
+        bool exist = false;
+        for(; index < vec.size(); index++)
+            if (item == vec[index]) {
+                exist = true;
+                break;
+            }
+        for (; index < vec.size() - 1; index++)
+            vec[index] = vec[index + 1];
+        vec.pop_back();
+        return exist;
+    }
+}

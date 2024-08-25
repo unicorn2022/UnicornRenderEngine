@@ -53,34 +53,18 @@ void Run() {
     /* 2. 渲染循环 */
     while (!glfwWindowShouldClose(window)) {
         /* 2.0 预处理 */
-        {
-            float current_time = glfwGetTime();
-            delta_time = current_time - last_time;
-            last_time = current_time;
-        }
-
+        float current_time = glfwGetTime();
+        delta_time = current_time - last_time;
+        last_time = current_time;
+        
         /* 2.1 处理输入 */ 
-        {
-            keyboard_callback(window);
-            GameWorld::GetInstance().GameTick();
-        }
-
+        keyboard_callback(window);
+        GameWorld::GetInstance().GameTick();
+        
         /* 2.2 渲染过程 */
-        {
-            // 2.2.1 渲染阴影贴图 (正面剔除)
-            if (use_opengl_cull_face) glCullFace(GL_FRONT);
-            auto component_shadow_direct_lights = GameComponent::GetInstance().GetComponentShadowDirectLight();
-            for (auto shadow_component : component_shadow_direct_lights) 
-                shadow_component->RenderTick();
-            if (use_opengl_cull_face) glCullFace(GL_BACK);
+        GameWorld::GetInstance().RenderTick();
 
-            // 2.2.2 每个相机渲染一次
-            auto camera_components = GameComponent::GetInstance().GetComponentCamera();
-            for (auto camera_component : camera_components) 
-                camera_component->RenderTick();
-        }
-
-        /* 2.3 将main_camera的帧缓冲绘制到屏幕上 */
+        /* 2.3 选择一个帧缓冲, 绘制到屏幕上 */
         {
             // 2.3.1 禁用深度测试, 面剔除
             if (use_opengl_cull_face) glDisable(GL_CULL_FACE);
@@ -91,16 +75,39 @@ void Run() {
             // 2.3.2 绘制屏幕对象
             glViewport(0, 0, window_width, window_height);
             FrameBuffer2D* target_frame_buffer_2D;
-            int show_shadow = GlobalValue::GetInstance().GetIntValue("show_shadow");
-            if (show_shadow < UniformBufferLight::GetInstance().use_direct_light_num) {
-                target_frame_buffer_2D = GameComponent::GetInstance().GetComponentShadowDirectLight()[show_shadow]->frame_buffer_2D;
-            } else {
-                target_frame_buffer_2D = GameWorld::GetInstance().main_camera->frame_buffer_2D;
+
+            // 2.3.3 判断是否显示阴影贴图
+            {
+                int show_shadow = GlobalValue::GetInstance().GetIntValue("show_shadow");
+                int use_direct_light_num = UniformBufferLight::GetInstance().use_direct_light_num;
+                int use_point_light_num = UniformBufferLight::GetInstance().use_point_light_num;
+                // 方向光源阴影
+                if (show_shadow < use_direct_light_num) {
+                    GameWorld::GetInstance().ResetSkyboxTexture();
+                    GameWorld::GetInstance().ShowAllObject();
+                    auto shadow_component = GameComponent::GetInstance().GetComponentShadowDirectLight()[show_shadow];
+                    target_frame_buffer_2D = shadow_component->frame_buffer_2D;
+                } 
+                // 点光源阴影
+                else if (show_shadow < use_direct_light_num + use_point_light_num) {
+                    auto shadow_component = GameComponent::GetInstance().GetComponentShadowPointLight()[show_shadow - use_direct_light_num];
+                    GameWorld::GetInstance().skybox->SetSkyboxTexture(shadow_component->frame_buffer_cube->color_texture);
+                    GameWorld::GetInstance().ShowOnlySkybox();
+                    target_frame_buffer_2D = GameWorld::GetInstance().main_camera->frame_buffer_2D;
+                } 
+                // 显示渲染画面
+                else {
+                    GameWorld::GetInstance().ResetSkyboxTexture();
+                    GameWorld::GetInstance().ShowAllObject();
+                    target_frame_buffer_2D = GameWorld::GetInstance().main_camera->frame_buffer_2D;
+                }
             }
+
+            // 2.3.4 绘制屏幕
             screen->SetTargetFrameBuffer2D(target_frame_buffer_2D);
             screen->Draw();
             
-            // 2.3.3 重新启用深度测试, 面剔除
+            // 2.3.5 重新启用深度测试, 面剔除
             glEnable(GL_DEPTH_TEST);
             if (use_opengl_cull_face) glEnable(GL_CULL_FACE);
         }

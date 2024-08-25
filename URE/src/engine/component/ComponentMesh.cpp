@@ -70,3 +70,7 @@ bool ComponentMesh::IsBasicShape() const {
     if (dynamic_cast<MeshSquare*>(mesh) != NULL) return true;
     return false;
 }
+
+bool ComponentMesh::IsDebug() const { 
+    return is_debug; 
+}

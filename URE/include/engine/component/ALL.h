@@ -4,4 +4,5 @@
 #include "engine/component/ComponentCamera.h"
 #include "engine/component/ComponentMesh.h"
 #include "engine/component/ComponentShadowDirectLight.h"
+#include "engine/component/ComponentShadowPointLight.h"
 #include "engine/component/ComponentTransform.h"

@@ -36,7 +36,8 @@ static void Scene_Skybox() {
     /* 天空盒 */
     {
         std::string skybox_file_name[6] = {"right", "left", "top", "bottom", "front", "back"};
-        GameWorld::GetInstance().skybox = new GOSkybox("skybox", new MaterialSkybox(new TextureCube(skybox_file_name, "jpg", true)));
+        GameWorld::GetInstance().skybox_texture = new TextureCube(skybox_file_name, "jpg", true);
+        GameWorld::GetInstance().skybox = new GOSkybox("skybox", new MaterialSkybox(GameWorld::GetInstance().skybox_texture));
     }
 }
 static void Scene_Light() {
@@ -107,6 +108,15 @@ static void Scene_Light() {
                 point_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(point_light_position[i]);
                 point_light_cube->GetComponents<ComponentTransform>()[i]->TransformScale(glm::vec3(0.1f));
                 // 阴影
+                auto point_light_shadow = new GOShadowPointLight(
+                    "point_light_shadow_" + std::to_string(i),
+                    &UniformBufferLight::GetInstance().point_lights[i],
+                    &UniformBufferShadow::GetInstance().point_light_shadow_map_index[i],
+                    2048, 2048,
+                    0.1, 100.0
+                );
+                point_light_shadow->GetComponents<ComponentTransform>()[0]->TransformTranslate(point_light_position[i]);
+                GameWorld::GetInstance().all_game_object.push_back(point_light_shadow);
             }
         }
         // 3. 聚光源

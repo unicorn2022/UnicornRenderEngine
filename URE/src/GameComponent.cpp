@@ -20,6 +20,9 @@ void GameComponent::AddComponent(Component* component) {
     else if (component->type == "component_shadow_direct_light") {
         component_shadow_direct_lights.push_back(dynamic_cast<ComponentShadowDirectLight*>(component));
     } 
+    else if (component->type == "component_shadow_point_light") {
+        component_shadow_point_lights.push_back(dynamic_cast<ComponentShadowPointLight*>(component));
+    } 
     else if (component->type == "component_transform") {
         component_transforms.push_back(dynamic_cast<ComponentTransform*>(component));
     } 
@@ -31,54 +34,22 @@ void GameComponent::AddComponent(Component* component) {
 /* 删除组件 */
 void GameComponent::DeleteComponent(Component* component) {
     if (component->type == "component_border") {
-        ComponentBorder* component_border = dynamic_cast<ComponentBorder*>(component);
-        int index = 0;
-        for(; index < component_borders.size(); index++)
-            if (component_border == component_borders[index])
-                break;
-        for (; index < component_borders.size() - 1; index++)
-            component_borders[index] = component_borders[index + 1];
-        component_borders.pop_back();
+        Utils::RemoveItemInVector(component_borders, dynamic_cast<ComponentBorder*>(component));
     }
     else if (component->type == "component_camera") {
-        ComponentCamera* component_camera = dynamic_cast<ComponentCamera*>(component);
-        int index = 0;
-        for(; index < component_cameras.size(); index++)
-            if (component_camera == component_cameras[index])
-                break;
-        for (; index < component_cameras.size() - 1; index++)
-            component_cameras[index] = component_cameras[index + 1];
-        component_cameras.pop_back();
+        Utils::RemoveItemInVector(component_cameras, dynamic_cast<ComponentCamera*>(component));
     } 
     else if (component->type == "component_mesh") {
-        ComponentMesh* component_mesh = dynamic_cast<ComponentMesh*>(component);
-        int index = 0;
-        for(; index < component_meshs.size(); index++)
-            if (component_mesh == component_meshs[index])
-                break;
-        for (; index < component_meshs.size() - 1; index++)
-            component_meshs[index] = component_meshs[index + 1];
-        component_meshs.pop_back();
+        Utils::RemoveItemInVector(component_meshs, dynamic_cast<ComponentMesh*>(component));
     } 
     else if (component->type == "component_shadow_direct_light") {
-        ComponentShadowDirectLight* component_shadow_direct_light = dynamic_cast<ComponentShadowDirectLight*>(component);
-        int index = 0;
-        for(; index < component_shadow_direct_lights.size(); index++)
-            if (component_shadow_direct_light == component_shadow_direct_lights[index])
-                break;
-        for (; index < component_shadow_direct_lights.size() - 1; index++)
-            component_shadow_direct_lights[index] = component_shadow_direct_lights[index + 1];
-        component_shadow_direct_lights.pop_back();
+        Utils::RemoveItemInVector(component_shadow_direct_lights, dynamic_cast<ComponentShadowDirectLight*>(component));
+    } 
+    else if (component->type == "component_shadow_point_light") {
+        Utils::RemoveItemInVector(component_shadow_point_lights, dynamic_cast<ComponentShadowPointLight*>(component));
     } 
     else if (component->type == "component_transform") {
-        ComponentTransform* component_transform = dynamic_cast<ComponentTransform*>(component);
-        int index = 0;
-        for(; index < component_transforms.size(); index++)
-            if (component_transform == component_transforms[index])
-                break;
-        for (; index < component_transforms.size() - 1; index++)
-            component_transforms[index] = component_transforms[index + 1];
-        component_transforms.pop_back();
+        Utils::RemoveItemInVector(component_transforms, dynamic_cast<ComponentTransform*>(component));
     } 
     else {
         std::cout << "[ERROR::GameComponent.h::DeleteComponent()] " << component->gameobject->GetName() << " 组件不是合法类型: " << component->type << "\n";
@@ -95,12 +66,15 @@ std::vector<ComponentCamera*> GameComponent::GetComponentCamera() {
 std::vector<ComponentShadowDirectLight*> GameComponent::GetComponentShadowDirectLight() { 
     return component_shadow_direct_lights; 
 }
+std::vector<ComponentShadowPointLight*> GameComponent::GetComponentShadowPointLight() { 
+    return component_shadow_point_lights; 
+}
 std::vector<ComponentTransform*> GameComponent::GetComponentTransform() { 
     return component_transforms; 
 }
 std::vector<ComponentMesh*> GameComponent::GetComponentMesh(Camera* camera, bool sorted) { 
     // 需要对 mesh 进行排序
-    if (sorted) {
+    if (sorted && camera != NULL) {
         std::sort(component_meshs.begin(), component_meshs.end(), [&](ComponentMesh* &A, ComponentMesh* &B){
             if(A->IsTransport() && B->IsTransport()) {
                 float distA = glm::distance(A->gameobject->GetComponents<ComponentTransform>()[0]->GetPosition(), camera->position);

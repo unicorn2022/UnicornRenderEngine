@@ -25,6 +25,8 @@ public:
     bool IsTransport() const;
     /* 是否为基础物体 */
     bool IsBasicShape() const;
+    /* 是否为Debug物体 */
+    bool IsDebug() const;
 
 private:
     /** 渲染单个网格体
