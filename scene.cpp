@@ -20,7 +20,7 @@ const bool use_opengl_cull_face = true;    // 面剔除
 /* 相机信息 */
 static const float main_camera_move_speed_min = 2.0f;
 static const float main_camera_move_speed_max = 20.0f;
-static const int main_camera_samples = 8;
+static const int main_camera_samples = 4;
 
 
 enum SceneChoice {
@@ -61,8 +61,8 @@ static void Scene_Light() {
                 UniformBufferLight::GetInstance().direct_light[i] = DirectLight(
                     direct_light_direction[i],          // 方向
                     glm::vec3(0.01f, 0.01f, 0.01f),     // 环境光
-                    glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
-                    glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
+                    glm::vec3(0.2f, 0.2f, 0.2f),        // 漫反射
+                    glm::vec3(0.5f, 0.5f, 0.5f)         // 高光
                 );
                 // 可视化
                 direct_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(glm::vec3(0.0f, 5.0f, 0.0f));
@@ -332,8 +332,8 @@ static void Test_Blinn_Phong_GameTick() {}
 
 /* 场景4: 测试 Shadow Map 算法 */
 static void Test_Shadow_Map_Scene() {
-    UniformBufferLight::GetInstance().use_direct_light_num = 2;
-    UniformBufferLight::GetInstance().use_point_light_num = 4;
+    UniformBufferLight::GetInstance().use_direct_light_num = 1;
+    UniformBufferLight::GetInstance().use_point_light_num = 1;
     UniformBufferLight::GetInstance().use_spot_light_num = 0;
     /* 主相机 */
     {
