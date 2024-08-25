@@ -74,9 +74,9 @@ public:
     PointLight point_lights[MAX_POINT_LIGHT_COUNT];
     SpotLight spot_light[MAX_SPOT_LIGHT_COUNT];
     // 2. 使用的光源个数
-    int use_direct_light_num;
-    int use_point_light_num;
-    int use_spot_light_num;
+    int use_direct_light_num;   // 使用的方向光源个数
+    int use_point_light_num;    // 使用的点光源个数, !!!至少为1个!!!
+    int use_spot_light_num;     // 使用的聚光源个数
 };
 
 class UniformBufferShadow : public UniformBuffer {

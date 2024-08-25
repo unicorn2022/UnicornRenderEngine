@@ -40,4 +40,8 @@ void MaterialPhongLight::Use() {
     for (int i = 0; i < UniformBufferLight::GetInstance().use_point_light_num; i++) {
         shader->SetUniform("point_light_shadow_map_" + std::to_string(i), UniformBufferShadow::GetInstance().point_light_shadow_map_index[i]);
     }
+    int last_point_index = std::max(UniformBufferLight::GetInstance().use_point_light_num - 1, 0);
+    for (int i = UniformBufferLight::GetInstance().use_point_light_num; i < MAX_POINT_LIGHT_COUNT; i++) {
+        shader->SetUniform("point_light_shadow_map_" + std::to_string(i), UniformBufferShadow::GetInstance().point_light_shadow_map_index[last_point_index]);
+    }
 }

@@ -332,7 +332,7 @@ static void Test_Blinn_Phong_GameTick() {}
 
 /* 场景4: 测试 Shadow Map 算法 */
 static void Test_Shadow_Map_Scene() {
-    UniformBufferLight::GetInstance().use_direct_light_num = 1;
+    UniformBufferLight::GetInstance().use_direct_light_num = 0;
     UniformBufferLight::GetInstance().use_point_light_num = 1;
     UniformBufferLight::GetInstance().use_spot_light_num = 0;
     /* 主相机 */

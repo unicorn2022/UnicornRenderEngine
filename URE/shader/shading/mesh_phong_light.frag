@@ -264,9 +264,9 @@ float CalcPointLightShadow(int index) {
         // 取得当前点的深度
         float shadow_depth = 1.0;
         if (index == 0) shadow_depth = texture(point_light_shadow_map_0, frag_to_light + PCF_SAMPLE_POINT_DIRECTIONS[i] * disk_radius).r;
-        // if (index == 1) shadow_depth = texture(point_light_shadow_map_1, frag_to_light + PCF_SAMPLE_POINT_DIRECTIONS[i] * disk_radius).r;
-        // if (index == 2) shadow_depth = texture(point_light_shadow_map_2, frag_to_light + PCF_SAMPLE_POINT_DIRECTIONS[i] * disk_radius).r;
-        // if (index == 3) shadow_depth = texture(point_light_shadow_map_3, frag_to_light + PCF_SAMPLE_POINT_DIRECTIONS[i] * disk_radius).r;
+        if (index == 1) shadow_depth = texture(point_light_shadow_map_1, frag_to_light + PCF_SAMPLE_POINT_DIRECTIONS[i] * disk_radius).r;
+        if (index == 2) shadow_depth = texture(point_light_shadow_map_2, frag_to_light + PCF_SAMPLE_POINT_DIRECTIONS[i] * disk_radius).r;
+        if (index == 3) shadow_depth = texture(point_light_shadow_map_3, frag_to_light + PCF_SAMPLE_POINT_DIRECTIONS[i] * disk_radius).r;
         if (abs(current_depth - shadow_depth) > bias && current_depth - shadow_depth > bias)
             shadow += 1.0;
     }
