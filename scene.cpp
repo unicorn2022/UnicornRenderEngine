@@ -86,9 +86,9 @@ static void Scene_Light() {
         {
             // 2.1 点光源位置
             std::vector<glm::vec3> point_light_position {
-                glm::vec3(0.0f,  0.0f, 3.0f),
-                glm::vec3(0.7f,  0.2f, 2.0f),
-                glm::vec3(2.3f, -3.3f, -4.0f),
+                glm::vec3( 0.0f,  0.0f,  0.0f),
+                glm::vec3( 0.7f,  0.2f,  2.0f),
+                glm::vec3( 2.3f, -3.3f, -4.0f),
                 glm::vec3(-4.0f,  2.0f, -12.0f),
             };
             // 2.2 点光源个数
@@ -101,8 +101,8 @@ static void Scene_Light() {
                 UniformBufferLight::GetInstance().point_lights[i] = PointLight(
                     point_light_position[i],            // 位置
                     glm::vec3(0.05f, 0.05f, 0.05f),     // 环境光
-                    glm::vec3(0.2f, 0.2f, 0.2f),        // 漫反射
-                    glm::vec3(0.5f, 0.5f, 0.5f)         // 高光
+                    glm::vec3(0.5f, 0.5f, 0.5f),        // 漫反射
+                    glm::vec3(1.0f, 1.0f, 1.0f)         // 高光
                 );
                 // 可视化
                 point_light_cube->GetComponents<ComponentTransform>()[i]->TransformTranslate(point_light_position[i]);
@@ -332,8 +332,8 @@ static void Test_Blinn_Phong_GameTick() {}
 
 /* 场景4: 测试 Shadow Map 算法 */
 static void Test_Shadow_Map_Scene() {
-    UniformBufferLight::GetInstance().use_direct_light_num = 1;
-    UniformBufferLight::GetInstance().use_point_light_num = 1;
+    UniformBufferLight::GetInstance().use_direct_light_num = 2;
+    UniformBufferLight::GetInstance().use_point_light_num = 4;
     UniformBufferLight::GetInstance().use_spot_light_num = 0;
     /* 主相机 */
     {
@@ -356,11 +356,13 @@ static void Test_Shadow_Map_Scene() {
     /* 箱子 */
     {
         const std::vector<glm::vec3> container_position {
-            glm::vec3(-2.0f, 1.0f, 0.0f),
-            glm::vec3(3.0f, 0.0f, 0.5f),
-            glm::vec3(3.0f, 0.0f, -0.5f)
+            glm::vec3(-2.0f, 0.0f, -2.0f),
+            glm::vec3( 2.0f, 0.0f, -2.0f),
+            glm::vec3(-2.0f, 0.0f,  2.0f),
+            glm::vec3( 2.0f, 0.0f,  2.0f)
         };
         const std::vector<glm::vec3> container_rotate {
+            glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 0.0f, 0.0f)
@@ -430,6 +432,9 @@ void GameWorld::GameTick() {
     /* 更新 shadow 组件中的相机状态 */
     auto component_shadow_direct_lights = GameComponent::GetInstance().GetComponentShadowDirectLight();
         for (auto shadow_component : component_shadow_direct_lights)
+            shadow_component->UpdateCameraState();
+    auto component_shadow_point_lights = GameComponent::GetInstance().GetComponentShadowPointLight();
+        for (auto shadow_component : component_shadow_point_lights)
             shadow_component->UpdateCameraState();
     
     /* 场景 GameTick */

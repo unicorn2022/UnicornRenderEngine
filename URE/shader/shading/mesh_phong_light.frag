@@ -102,9 +102,16 @@ uniform int use_blinn_phong = 1;
 const float SHADOW_BIAS_MIN = 0.0001; // 阴影计算 bias: 最小值
 const float SHADOW_BIAS_MAX = 0.0002; // 阴影计算 bias: 最大值
 const int PCF_SAMPLE_RANGE = 1;      // PCF采样范围 [-x, x]
-const int PCF_SAMPLE_NUM = (PCF_SAMPLE_RANGE * 2 + 1) * (PCF_SAMPLE_RANGE * 2 + 1); // PCF采样点个数
+const int PCF_SAMPLE_DIRECT_NUM = (PCF_SAMPLE_RANGE * 2 + 1) * (PCF_SAMPLE_RANGE * 2 + 1); // PCF采样点个数
 const float POINT_LIGHT_SHADOW_ZFAR = 100.0f;
-
+const int PCF_SAMPLE_POINT_NUM = 20;
+const vec3 PCF_SAMPLE_POINT_DIRECTIONS[20] = {
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+};
 
 void main() {
     vec3 normal_dir = normalize(fs_in.Normal);
@@ -234,28 +241,37 @@ float CalcDirectLightShadow(int index, vec4 light_space_position, float bias) {
             // 取得当前点的深度
             float shadow_depth;
             if (index == 0) shadow_depth = texture(direct_light_shadow_map_0, tex_coord.xy + vec2(x, y) * texel_size).r;
-            else if(index == 1) shadow_depth = texture(direct_light_shadow_map_1, tex_coord.xy + vec2(x, y) * texel_size).r;
-            shadow += current_depth - bias > shadow_depth ? 1.0 : 0.0;
+            if (index == 1) shadow_depth = texture(direct_light_shadow_map_1, tex_coord.xy + vec2(x, y) * texel_size).r;
+
+            // 计算阴影值
+            if (current_depth - bias > shadow_depth)
+                shadow += 1.0;
         }
     }
-    shadow /= PCF_SAMPLE_NUM;
-    // FragColor = vec4(shadow, texel_size.x, texel_size.y, 1.0);
+    shadow /= PCF_SAMPLE_DIRECT_NUM;
     return shadow;
 }
 
 float CalcPointLightShadow(int index, float bias) {
     vec3 frag_to_light = fs_in.Position - point_lights[index].position;
-    float current_depth = length(frag_to_light);
+    float current_depth = length(frag_to_light) / POINT_LIGHT_SHADOW_ZFAR; // 映射到[0, 1]之间
 
-    // 取得当前点的深度
-    float shadow_depth = 1.0;
-    // if (index == 0) shadow_depth = texture(point_light_shadow_map_0, frag_to_light).r;
-    // else if(index == 1) shadow_depth = texture(point_light_shadow_map_1, frag_to_light).r;
-    // else if(index == 2) shadow_depth = texture(point_light_shadow_map_2, frag_to_light).r;
-    // else if(index == 3) shadow_depth = texture(point_light_shadow_map_3, frag_to_light).r;
-    // FragColor = vec4(current_depth / POINT_LIGHT_SHADOW_ZFAR, shadow_depth, 0, 1);
-    shadow_depth *= POINT_LIGHT_SHADOW_ZFAR;
-    // 计算阴影值
-    float shadow = current_depth - bias > shadow_depth ? 1.0 : 0.0;
+    float view_distance = length(fs_in.ViewPosition - fs_in.Position);
+    float disk_radius = (1.0 + (view_distance / POINT_LIGHT_SHADOW_ZFAR)) / 25.0;
+    float shadow = 0.0;
+    for (int i = 0; i < PCF_SAMPLE_POINT_NUM; i++) {
+        // 取得当前点的深度
+        float shadow_depth = 1.0;
+        if (index == 0) shadow_depth = texture(point_light_shadow_map_0, frag_to_light).r;
+        // if (index == 1) shadow_depth = texture(point_light_shadow_map_1, frag_to_light).r;
+        // if (index == 2) shadow_depth = texture(point_light_shadow_map_2, frag_to_light).r;
+        // if (index == 3) shadow_depth = texture(point_light_shadow_map_3, frag_to_light).r;
+
+        // 计算阴影值
+        if (current_depth - bias > shadow_depth)
+            shadow += 1.0;
+
+    }
+    shadow /= PCF_SAMPLE_POINT_NUM;
     return shadow;
 }

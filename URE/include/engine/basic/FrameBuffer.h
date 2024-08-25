@@ -63,6 +63,7 @@ public:
     virtual ~FrameBufferCube();
 
 public:
+    virtual void Use(int face);
     virtual void Convert() {}
 
 public:

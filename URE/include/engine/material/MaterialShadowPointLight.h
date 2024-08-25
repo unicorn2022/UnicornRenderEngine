@@ -11,11 +11,6 @@ public:
 public:
     virtual void Use();
 
-public:
-    /* 变换信息 */
-    glm::mat4 view_transforms[6];
-    glm::mat4 projection_transforms[6];
-
 private:
     /* 材质信息 */
     glm::vec3 light_position;

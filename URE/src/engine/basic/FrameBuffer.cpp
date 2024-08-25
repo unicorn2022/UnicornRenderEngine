@@ -92,6 +92,14 @@ FrameBufferCube::~FrameBufferCube() {
     glDeleteFramebuffers(1, &ID);
     delete color_texture;
 }
+void FrameBufferCube::Use(int face) {
+    // 1.1 绑定帧缓冲
+    glBindFramebuffer(GL_FRAMEBUFFER, ID);
+    // 1.2 修改视口大小
+    glViewport(0, 0, width, height);
+    // 1.3 指定当前面
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, color_texture->ID, 0);
+}
 void FrameBufferCube::CreateFrameBufferCube() {
     // 1.1 帧缓冲对象
     glGenFramebuffers(1, &ID);

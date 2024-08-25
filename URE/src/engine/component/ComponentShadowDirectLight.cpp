@@ -56,7 +56,7 @@ void ComponentShadowDirectLight::RenderTick() {
         glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
         glStencilMask(0x00); // 写入的模板值为0
         for (auto object : render_objects)
-            if (object->IsTransport() == false)
+            if (object->IsTransport() == false && object->IsDebug() == false)
                 object->Draw(material);
     }
 
