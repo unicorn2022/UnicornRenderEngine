@@ -35,7 +35,7 @@ ComponentMesh::~ComponentMesh() {
 
 void ComponentMesh::Draw(Material* material) {
     if (!enable) return;
-    if (is_debug && GlobalValue::GetInstance().GetIntValue("debug") == 0) return;
+    if (is_debug && GlobalValue::GetInstance().GetIntValue("show_debug") == 0) return;
     for (int i = 0; i < meshs.size(); i++) {
         if (material != NULL) DrawOneMesh(meshs[i], material);
         else DrawOneMesh(meshs[i], materials[i]);

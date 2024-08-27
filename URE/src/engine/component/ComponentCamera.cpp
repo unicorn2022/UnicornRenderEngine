@@ -103,7 +103,7 @@ void ComponentCamera::RenderTick() {
                     object->Draw();
         }
         // 3.1.3 根据模板缓冲绘制边界
-        if (GlobalValue::GetInstance().GetIntValue("show_border")) {
+        if (GlobalValue::GetInstance().GetIntValue("show_border") == 1) {
             glStencilFunc(GL_NOTEQUAL, 1, 0xff);// 模板值不为1时, 通过测试
             for (auto border : component_borders)
                 border->Draw();

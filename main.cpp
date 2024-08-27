@@ -6,9 +6,9 @@
 #include "GameWorld.h"
 #include "GameComponent.h"
 #include "GlobalValue.h"
+#include "InputSystem.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void keyboard_callback(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void InitOpenGL();
@@ -52,16 +52,20 @@ void Run() {
 
     /* 2. 渲染循环 */
     while (!glfwWindowShouldClose(window)) {
+        /* ESC 退出程序 */
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
+
         /* 2.0 预处理 */
         float current_time = glfwGetTime();
         delta_time = current_time - last_time;
         last_time = current_time;
         
-        /* 2.1 处理输入 */ 
-        keyboard_callback(window);
-        GameWorld::GetInstance().GameTick();
-        
-        /* 2.2 渲染过程 */
+        /* 2.1 处理输入 */
+        InputSystem::GetInstance().UpdateKeyBoardState(window);
+
+        /* 2.2 游戏逻辑 & 渲染逻辑 */
+        GameWorld::GetInstance().GameTick(delta_time);
         GameWorld::GetInstance().RenderTick();
 
         /* 2.3 选择一个帧缓冲, 绘制到屏幕上 */
@@ -172,69 +176,10 @@ void InitOpenGL(){
     GLint max_fragment_input_component;
     glGetIntegerv(GL_MAX_FRAGMENT_INPUT_COMPONENTS, &max_fragment_input_component);
     std::cout << "片段着色器输入最大为: " << max_fragment_input_component << "N\n"; 
-
-    GlobalValue::GetInstance().SetValue("show_shadow", 12);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
-}
-
-void keyboard_callback(GLFWwindow* window) {
-    /* ESC 退出程序 */
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
-
-    /* 长按 TAB 显示 Border */
-    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
-        GlobalValue::GetInstance().SetValue("show_border", 1);
-    } else {
-        GlobalValue::GetInstance().SetValue("show_border", 0);
-    }
-    
-    /* 0~9 选择后处理效果 */
-    for (int i = 0; i <= num_post_process; i++) {
-        if (glfwGetKey(window, GLFW_KEY_0 + i) == GLFW_PRESS) 
-            GlobalValue::GetInstance().SetValue("choose_post_process", i);
-    }
-
-    /* F1 ~ F12 选择显示阴影贴图 */
-    for (int i = 0; i < 12; i++) {
-        if (glfwGetKey(window, GLFW_KEY_F1 + i) == GLFW_PRESS) 
-            GlobalValue::GetInstance().SetValue("show_shadow", i);
-    }
-
-    /* 长按 G 显示调试对象 */
-    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
-        GlobalValue::GetInstance().SetValue("debug", 1);
-    } else {
-        GlobalValue::GetInstance().SetValue("debug", 0);
-    }
-
-    /* 长按 B 使用 phong 模型*/
-    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
-        GlobalValue::GetInstance().SetValue("use_blinn_phong", 0);
-    } else {
-        GlobalValue::GetInstance().SetValue("use_blinn_phong", 1);
-    }
-
-    /* 长按 R 取消 Gamma 矫正 */
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        GlobalValue::GetInstance().SetValue("gamma", 1.0f);
-    } else {
-        GlobalValue::GetInstance().SetValue("gamma", 2.2f);
-    }
-
-    /* 长按 Z 不显示天空盒 */
-    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
-        GlobalValue::GetInstance().SetValue("show_skybox", 0);
-    } else {
-        GlobalValue::GetInstance().SetValue("show_skybox", 1);
-    }
-    
-    /* 控制GO */
-    GameWorld::GetInstance().HandleKeyBoard(window, delta_time);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {

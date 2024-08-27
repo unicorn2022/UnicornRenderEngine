@@ -9,7 +9,7 @@ public:
 
 public:
     void SceneCreate();
-    void GameTick();
+    void GameTick(float delta_time);
     void RenderTick();
 
 public:
@@ -34,9 +34,7 @@ public:
     /* 场景2: 行星带 */
     ComponentTransform* planet;
 
-public:
-    void HandleKeyBoard(GLFWwindow* window, float delta_time);
-    
+public:    
     void HandleMouseMovement(float x_offset, float y_offset);
     
     void HandleMouseScroll(float y_offset);

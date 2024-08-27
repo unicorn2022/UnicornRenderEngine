@@ -21,6 +21,6 @@ void MaterialPostProcess::Use() {
     shader->SetUniform("choose_post_process", choose_post_process);
     shader->SetUniform("samples", screen_texture_multisample->samples);
     
-    this->gamma = GlobalValue::GetInstance().GetFloatValue("gamma");
+    gamma = GlobalValue::GetInstance().GetIntValue("use_gamma") == 1 ? 2.2f : 1.0f;
     shader->SetUniform("gamma", gamma);
 }

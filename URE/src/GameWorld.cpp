@@ -37,38 +37,6 @@ void GameWorld::RenderTick() {
         camera_component->RenderTick();
 }
 
-void GameWorld::HandleKeyBoard(GLFWwindow* window, float delta_time) {
-    // LShift 加快 main_camera 的移动速度
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        main_camera->gameobject->GetComponents<ComponentTransform>()[0]->MoveSpeedUp();
-    } 
-    // LCtrl 降低 main_camera 的移动速度
-    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        main_camera->gameobject->GetComponents<ComponentTransform>()[0]->MoveSpeedDown();
-    }
-
-    // 判断 main_camera 移动方向
-    MovementDirection direction;
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        direction = MovementDirection::UP;
-    } else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-        direction = MovementDirection::DOWN;
-    } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        direction = MovementDirection::LEFT;
-    } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        direction = MovementDirection::RIGHT;
-    } else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        direction = MovementDirection::FORWARD;
-    } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        direction = MovementDirection::BACKWARD;
-    } else {
-        direction = MovementDirection::NONE;
-    }
-
-    // 更新 main_camera 的位置
-    main_camera->gameobject->GetComponents<ComponentTransform>()[0]->ProcessKeyboard(direction, delta_time);
-}
-
 void GameWorld::HandleMouseMovement(float x_offset, float y_offset) {
     // 更新 main_camera 的旋转
     main_camera->gameobject->GetComponents<ComponentTransform>()[0]->ProcessMouseMovement(x_offset, y_offset);

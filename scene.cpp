@@ -1,6 +1,7 @@
 #include "GameWorld.h"
 #include "GameComponent.h"
 #include "GlobalValue.h"
+#include "InputSystem.h"
 #include "engine/material/ALL.h"
 #include "engine/basic/UniformBuffer.h"
 
@@ -159,7 +160,76 @@ static void Scene_Light() {
 
     
 }
+static void Scene_Config_MainCamera(float delta_time) {
+    // LShift 加快 main_camera 的移动速度
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::LShift) == KeyState::Pressed)
+        GameWorld::GetInstance().main_camera->gameobject->GetComponents<ComponentTransform>()[0]->MoveSpeedUp();
+    // LCtrl 降低 main_camera 的移动速度
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::LCtrl) == KeyState::Pressed) 
+        GameWorld::GetInstance().main_camera->gameobject->GetComponents<ComponentTransform>()[0]->MoveSpeedDown();
+    
 
+    // 判断 main_camera 移动方向
+    MovementDirection direction;
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::E) == KeyState::Pressed) {
+        direction = MovementDirection::UP;
+    } else if (InputSystem::GetInstance().GetKeyState(KeyCode::Q) == KeyState::Pressed) {
+        direction = MovementDirection::DOWN;
+    } else if (InputSystem::GetInstance().GetKeyState(KeyCode::A) == KeyState::Pressed) {
+        direction = MovementDirection::LEFT;
+    } else if (InputSystem::GetInstance().GetKeyState(KeyCode::D) == KeyState::Pressed) {
+        direction = MovementDirection::RIGHT;
+    } else if (InputSystem::GetInstance().GetKeyState(KeyCode::W) == KeyState::Pressed) {
+        direction = MovementDirection::FORWARD;
+    } else if (InputSystem::GetInstance().GetKeyState(KeyCode::S) == KeyState::Pressed) {
+        direction = MovementDirection::BACKWARD;
+    } else {
+        direction = MovementDirection::NONE;
+    }
+
+    // 更新 main_camera 的位置
+    GameWorld::GetInstance().main_camera->gameobject->GetComponents<ComponentTransform>()[0]->ProcessKeyboard(direction, delta_time);
+}
+static void Scene_Config_Default() {
+    GlobalValue::GetInstance().SetValue("show_debug", 0);
+    GlobalValue::GetInstance().SetValue("show_border", 0);
+    GlobalValue::GetInstance().SetValue("show_skybox", 1);
+
+    GlobalValue::GetInstance().SetValue("use_blinn_phong", 1);
+    GlobalValue::GetInstance().SetValue("use_gamma", 1);
+
+    GlobalValue::GetInstance().SetValue("choose_post_process", 0);
+    GlobalValue::GetInstance().SetValue("show_shadow", 12);
+}
+static void Scene_Config_GameTick() {
+    /* G 切换显示调试对象 */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::G) == KeyState::First_Pressed) 
+        GlobalValue::GetInstance().SwitchValue("show_debug");
+    /* TAB 切换显示 Border */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::TAB) == KeyState::First_Pressed)
+        GlobalValue::GetInstance().SwitchValue("show_border");
+    /* Z 切换显示天空盒 */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::Z) == KeyState::First_Pressed)
+        GlobalValue::GetInstance().SwitchValue("show_skybox");
+    /* B 切换使用 phong 模型*/
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::B) == KeyState::First_Pressed)
+        GlobalValue::GetInstance().SwitchValue("use_blinn_phong");
+    /* R 切换 Gamma 矫正 */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::R) == KeyState::First_Pressed) 
+        GlobalValue::GetInstance().SwitchValue("use_gamma");
+
+    /* 0~9 选择后处理效果 */
+    for (int i = 0; i <= num_post_process; i++) {
+        if (InputSystem::GetInstance().GetKeyState((KeyCode)((int)KeyCode::NUM0 + i)) == KeyState::First_Pressed) 
+            GlobalValue::GetInstance().SetValue("choose_post_process", i);
+    }
+
+    /* F1 ~ F12 选择显示阴影贴图 */
+    for (int i = 0; i < 12; i++) {
+        if (InputSystem::GetInstance().GetKeyState((KeyCode)((int)KeyCode::F1 + i)) == KeyState::First_Pressed)
+            GlobalValue::GetInstance().SetValue("show_shadow", i);
+    }    
+}
 
 /* 场景1: 测试场景 */
 static void Test_Capture2D_Blend_Reflect_Scene() {
@@ -371,7 +441,7 @@ static void Test_Shadow_Map_Scene() {
             new MaterialPhongLight(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
             container_position.size()
         );
-        // container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));
+        container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));
         for (int i = 0; i < container_position.size(); i++) {            
             container->GetComponents<ComponentTransform>()[i]->TransformTranslate(container_position[i]);
             container->GetComponents<ComponentTransform>()[i]->TransformRotate(container_rotate[i]);
@@ -388,11 +458,11 @@ static void Test_Shadow_Map_GameTick() {
 }
 
 
-
 /* 实现 GameWorld 的 GameTick() 和 SceneCreate() */
 void GameWorld::SceneCreate() {
     /* 天空盒 */
     Scene_Skybox();
+    Scene_Config_Default();
 
     /* 场景配置 */
     switch (scene) {
@@ -419,7 +489,11 @@ void GameWorld::SceneCreate() {
     /* 灯光 */
     Scene_Light();
 }
-void GameWorld::GameTick() {
+void GameWorld::GameTick(float delta_time) {
+    /* 按键设置场景属性 */
+    Scene_Config_MainCamera(delta_time);
+    Scene_Config_GameTick();
+
     /* 设置聚光源属性 */
     spot_light->position = main_camera->camera->position;
     spot_light->direction = main_camera->camera->front;

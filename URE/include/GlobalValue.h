@@ -35,6 +35,7 @@ public:
 public:
     void SetValue(std::string name, float value, float min = -1e10, float max = 1e10);
     void SetValue(std::string name, int value, int min = -1e10, int max = 1e10);
+    void SwitchValue(std::string name);
     float GetFloatValue(std::string name);
     int GetIntValue(std::string name);
 
