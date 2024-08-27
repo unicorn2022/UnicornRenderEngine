@@ -35,31 +35,29 @@ void ComponentShadowDirectLight::RenderTick() {
     if (!enable) return;
     std::vector<ComponentMesh*> render_objects = GameComponent::GetInstance().GetComponentMesh(this->camera, false);
 
+    /* 禁用模板测试 */
+    glDisable(GL_STENCIL_TEST);
     /* 1. 预处理 */
-    {
-        // 1.1 绑定帧缓冲
-        frame_buffer_2D->Use();
-        // 1.2 更新 UniformBufferCamera 的值
-        UniformBufferCamera::GetInstance().view_transform = camera->GetViewMatrix();
-        UniformBufferCamera::GetInstance().projection_transform = camera->GetProjectionMatrix();
-        UniformBufferCamera::GetInstance().UpdateUniformData();
-    }
+    // 1.1 绑定帧缓冲
+    frame_buffer_2D->Use();
+    // 1.2 更新 UniformBufferCamera 的值
+    UpdateCameraState();
+    UniformBufferCamera::GetInstance().view_transform = camera->GetViewMatrix();
+    UniformBufferCamera::GetInstance().projection_transform = camera->GetProjectionMatrix();
+    UniformBufferCamera::GetInstance().UpdateUniformData();
         
     /* 2. 清屏: 颜色缓冲, 深度缓冲, 模板缓冲 */
-    {
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    }
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
     
     /* 3. 使用特定材质, 绘制所有不透明物体 */
-    {
-        glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
-        glStencilMask(0x00); // 写入的模板值为0
-        for (auto object : render_objects)
-            if (object->IsTransport() == false && object->IsDebug() == false)
-                object->Draw(material);
-    }
-
+    for (auto object : render_objects)
+        if (object->IsTransport() == false && object->IsDebug() == false)
+            object->Draw(material);
+    
     /* 4. 转换帧缓冲的颜色附件 */
     frame_buffer_2D->Convert();
+    
+    /* 重新启用模板测试 */
+    glEnable(GL_STENCIL_TEST);
 }

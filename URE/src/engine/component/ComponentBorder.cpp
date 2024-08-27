@@ -22,9 +22,12 @@ ComponentBorder::~ComponentBorder() {
 
 void ComponentBorder::Draw() {
     if (is_basic_shape) {
-        gameobject->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(1.1f));
+        auto component_transforms = gameobject->GetComponents<ComponentTransform>();
+        for (auto transform : component_transforms)
+            transform->TransformScale(glm::vec3(1.1f));
         component_mesh->Draw(material);
-        gameobject->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(1.0f / 1.1f));
+        for (auto transform : component_transforms)
+            transform->TransformScale(glm::vec3(1.0f / 1.1f));
     } else {
         component_mesh->Draw(material);
     }

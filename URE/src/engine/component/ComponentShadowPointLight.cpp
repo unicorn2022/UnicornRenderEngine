@@ -47,29 +47,30 @@ void ComponentShadowPointLight::RenderTick() {
         glm::vec3(0.0, -1.0,  0.0),
     };
 
+    /* 禁用模板测试 */
+    glDisable(GL_STENCIL_TEST);
     for (int face = 0; face < 6; face++) {
         /* 1. 预处理 */
         // 1.1 绑定帧缓冲
         frame_buffer_cube->Use(face);
         // 1.2 更新 UniformBufferCamera 的值
+        UpdateCameraState();
         camera->front = front_dir[face];
         camera->up = up_dir[face];
         UniformBufferCamera::GetInstance().view_transform = camera->GetViewMatrix();
         UniformBufferCamera::GetInstance().projection_transform = camera->GetProjectionMatrix();
         UniformBufferCamera::GetInstance().UpdateUniformData();
-
         
         /* 2. 清屏: 颜色缓冲, 深度缓冲, 模板缓冲 */
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
         
         /* 3. 使用特定材质, 绘制所有不透明物体 */
-        glStencilFunc(GL_ALWAYS, 1, 0xff);  // 始终通过测试
-        glStencilMask(0x00); // 写入的模板值为0
         for (auto object : render_objects)
             if (object->IsTransport() == false && object->IsDebug() == false)
                 object->Draw(material);
     }
 
-
+    /* 重新启用模板测试 */
+    glEnable(GL_STENCIL_TEST);
 }

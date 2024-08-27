@@ -402,7 +402,7 @@ static void Test_Blinn_Phong_GameTick() {}
 
 /* 场景4: 测试 Shadow Map 算法 */
 static void Test_Shadow_Map_Scene() {
-    UniformBufferLight::GetInstance().use_direct_light_num = 0;
+    UniformBufferLight::GetInstance().use_direct_light_num = 1;
     UniformBufferLight::GetInstance().use_point_light_num = 1;
     UniformBufferLight::GetInstance().use_spot_light_num = 0;
     /* 主相机 */
@@ -502,14 +502,6 @@ void GameWorld::GameTick(float delta_time) {
     auto camera_component = GameComponent::GetInstance().GetComponentCamera();
         for (auto camera_component : camera_component)
             camera_component->UpdateCameraState();
-
-    /* 更新 shadow 组件中的相机状态 */
-    auto component_shadow_direct_lights = GameComponent::GetInstance().GetComponentShadowDirectLight();
-        for (auto shadow_component : component_shadow_direct_lights)
-            shadow_component->UpdateCameraState();
-    auto component_shadow_point_lights = GameComponent::GetInstance().GetComponentShadowPointLight();
-        for (auto shadow_component : component_shadow_point_lights)
-            shadow_component->UpdateCameraState();
     
     /* 场景 GameTick */
     switch (scene) {
