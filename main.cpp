@@ -205,25 +205,32 @@ void keyboard_callback(GLFWwindow* window) {
             GlobalValue::GetInstance().SetValue("show_shadow", i);
     }
 
-    /* G 选择是否显示调试对象 */
+    /* 长按 G 显示调试对象 */
     if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
         GlobalValue::GetInstance().SetValue("debug", 1);
     } else {
         GlobalValue::GetInstance().SetValue("debug", 0);
     }
 
-    /* B 选择是否使用 blinn_phong 模型*/
+    /* 长按 B 使用 phong 模型*/
     if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
         GlobalValue::GetInstance().SetValue("use_blinn_phong", 0);
     } else {
         GlobalValue::GetInstance().SetValue("use_blinn_phong", 1);
     }
 
-    /* R 选择是否使用 Gamma 矫正 */
+    /* 长按 R 取消 Gamma 矫正 */
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
         GlobalValue::GetInstance().SetValue("gamma", 1.0f);
     } else {
         GlobalValue::GetInstance().SetValue("gamma", 2.2f);
+    }
+
+    /* 长按 Z 不显示天空盒 */
+    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+        GlobalValue::GetInstance().SetValue("show_skybox", 0);
+    } else {
+        GlobalValue::GetInstance().SetValue("show_skybox", 1);
     }
     
     /* 控制GO */

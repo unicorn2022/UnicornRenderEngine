@@ -118,7 +118,7 @@ void ComponentCamera::RenderTick() {
     }
 
     /* 4. 绘制天空盒 */
-    if (skybox != NULL) {
+    if (skybox != NULL && GlobalValue::GetInstance().GetIntValue("show_skybox") == 1) {
         glDepthFunc(GL_LEQUAL);
         if (use_opengl_cull_face) glDisable(GL_CULL_FACE);
         skybox->Draw();
