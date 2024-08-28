@@ -98,7 +98,6 @@ void Run() {
                     auto shadow_component = GameComponent::GetInstance().GetComponentShadowPointLight()[index];
                     GameWorld::GetInstance().skybox->SetSkyboxTexture(shadow_component->frame_buffer_cube->color_texture);
                     GameWorld::GetInstance().show_only_skybox = true;
-                    GameWorld::GetInstance().main_camera->gameobject->GetComponents<ComponentTransform>()[0]->position = UniformBufferLight::GetInstance().point_lights[index].position;
                     target_frame_buffer_2D = GameWorld::GetInstance().main_camera->frame_buffer_2D;
                 } 
                 // 显示渲染画面

@@ -46,9 +46,9 @@ void ComponentShadowDirectLight::RenderTick() {
     UniformBufferCamera::GetInstance().projection_transform = camera->GetProjectionMatrix();
     UniformBufferCamera::GetInstance().UpdateUniformData();
         
-    /* 2. 清屏: 颜色缓冲, 深度缓冲, 模板缓冲 */
+    /* 2. 清屏: 颜色缓冲, 深度缓冲 */
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     /* 3. 使用特定材质, 绘制所有不透明物体 */
     for (auto object : render_objects)
