@@ -9,6 +9,19 @@ Texture::Texture(int width, int height) {
     CreateTexture();
 }
 
+Texture::Texture(glm::vec4 color) {
+    this->width = 1;
+    this->height = 1;
+    this->name = "";
+    this->path = "";
+    this->sRGB = false;
+    CreateTexture();
+    // 将颜色转化为RGBA
+    unsigned char data[4];
+    for (int i = 0; i < 4; i++) data[i] = color[i] * 255;
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+}
+
 Texture::Texture(std::string file_name, bool sRGB, std::string root_directory) {
     this->width = 0;
     this->height = 0;

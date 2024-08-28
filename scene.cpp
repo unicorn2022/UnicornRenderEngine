@@ -194,6 +194,7 @@ static void Scene_Config_Default() {
     GlobalValue::GetInstance().SetValue("show_debug", 0);
     GlobalValue::GetInstance().SetValue("show_border", 0);
     GlobalValue::GetInstance().SetValue("show_skybox", 1);
+    GlobalValue::GetInstance().SetValue("show_render_shadow", 1);
 
     GlobalValue::GetInstance().SetValue("use_blinn_phong", 1);
     GlobalValue::GetInstance().SetValue("use_gamma", 1);
@@ -211,6 +212,9 @@ static void Scene_Config_GameTick() {
     /* Z 切换显示天空盒 */
     if (InputSystem::GetInstance().GetKeyState(KeyCode::Z) == KeyState::First_Pressed)
         GlobalValue::GetInstance().SwitchValue("show_skybox");
+    /* X 切换渲染阴影 */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::X) == KeyState::First_Pressed)
+        GlobalValue::GetInstance().SwitchValue("show_render_shadow");
     /* B 切换使用 phong 模型*/
     if (InputSystem::GetInstance().GetKeyState(KeyCode::B) == KeyState::First_Pressed)
         GlobalValue::GetInstance().SwitchValue("use_blinn_phong");
@@ -438,7 +442,8 @@ static void Test_Shadow_Map_Scene() {
             glm::vec3(0.0f, 0.0f, 0.0f)
         };
         GOCube* container = new GOCube("container",
-            new MaterialPhongLight(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
+            new MaterialPhongLight(new Texture(Utils::Color::yellow), new Texture(Utils::Color::yellow)), 
+            // new MaterialPhongLight(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
             container_position.size()
         );
         container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));

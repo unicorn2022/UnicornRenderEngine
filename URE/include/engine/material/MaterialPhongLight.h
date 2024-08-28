@@ -25,4 +25,5 @@ private:
 
     /* 光照模型信息 */
     int use_blinn_phong;
+    int show_render_shadow;
 };

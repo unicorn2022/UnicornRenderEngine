@@ -10,6 +10,11 @@ public:
     */
     Texture(int width, int height);
 
+    /** 常量颜色纹理
+     * \param color 颜色 
+     */
+    Texture(glm::vec4 color);
+
     /** 从图片中生成纹理
      * \param file_name 文件名
      * \param sRGB 是否为sRGB纹理

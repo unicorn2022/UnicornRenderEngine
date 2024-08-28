@@ -62,6 +62,22 @@ namespace Utils {
     void Check(std::string msg);
 }
 
+/* 颜色相关 */
+namespace Utils{
+    namespace Color {
+        const glm::vec4 black   = glm::vec4(0, 0, 0, 1.0f);     // 黑
+        const glm::vec4 red     =   glm::vec4(1, 0, 0, 1.0f);   // 红
+        const glm::vec4 green   = glm::vec4(0, 1, 0, 1.0f);     // 绿
+        const glm::vec4 blue    =  glm::vec4(0, 0, 1, 1.0f);    // 蓝
+        const glm::vec4 yellow  = glm::vec4(1, 1, 0, 1.0f);     // 黄
+        const glm::vec4 purple  = glm::vec4(1, 0, 1, 1.0f);     // 紫
+        const glm::vec4 cyan    = glm::vec4(0, 1, 1, 1.0f);     // 青
+        const glm::vec4 white   = glm::vec4(1, 1, 1, 1.0f);     // 白
+        const glm::vec4 gray =  glm::vec4(0.5, 0.5, 0.5, 1.0f); // 灰
+        const glm::vec4 blue_tianyi = glm::vec4(0.4, 0.8, 1, 1.0f); // 天依蓝
+    }
+}
+
 /* 数学相关 */
 namespace Utils {
     const float PI = 3.1415926535;

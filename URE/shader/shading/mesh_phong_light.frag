@@ -97,7 +97,9 @@ uniform samplerCube point_light_shadow_map_3;
 // 材质
 uniform PhongMaterial material;
 // 是否使用 Blinn-Phong 模型
-uniform int use_blinn_phong = 1;
+uniform int use_blinn_phong;
+// 是否显示阴影
+uniform int show_render_shadow;
 
 const float SHADOW_BIAS_MIN = 0.0001; // 阴影计算 bias: 最小值
 const float SHADOW_BIAS_MAX = 0.0001; // 阴影计算 bias: 最大值
@@ -124,14 +126,22 @@ void main() {
     // 1. 方向光
     for(int i = 0; i < use_direct_light_num; i++) {
         vec3 light_dir = normalize(direct_lights[i].direction);
-        float bias = (SHADOW_BIAS_MAX - SHADOW_BIAS_MIN) * abs(1.0 - dot(normal_dir, light_dir)) + SHADOW_BIAS_MIN;
-        float shadow = CalcDirectLightShadow(i, fs_in.direct_light_position[i], bias);
-        color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, shadow);
+        if (show_render_shadow == 1) {
+            float bias = (SHADOW_BIAS_MAX - SHADOW_BIAS_MIN) * abs(1.0 - dot(normal_dir, light_dir)) + SHADOW_BIAS_MIN;
+            float shadow = CalcDirectLightShadow(i, fs_in.direct_light_position[i], bias);
+            color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, shadow);
+        } else {
+            color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, 0.0);
+        }
     }
     // 2. 点光源
     for(int i = 0; i < use_point_light_num; i++) {
-        float shadow = CalcPointLightShadow(i);
-        color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir, shadow);
+        if (show_render_shadow == 1) {
+            float shadow = CalcPointLightShadow(i);
+            color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir, shadow);
+        } else {
+            color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir, 0.0);
+        }
     }
     // 3. 聚光源
     for(int i = 0; i < use_spot_light_num; i++)

@@ -30,6 +30,8 @@ void MaterialPhongLight::Use() {
     /* 光照模型信息 */
     use_blinn_phong = GlobalValue::GetInstance().GetIntValue("use_blinn_phong");
     shader->SetUniform("use_blinn_phong", use_blinn_phong);
+    show_render_shadow = GlobalValue::GetInstance().GetIntValue("show_render_shadow");
+    shader->SetUniform("show_render_shadow", show_render_shadow);
 
     /* 阴影贴图 */
     // 1. direct_light
