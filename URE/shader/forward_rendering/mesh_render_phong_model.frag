@@ -9,6 +9,7 @@
 struct PhongMaterial {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D normal;
     float shininess;
 };
 /* 定向光源 */
@@ -54,9 +55,9 @@ struct SpotLight {
 };
 
 /* 光源计算函数 */
-vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir, float shadow);
-vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, float shadow);
-vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, float shadow);
+vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir, vec3 color_diffuse, vec3 color_specular, float shadow);
+vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, vec3 color_diffuse, vec3 color_specular, float shadow);
+vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, vec3 color_diffuse, vec3 color_specular, float shadow);
 
 /* 阴影计算函数 */
 float CalcDirectLightShadow(int index, vec4 light_space_position, float bias);
@@ -69,8 +70,8 @@ in VS_OUT {
     vec3 Normal;
     vec2 TexCoord;
     vec3 ViewPosition;
-    // 光源视角的坐标
-    vec4 direct_light_position[MAX_DIRECT_LIGHT_COUNT];
+    mat3 TBN;
+    vec4 direct_light_position[MAX_DIRECT_LIGHT_COUNT]; // 定向光源视角的坐标
     vec3 debug_color;
 } fs_in;
 
@@ -100,6 +101,10 @@ uniform PhongMaterial material;
 uniform int use_blinn_phong;
 // 是否显示阴影
 uniform int show_render_shadow;
+// 是否使用高光贴图
+uniform int use_specular_map;
+// 是否使用法线贴图
+uniform int use_normal_map;
 
 const float SHADOW_BIAS_MIN = 0.0001; // 阴影计算 bias: 最小值
 const float SHADOW_BIAS_MAX = 0.0001; // 阴影计算 bias: 最大值
@@ -117,9 +122,25 @@ const vec3 PCF_SAMPLE_POINT_DIRECTIONS[21] = {
 };
 
 void main() {
-    vec3 normal_dir = normalize(fs_in.Normal);
+    /* 计算观察方向 */
     vec3 view_dir = normalize(fs_in.ViewPosition - fs_in.Position);
+    /* 计算透明度 */
     float alpha = texture(material.diffuse, fs_in.TexCoord).a;
+    /* 采样 diffuse 贴图*/
+    vec3 color_diffuse = texture(material.diffuse, fs_in.TexCoord).rgb;
+    /* 采样 specular 贴图 */
+    vec3 color_specular = vec3(0.0, 0.0, 0.0);
+    if (use_specular_map == 1) color_specular = texture(material.specular, fs_in.TexCoord).rgb;
+    /* 采样 normal 贴图 */
+    vec3 normal_dir;
+    if (use_normal_map == 1) {
+        normal_dir = texture(material.normal, fs_in.TexCoord).rgb;
+        normal_dir = normalize(normal_dir * 2.0 - 1.0);
+        normal_dir = normalize(fs_in.TBN * normal_dir);
+    } else {
+        normal_dir = normalize(fs_in.Normal);
+    }
+    
 
     /* 计算三种光照 */
     vec3 color = vec3(0.0f);
@@ -129,43 +150,43 @@ void main() {
         if (show_render_shadow == 1) {
             float bias = (SHADOW_BIAS_MAX - SHADOW_BIAS_MIN) * abs(1.0 - dot(normal_dir, light_dir)) + SHADOW_BIAS_MIN;
             float shadow = CalcDirectLightShadow(i, fs_in.direct_light_position[i], bias);
-            color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, shadow);
+            color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, color_diffuse, color_specular, shadow);
         } else {
-            color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, 0.0);
+            color += CalcDirectLight(direct_lights[i], normal_dir, view_dir, color_diffuse, color_specular, 0.0);
         }
     }
     // 2. 点光源
     for(int i = 0; i < use_point_light_num; i++) {
         if (show_render_shadow == 1) {
             float shadow = CalcPointLightShadow(i);
-            color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir, shadow);
+            color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir, color_diffuse, color_specular, shadow);
         } else {
-            color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir, 0.0);
+            color += CalcPointLight(point_lights[i], normal_dir, fs_in.Position, view_dir, color_diffuse, color_specular, 0.0);
         }
     }
     // 3. 聚光源
     for(int i = 0; i < use_spot_light_num; i++)
-        color += CalcSpotLight(spot_lights[i], normal_dir, fs_in.Position, view_dir, 0.0);
+        color += CalcSpotLight(spot_lights[i], normal_dir, fs_in.Position, view_dir, color_diffuse, color_specular, 0.0);
 
     FragColor = vec4(color, alpha);
 }
 
-vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir, float shadow) {
+vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir, vec3 color_diffuse, vec3 color_specular, float shadow) {
     // 1. 环境光
-    vec3 ambient = light.ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
+    vec3 ambient = light.ambient * color_diffuse;
 
     // 2. 漫反射光
     vec3 light_dir = normalize(-light.direction);
-    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, fs_in.TexCoord).rgb;
+    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * color_diffuse;
 
     // 3. 高光
     vec3 specular;
     if (use_blinn_phong == 0) {
         vec3 reflect_dir = reflect(-light_dir, normal_dir);
-        specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+        specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * color_specular;
     } else {
         vec3 half_way_dir = normalize(light_dir + view_dir);
-        specular = pow(max(dot(normal_dir, half_way_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+        specular = pow(max(dot(normal_dir, half_way_dir), 0.0), material.shininess)  * light.specular * color_specular;
     }
 
     // 最终颜色
@@ -173,22 +194,22 @@ vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir, float sh
     return color;
 }
 
-vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, float shadow) {
+vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, vec3 color_diffuse, vec3 color_specular, float shadow) {
     // 1. 环境光
-    vec3 ambient = light.ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
+    vec3 ambient = light.ambient * color_diffuse;
 
     // 2. 漫反射光
     vec3 light_dir = normalize(light.position - frag_position);
-    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, fs_in.TexCoord).rgb;
+    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * color_diffuse;
 
     // 3. 高光
     vec3 specular;
     if (use_blinn_phong == 0) {
         vec3 reflect_dir = reflect(-light_dir, normal_dir);
-        specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+        specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * color_specular;
     } else {
         vec3 half_way_dir = normalize(light_dir + view_dir);
-        specular = pow(max(dot(normal_dir, half_way_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+        specular = pow(max(dot(normal_dir, half_way_dir), 0.0), material.shininess)  * light.specular * color_specular;
     }
     
     // 4. 衰减
@@ -200,22 +221,22 @@ vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 
     return color * attenuation;
 }
 
-vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, float shadow) {
+vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 view_dir, vec3 color_diffuse, vec3 color_specular, float shadow) {
     // 1. 环境光
-    vec3 ambient = light.ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
+    vec3 ambient = light.ambient * color_diffuse;
 
     // 2. 漫反射光
     vec3 light_dir = normalize(light.position - frag_position);
-    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * texture(material.diffuse, fs_in.TexCoord).rgb;
+    vec3 diffuse = max(dot(normal_dir, light_dir), 0.0) * light.diffuse * color_diffuse;
 
     // 3. 高光
     vec3 specular;
     if (use_blinn_phong == 0) {
         vec3 reflect_dir = reflect(-light_dir, normal_dir);
-        specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+        specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * color_specular;
     } else {
         vec3 half_way_dir = normalize(light_dir + view_dir);
-        specular = pow(max(dot(normal_dir, half_way_dir), 0.0), material.shininess)  * light.specular * texture(material.specular, fs_in.TexCoord).rgb;
+        specular = pow(max(dot(normal_dir, half_way_dir), 0.0), material.shininess)  * light.specular * color_specular;
     }
 
     // 4. 衰减

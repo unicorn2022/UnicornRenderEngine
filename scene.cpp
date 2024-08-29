@@ -405,8 +405,8 @@ static void Test_Blinn_Phong_GameTick() {}
 /* 场景4: 测试 Shadow Map 算法 */
 static void Test_Shadow_Map_Scene() {
     UniformBufferLight::GetInstance().use_direct_light_num = 1;
-    UniformBufferLight::GetInstance().use_point_light_num = 1;
-    UniformBufferLight::GetInstance().use_spot_light_num = 0;
+    UniformBufferLight::GetInstance().use_point_light_num = 4;
+    UniformBufferLight::GetInstance().use_spot_light_num = 1;
     /* 主相机 */
     {
         GOCamera* camera = new GOCamera("main_camera", 45, 0.1f, 1000.0f, window_width, window_height, main_camera_samples);
@@ -419,10 +419,18 @@ static void Test_Shadow_Map_Scene() {
 
     /* 平面 */
     {
-        auto plane = new GOCube("plane", new MaterialRenderPhongModel(new Texture("wood.png"), new Texture("wood.png")));
+        auto plane = new GOCube("plane", new MaterialRenderPhongModel(new Texture("wood.png")));
         plane->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, -0.6f, 0.0f));
         plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f, 0.1f, 5.0f));
         GameWorld::GetInstance().all_game_object.push_back(plane);
+    }
+
+    /* 墙 */
+    {
+        auto wall = new GOCube("wall", new MaterialRenderPhongModel(new Texture("brickwall_diffuse.jpg"), NULL, new Texture("brickwall_normal.jpg")));
+        wall->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 2.0f, -3.0f));
+        wall->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(2.0f, 2.0f, 0.2f));
+        GameWorld::GetInstance().all_game_object.push_back(wall);
     }
 
     /* 箱子 */
@@ -440,8 +448,8 @@ static void Test_Shadow_Map_Scene() {
             glm::vec3(0.0f, 0.0f, 0.0f)
         };
         GOCube* container = new GOCube("container",
-            new MaterialRenderPhongModel(new Texture(Utils::Color::yellow), new Texture(Utils::Color::yellow)), 
-            // new MaterialRenderPhongModel(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
+            // new MaterialRenderPhongModel(new Texture(Utils::Color::yellow)), 
+            new MaterialRenderPhongModel(new Texture("container_diffuse.png")), 
             container_position.size()
         );
         container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));

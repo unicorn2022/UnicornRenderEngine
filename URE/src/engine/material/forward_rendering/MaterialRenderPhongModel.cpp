@@ -2,29 +2,45 @@
 #include "GlobalValue.h"
 #include "engine/basic/UniformBuffer.h"
 
-MaterialRenderPhongModel::MaterialRenderPhongModel(Texture* diffuse, Texture* specular, float shininess) : Material("MaterialRenderPhongModel") {
+MaterialRenderPhongModel::MaterialRenderPhongModel(Texture* diffuse, Texture* specular, Texture* normal, float shininess) : Material("MaterialRenderPhongModel") {
     this->shader = new Shader("forward_rendering/mesh_render_phong_model");
     this->diffuse = diffuse;
     this->specular = specular;
+    this->normal = normal;
     this->shininess = shininess;
 }
 
 MaterialRenderPhongModel::~MaterialRenderPhongModel() {
     delete diffuse;
     delete specular;
+    delete normal;
 }
 
 void MaterialRenderPhongModel::Use() {
     shader->Use();
     /* 材质信息 */
+    // 1. diffuse 贴图
     if (diffuse != NULL) {
         diffuse->Use(0);
         shader->SetUniform("material.diffuse", 0);
     }
+    // 2. specular 贴图
     if (specular != NULL) {
         specular->Use(1);
         shader->SetUniform("material.specular", 1);
+        shader->SetUniform("use_specular_map", 1);
+    } else {
+        shader->SetUniform("use_specular_map", 0);
     }
+    // 3. normal 贴图
+    if (normal != NULL) {
+        normal->Use(2);
+        shader->SetUniform("material.normal", 2);
+        shader->SetUniform("use_normal_map", 1);
+    } else {
+        shader->SetUniform("use_normal_map", 0);
+    }
+    // 4. shiness
     shader->SetUniform("material.shininess", shininess);
     
     /* 光照模型信息 */

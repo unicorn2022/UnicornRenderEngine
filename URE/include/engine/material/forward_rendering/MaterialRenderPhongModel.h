@@ -8,9 +8,10 @@ public:
     /** 材质: Phong光照模型
      * \param diffuse 漫反射贴图
      * \param specular 高光度贴图
+     * \param normal 法线贴图
      * \param shininess 高光项
      */
-    MaterialRenderPhongModel(Texture* diffuse, Texture* specular, float shininess = 32.0f);
+    MaterialRenderPhongModel(Texture* diffuse, Texture* specular = NULL, Texture* normal = NULL, float shininess = 32.0f);
 
     ~MaterialRenderPhongModel();
 
@@ -21,6 +22,7 @@ private:
     /* 材质信息 */
     Texture* diffuse;
     Texture* specular;
+    Texture* normal;
     float shininess;
 
     /* 光照模型信息 */

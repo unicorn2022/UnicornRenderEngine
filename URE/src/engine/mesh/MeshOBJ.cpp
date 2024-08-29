@@ -16,19 +16,19 @@ void MeshOBJSubMesh::Draw(unsigned int num) {
     glBindVertexArray(VAO);
     // 1. 传输: 实例化 model 矩阵 
     // note: 通过一个buffer更新model矩阵, 在该buffer中, model矩阵的stride为 sizeof(glm::mat4)
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
     glEnableVertexAttribArray(5);
-    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
     glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
-    // 告诉OpenGL: 在每1次绘制实例时, 需要更新顶点属性3~6
-    glVertexAttribDivisor(3, 1);
-    glVertexAttribDivisor(4, 1);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+    glEnableVertexAttribArray(7);
+    glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+    glEnableVertexAttribArray(8);
+    glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+    // 告诉OpenGL: 在每1次绘制实例时, 需要更新顶点属性5~8
     glVertexAttribDivisor(5, 1);
     glVertexAttribDivisor(6, 1);
+    glVertexAttribDivisor(7, 1);
+    glVertexAttribDivisor(8, 1);
     // 2. 绘制实例
     glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, num);
 }
@@ -58,13 +58,16 @@ void MeshOBJSubMesh::CreateOBJSubMesh() {
     // 4.3 纹理坐标
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coords));
-    
+    // 4.4 切线方向
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
+    // 4.5 副切线方向
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
 
     /* 5. 取消绑定 */
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
-
-
 
 OBJModel::OBJModel(std::string root_path, std::string name) {
     this->directory = root_path + name + "/";
@@ -75,7 +78,7 @@ OBJModel::OBJModel(std::string root_path, std::string name) {
 void OBJModel::CreateOBJ() {
     /* 加载模型 */
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(obj_model_path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* scene = importer.ReadFile(obj_model_path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cout << "[ERROR::MeshOBJ.h::CreateOBJ()] 模型加载失败: " << importer.GetErrorString() << std::endl;
         return;
@@ -118,6 +121,14 @@ void OBJModel::ProcessMesh(aiMesh* ai_mesh, const aiScene* scene) {
         } else {
             vertex.tex_coords = glm::vec2(0.0f, 0.0f);
         }
+        // 1.4 切线
+        vertex.tangent.x = ai_mesh->mTangents[i].x;
+        vertex.tangent.y = ai_mesh->mTangents[i].y;
+        vertex.tangent.z = ai_mesh->mTangents[i].z;
+        // 1.5 副切线
+        vertex.bitangent.x = ai_mesh->mBitangents[i].x;
+        vertex.bitangent.y = ai_mesh->mBitangents[i].y;
+        vertex.bitangent.z = ai_mesh->mBitangents[i].z;
         vertices.push_back(vertex);
     }
     // 2. 处理索引
@@ -131,8 +142,10 @@ void OBJModel::ProcessMesh(aiMesh* ai_mesh, const aiScene* scene) {
         aiMaterial* mat = scene->mMaterials[ai_mesh->mMaterialIndex];
         Texture* diffuse = ProcessTexture(mat, aiTextureType_DIFFUSE);
         Texture* specular = ProcessTexture(mat, aiTextureType_SPECULAR);
+        Texture* normal = ProcessTexture(mat, aiTextureType_HEIGHT);
         sub_meshs_diffuse.push_back(diffuse);
         sub_meshs_specular.push_back(specular);
+        sub_meshs_normal.push_back(normal);
     } 
     // 4. 保存到meshs中
     MeshOBJSubMesh* mesh = new MeshOBJSubMesh(vertices, indices);
@@ -145,11 +158,13 @@ Texture* OBJModel::ProcessTexture(aiMaterial* mat, aiTextureType type) {
         aiString file_name;
         mat->GetTexture(type, i, &file_name);
         Texture* texture;
+        // diffuse 默认是 sRGB 纹理
         if (type == aiTextureType_DIFFUSE) {
             texture = new Texture(file_name.C_Str(), true, directory);
-        } else if (type == aiTextureType_SPECULAR) {
+        } else {
             texture = new Texture(file_name.C_Str(), false, directory);
         } 
+        // 每个材质每种纹理只保留一张
         if (first_texture == NULL) first_texture = texture;
         else std::cout << "[INFO] 舍弃纹理: " << file_name.C_Str() << "\n";
     }

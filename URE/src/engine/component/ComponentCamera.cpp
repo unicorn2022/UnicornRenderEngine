@@ -57,7 +57,7 @@ void ComponentCamera::RenderTick() {
         // 1.3 更新 UniformBufferLight 的值
         UniformBufferLight::GetInstance().UpdateUniformData();
         // 1.4 更新 UniformBufferShadow 的值
-        int texture_index = 2;
+        int texture_index = 4;
         // 1.4.1 定向光源阴影
         int use_direct_light_num = UniformBufferLight::GetInstance().use_direct_light_num;
         for (int i = 0; i < use_direct_light_num; i++) {

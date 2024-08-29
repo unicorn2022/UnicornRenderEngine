@@ -32,6 +32,7 @@ public:
     std::vector<Mesh*> sub_meshs;
     std::vector<Texture*> sub_meshs_diffuse;
     std::vector<Texture*> sub_meshs_specular;
+    std::vector<Texture*> sub_meshs_normal;
 
 private:
     std::string directory;
