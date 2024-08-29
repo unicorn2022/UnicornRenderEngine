@@ -1,6 +1,6 @@
 #include "engine/basic/Shader.h"
 
-static const bool show_shader_error = true;
+static bool show_shader_error = true;
 
 Shader::Shader(std::string name, bool use_geometry_shader, std::string root_directory){
     this->name = name;
@@ -135,6 +135,7 @@ bool Shader::Check(int shaderID, std::string message) const {
     if(!success) {
         glGetShaderInfoLog(shaderID, 512, NULL, infoLog);
         std::cout << "[ERROR::Shader.h::Check()] " << message << infoLog << std::endl;
+        show_shader_error = false;
     }
     return success;
 }

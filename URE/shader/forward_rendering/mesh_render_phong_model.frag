@@ -66,12 +66,17 @@ float CalcPointLightShadow(int index);
 /* 输入输出变量 */
 out vec4 FragColor;
 in VS_OUT {
+    // 位置、纹理坐标、观察点
     vec3 Position;
-    vec3 Normal;
     vec2 TexCoord;
     vec3 ViewPosition;
-    mat3 TBN;
+    // 法线、切线、副切线
+    vec3 Normal;
+    vec3 Tangent;
+    vec3 Bitangent;
+    // 光源相关
     vec4 direct_light_position[MAX_DIRECT_LIGHT_COUNT]; // 定向光源视角的坐标
+    // 调试相关
     vec3 debug_color;
 } fs_in;
 
@@ -134,14 +139,20 @@ void main() {
     /* 采样 normal 贴图 */
     vec3 normal_dir;
     if (use_normal_map == 1) {
+        // 采样法线, 法线定义在切线空间
         normal_dir = texture(material.normal, fs_in.TexCoord).rgb;
         normal_dir = normalize(normal_dir * 2.0 - 1.0);
-        normal_dir = normalize(fs_in.TBN * normal_dir);
+        // 计算世界坐标系下的TBN矩阵
+        vec3 T = normalize(fs_in.Tangent);
+        vec3 B = normalize(fs_in.Bitangent);
+        vec3 N = normalize(fs_in.Normal);
+        mat3 TBN = mat3(T, B, N);
+        // 将法线通过TBN变换到世界坐标系
+        normal_dir = normalize(TBN * normal_dir);
     } else {
         normal_dir = normalize(fs_in.Normal);
     }
     
-
     /* 计算三种光照 */
     vec3 color = vec3(0.0f);
     // 1. 方向光

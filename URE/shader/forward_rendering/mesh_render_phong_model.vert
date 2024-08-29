@@ -12,12 +12,17 @@ layout (location = 5) in mat4 model_transform;  // 实例化绘制
 
 /* 输入输出变量 */
 out VS_OUT {
+    // 位置、纹理坐标、观察点
     vec3 Position;
-    vec3 Normal;
     vec2 TexCoord;
     vec3 ViewPosition;
-    mat3 TBN;
+    // 法线、切线、副切线
+    vec3 Normal;
+    vec3 Tangent;
+    vec3 Bitangent;
+    // 光源相关
     vec4 direct_light_position[MAX_DIRECT_LIGHT_COUNT]; // 定向光源视角的坐标
+    // 调试相关
     vec3 debug_color;
 } vs_out;
 
@@ -34,16 +39,15 @@ layout (std140, binding = 2) uniform ShadowMatrix {
 
 void main() {
     /* 计算输出 */
+    // 位置、纹理坐标、观察点
     vs_out.Position = vec3(model_transform * vec4(aPos, 1.0)); // 世界坐标下的顶点位置
-    vs_out.Normal = mat3(transpose(inverse(model_transform))) * aNormal; // 保证法向量垂直平面
     vs_out.TexCoord = vec2(aTexCoord.x, aTexCoord.y);
     vs_out.ViewPosition = view_position;
-
-    /* 计算TBN矩阵 */
-    vec3 T = normalize(vec3(model_transform * vec4(aTangent,    0.0)));
-    vec3 B = normalize(vec3(model_transform * vec4(aBitangent,  0.0)));
-    vec3 N = normalize(vec3(model_transform * vec4(aNormal,     0.0)));
-    vs_out.TBN = mat3(T, B, N);
+    // 法线、切线、副切线
+    mat3 normal_mat = transpose(inverse(mat3(model_transform)));
+    vs_out.Normal = normal_mat * aNormal; // 保证法向量垂直平面
+    vs_out.Tangent = normal_mat * aTangent;
+    vs_out.Bitangent = normal_mat * aBitangent;
 
     /* 计算定向光照对应的顶点坐标 */
     for(int i = 0; i < use_direct_light_num_vert; i++)

@@ -41,10 +41,10 @@ void Utils::FreePicture(unsigned char* data) {
 }
 
 void Utils::Debug(std::string msg, glm::vec3 data) {
-    printf("%s: (%.3f, %.3f, %.3f)", msg.c_str(), data.x, data.y, data.z);
+    printf("%s:\n(%.3f, %.3f, %.3f)\n", msg.c_str(), data.x, data.y, data.z);
 }
 void Utils::Debug(std::string msg, glm::vec4 data) {
-    printf("%s: (%.3f, %.3f, %.3f, %.3f)", msg.c_str(), data.x, data.y, data.z, data.w);
+    printf("%s:\n(%.3f, %.3f, %.3f, %.3f)\n", msg.c_str(), data.x, data.y, data.z, data.w);
 }
 void Utils::Debug(std::string msg, glm::mat4 data) {
     printf("%s:\n", msg.c_str());
