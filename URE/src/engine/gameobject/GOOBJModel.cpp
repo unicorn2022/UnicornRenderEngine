@@ -1,6 +1,6 @@
 #include "engine/gameobject/GOOBJModel.h"
 #include "engine/mesh/MeshOBJ.h"
-#include "engine/material/MaterialPhongLight.h"
+#include "engine/material/forward_rendering/MaterialRenderPhongModel.h"
 #include "engine/component/ALL.h"
 
 
@@ -18,7 +18,7 @@ GOOBJModel::GOOBJModel(std::string name, std::string file_name, Material* materi
     for (int i = 0; i < model->sub_meshs.size(); i++) {
         meshs.push_back(model->sub_meshs[i]);
         if (material != NULL) materials.push_back(material);
-        else materials.push_back(new MaterialPhongLight(model->sub_meshs_diffuse[i], model->sub_meshs_specular[i]));
+        else materials.push_back(new MaterialRenderPhongModel(model->sub_meshs_diffuse[i], model->sub_meshs_specular[i]));
     }
     AddComponent(new ComponentMesh(this, meshs, materials, is_debug));
 }

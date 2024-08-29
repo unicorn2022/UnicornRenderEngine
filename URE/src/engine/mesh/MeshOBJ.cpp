@@ -1,5 +1,4 @@
 #include "engine/mesh/MeshOBJ.h"
-#include "engine/material/MaterialPhongLight.h"
 
 MeshOBJSubMesh::MeshOBJSubMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
     this->vertices = vertices;

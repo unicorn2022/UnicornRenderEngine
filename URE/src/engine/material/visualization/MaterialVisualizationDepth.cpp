@@ -1,7 +1,7 @@
-#include "engine/material/MaterialVisualizationDepth.h"
+#include "engine/material/visualization/MaterialVisualizationDepth.h"
 
 MaterialVisualizationDepth::MaterialVisualizationDepth(float z_near, float z_far) : Material("MaterialVisualizationDepth") {
-    this->shader = new Shader("visualization/mesh_visualization_depth");
+    this->shader = new Shader("visualization/visualization_depth");
     this->z_near = z_near;
     this->z_far = z_far;
 }

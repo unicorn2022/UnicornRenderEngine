@@ -1,6 +1,6 @@
 #pragma once
 #include "engine/gameobject/GO.h"
-#include "engine/material/MaterialSkybox.h"
+#include "engine/material/skybox/MaterialSkybox.h"
 #include "engine/basic/TextureCube.h"
 
 class GOSkybox : public GO {

@@ -25,25 +25,16 @@ link_directories(
     ${PROJECT_SOURCE_DIR}/3rd-party/assimp-5.4.2/lib
 )
 
-
-# 源代码
-aux_source_directory(${PROJECT_SOURCE_DIR}/URE/src SRC_ENGINE)
-aux_source_directory(${PROJECT_SOURCE_DIR}/URE/src/engine/basic SRC_ENGINE_BASIC)
-aux_source_directory(${PROJECT_SOURCE_DIR}/URE/src/engine/component SRC_ENGINE_COMPONENT)
-aux_source_directory(${PROJECT_SOURCE_DIR}/URE/src/engine/gameobject SRC_ENGINE_GAMEOBJECT)
-aux_source_directory(${PROJECT_SOURCE_DIR}/URE/src/engine/material SRC_ENGINE_MATERIAL)
-aux_source_directory(${PROJECT_SOURCE_DIR}/URE/src/engine/mesh SRC_ENGINE_MESH)
-
+# 递归查询 directory 目录下的所有*.cpp文件, 保存在 variable 中
+macro(get_cpp_file_recursively directory variable)
+    file(GLOB_RECURSE "${variable}" "${directory}/*.cpp")
+endmacro()
+get_cpp_file_recursively(${PROJECT_SOURCE_DIR}/URE/src SRC_ENGINE)
 
 # 链接器配置
 add_executable(${PROJECT_NAME} 
     ${PROJECT_SOURCE_DIR}/3rd-party/glad/src/glad.c
     ${SRC_ENGINE}
-    ${SRC_ENGINE_BASIC}
-    ${SRC_ENGINE_COMPONENT}
-    ${SRC_ENGINE_GAMEOBJECT}
-    ${SRC_ENGINE_MATERIAL}
-    ${SRC_ENGINE_MESH}
     main.cpp
     scene.cpp
 )

@@ -1,7 +1,7 @@
 #pragma once
 #include "engine/gameobject/GO.h"
 #include "engine/mesh/MeshSquare.h"
-#include "engine/material/MaterialPostProcess.h"
+#include "engine/material/post_process/MaterialPostProcess.h"
 #include "engine/basic/FrameBuffer.h"
 
 class GOScreen : public GO {

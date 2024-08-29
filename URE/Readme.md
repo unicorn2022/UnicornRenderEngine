@@ -209,7 +209,7 @@ uniform缓冲类，封装OpenGL中与uniform缓冲对象有关的接口
 
 材质的接口类，包含对`Shader`的引用，在销毁材质时销毁`Shader`
 
-### 1.4.2	MaterialConstantColor.h
+### 1.4.2	MaterialDebug.h
 
 固定颜色材质
 
@@ -230,7 +230,7 @@ uniform缓冲类，封装OpenGL中与uniform缓冲对象有关的接口
 - 变化信息：`model`
 - 材质信息：`diffuse`
 
-### 1.4.5	MaterialPhongLight.h
+### 1.4.5	MaterialRenderPhongModel.h
 
 Phong光照材质
 
@@ -250,14 +250,14 @@ Phong光照材质
 
 - 材质信息：`skybox `
 
-### 1.4.8	MaterialSkyboxReflect.h
+### 1.4.8	MaterialReflectTextureCube.h
 
 反射天空盒材质
 
 - 变化信息：`model`
 - 材质信息：`skybox `
 
-### 1.4.9	MaterialSkyboxRefract.h
+### 1.4.9	MaterialRefractTextureCube.h
 
 折射天空盒材质
 

@@ -1,4 +1,4 @@
-#include "engine/material/MaterialShadowPointLight.h"
+#include "engine/material/shadow/MaterialShadowPointLight.h"
 
 MaterialShadowPointLight::MaterialShadowPointLight(glm::vec3 light_position) : Material("MaterialShadowPointLight") {
     this->shader = new Shader("shadow/shadow_point_light");

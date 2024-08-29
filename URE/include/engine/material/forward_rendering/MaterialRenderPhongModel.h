@@ -3,16 +3,16 @@
 #include "engine/basic/Texture.h"
 #include "engine/basic/Light.h"
 
-class MaterialPhongLight : public Material {
+class MaterialRenderPhongModel : public Material {
 public:
-    /** 材质: Phong光照
+    /** 材质: Phong光照模型
      * \param diffuse 漫反射贴图
      * \param specular 高光度贴图
      * \param shininess 高光项
      */
-    MaterialPhongLight(Texture* diffuse, Texture* specular, float shininess = 32.0f);
+    MaterialRenderPhongModel(Texture* diffuse, Texture* specular, float shininess = 32.0f);
 
-    ~MaterialPhongLight();
+    ~MaterialRenderPhongModel();
 
 public:
     virtual void Use();

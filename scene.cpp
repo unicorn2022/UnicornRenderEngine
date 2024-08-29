@@ -54,7 +54,7 @@ static void Scene_Light() {
             // 1.2 方向光源个数
             int num = UniformBufferLight::GetInstance().use_direct_light_num;
             // 1.3 方向光源可视化
-            auto direct_light_cube = new GOCube("direct_light_cube", new MaterialConstantColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)), num, true);
+            auto direct_light_cube = new GOCube("direct_light_cube", new MaterialDebug(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)), num, true);
             GameWorld::GetInstance().all_game_object.push_back(direct_light_cube);
             // 1.4 配置方向光源
             for (int i = 0; i < num; i++) {
@@ -93,7 +93,7 @@ static void Scene_Light() {
             // 2.2 点光源个数
             int num = UniformBufferLight::GetInstance().use_point_light_num;
             // 2.3 点光源可视化
-            auto point_light_cube = new GOCube("point_light_cube", new MaterialConstantColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)), num, true);
+            auto point_light_cube = new GOCube("point_light_cube", new MaterialDebug(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)), num, true);
             GameWorld::GetInstance().all_game_object.push_back(point_light_cube);
             // 2.4 配置点光源
             for (int i = 0; i < num; i++) {
@@ -131,7 +131,7 @@ static void Scene_Light() {
             // 3.2 聚光源个数
             int num = UniformBufferLight::GetInstance().use_spot_light_num;
             // 3.3 点光源可视化
-            auto spot_light_cube = new GOCube("spot_light_cube", new MaterialConstantColor(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)), num, true);
+            auto spot_light_cube = new GOCube("spot_light_cube", new MaterialDebug(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)), num, true);
             GameWorld::GetInstance().all_game_object.push_back(spot_light_cube);
             // 3.4 配置聚光源
             for (int i = 0; i < num; i++) {
@@ -271,7 +271,7 @@ static void Test_Capture2D_Blend_Reflect_Scene() {
             glm::vec3(2.0f, 0.0f, 0.0f)
         };
         GOCube* container = new GOCube("container",
-            new MaterialPhongLight(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
+            new MaterialRenderPhongModel(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
             container_position.size()
         );
         container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));
@@ -293,7 +293,7 @@ static void Test_Capture2D_Blend_Reflect_Scene() {
             glm::vec3( 0.5f, 0.0f, -0.6f)
         };
         GO* windows = new GOSquare("windows",
-            new MaterialPhongLight(new Texture("window.png"), new Texture("window.png")),
+            new MaterialRenderPhongModel(new Texture("window.png"), new Texture("window.png")),
             window_position.size(),
             false,
             true
@@ -308,7 +308,7 @@ static void Test_Capture2D_Blend_Reflect_Scene() {
 
     /* 1个反射天空盒的物体 */
     {
-        GO* reflect_item = new GOOBJModel("reflect_item", "nanosuit", new MaterialSkyboxReflect(GameWorld::GetInstance().skybox->GetSkyboxTexture()));
+        GO* reflect_item = new GOOBJModel("reflect_item", "nanosuit", new MaterialReflectTextureCube(GameWorld::GetInstance().skybox->GetSkyboxTexture()));
         reflect_item->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(0.5));
         reflect_item->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(3, 0, -5));
         reflect_item->AddComponent(new ComponentBorder(reflect_item, reflect_item->GetComponents<ComponentMesh>()[0]));
@@ -317,7 +317,7 @@ static void Test_Capture2D_Blend_Reflect_Scene() {
     
     /* 1个折射天空盒的物体 */
     {
-        GO* refract_item = new GOOBJModel("reflect_item", "nanosuit", new MaterialSkyboxRefract(GameWorld::GetInstance().skybox->GetSkyboxTexture()));
+        GO* refract_item = new GOOBJModel("reflect_item", "nanosuit", new MaterialRefractTextureCube(GameWorld::GetInstance().skybox->GetSkyboxTexture()));
         refract_item->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(0.5));
         refract_item->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(-3, 0, -5));
         GameWorld::GetInstance().all_game_object.push_back(refract_item);
@@ -395,7 +395,7 @@ static void Test_Blinn_Phong_Scene() {
 
     /* 平面 */
     {
-        auto plane = new GOSquare("plane", new MaterialPhongLight(new Texture("wood.png"), new Texture("wood.png")));
+        auto plane = new GOSquare("plane", new MaterialRenderPhongModel(new Texture("wood.png"), new Texture("wood.png")));
         plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f, 5.0f, 5.0f));
         GameWorld::GetInstance().all_game_object.push_back(plane);
     }
@@ -419,7 +419,7 @@ static void Test_Shadow_Map_Scene() {
 
     /* 平面 */
     {
-        auto plane = new GOCube("plane", new MaterialPhongLight(new Texture("wood.png"), new Texture("wood.png")));
+        auto plane = new GOCube("plane", new MaterialRenderPhongModel(new Texture("wood.png"), new Texture("wood.png")));
         plane->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, -0.6f, 0.0f));
         plane->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(5.0f, 0.1f, 5.0f));
         GameWorld::GetInstance().all_game_object.push_back(plane);
@@ -440,8 +440,8 @@ static void Test_Shadow_Map_Scene() {
             glm::vec3(0.0f, 0.0f, 0.0f)
         };
         GOCube* container = new GOCube("container",
-            new MaterialPhongLight(new Texture(Utils::Color::yellow), new Texture(Utils::Color::yellow)), 
-            // new MaterialPhongLight(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
+            new MaterialRenderPhongModel(new Texture(Utils::Color::yellow), new Texture(Utils::Color::yellow)), 
+            // new MaterialRenderPhongModel(new Texture("container_diffuse.png"), new Texture("container_specular.png")), 
             container_position.size()
         );
         container->AddComponent(new ComponentBorder(container, container->GetComponents<ComponentMesh>()[0]));

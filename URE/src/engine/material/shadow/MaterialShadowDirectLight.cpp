@@ -1,4 +1,4 @@
-#include "engine/material/MaterialShadowDirectLight.h"
+#include "engine/material/shadow/MaterialShadowDirectLight.h"
 
 MaterialShadowDirectLight::MaterialShadowDirectLight() : Material("MaterialShadowDirectLight") {
     this->shader = new Shader("shadow/shadow_direct_light");

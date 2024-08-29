@@ -1,20 +1,20 @@
-#include "engine/material/MaterialPhongLight.h"
+#include "engine/material/forward_rendering/MaterialRenderPhongModel.h"
 #include "GlobalValue.h"
 #include "engine/basic/UniformBuffer.h"
 
-MaterialPhongLight::MaterialPhongLight(Texture* diffuse, Texture* specular, float shininess) : Material("MaterialPhongLight") {
-    this->shader = new Shader("shading/mesh_phong_light");
+MaterialRenderPhongModel::MaterialRenderPhongModel(Texture* diffuse, Texture* specular, float shininess) : Material("MaterialRenderPhongModel") {
+    this->shader = new Shader("forward_rendering/mesh_render_phong_model");
     this->diffuse = diffuse;
     this->specular = specular;
     this->shininess = shininess;
 }
 
-MaterialPhongLight::~MaterialPhongLight() {
+MaterialRenderPhongModel::~MaterialRenderPhongModel() {
     delete diffuse;
     delete specular;
 }
 
-void MaterialPhongLight::Use() {
+void MaterialRenderPhongModel::Use() {
     shader->Use();
     /* 材质信息 */
     if (diffuse != NULL) {

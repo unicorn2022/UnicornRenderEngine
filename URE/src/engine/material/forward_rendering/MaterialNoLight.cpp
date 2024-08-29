@@ -1,7 +1,7 @@
-#include "engine/material/MaterialNoLight.h"
+#include "engine/material/forward_rendering/MaterialNoLight.h"
 
 MaterialNoLight::MaterialNoLight(Texture* diffuse) : Material("MaterialNoLight") {
-    this->shader = new Shader("shading/mesh_no_light");
+    this->shader = new Shader("forward_rendering/mesh_no_light");
     this->diffuse = diffuse;
 }
 
