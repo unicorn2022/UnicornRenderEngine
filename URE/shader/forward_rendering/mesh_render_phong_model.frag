@@ -10,7 +10,12 @@ struct PhongMaterial {
     sampler2D diffuse;
     sampler2D specular;
     sampler2D normal;
+    sampler2D depth;
     float shininess;
+    float height_scale;
+    int use_specular_map;   // 是否使用高光贴图
+    int use_normal_map;     // 是否使用法线贴图
+    int use_depth_map;      // 是否使用深度贴图
 };
 /* 定向光源 */
 struct DirectLight {
@@ -106,10 +111,6 @@ uniform PhongMaterial material;
 uniform int use_blinn_phong;
 // 是否显示阴影
 uniform int show_render_shadow;
-// 是否使用高光贴图
-uniform int use_specular_map;
-// 是否使用法线贴图
-uniform int use_normal_map;
 
 const float SHADOW_BIAS_MIN = 0.0001; // 阴影计算 bias: 最小值
 const float SHADOW_BIAS_MAX = 0.0001; // 阴影计算 bias: 最大值
@@ -129,24 +130,39 @@ const vec3 PCF_SAMPLE_POINT_DIRECTIONS[21] = {
 void main() {
     /* 计算观察方向 */
     vec3 view_dir = normalize(fs_in.ViewPosition - fs_in.Position);
+    /* 计算TBN矩阵 */
+    vec3 T = normalize(fs_in.Tangent);
+    vec3 B = normalize(fs_in.Bitangent);
+    vec3 N = normalize(fs_in.Normal);
+    mat3 TBN = mat3(T, B, N);
+    /* 采样 depth 贴图 */
+    vec2 tex_coord = fs_in.TexCoord;
+    if (material.use_depth_map == 1) {
+        vec3 view_dir_TBN = normalize(TBN * fs_in.ViewPosition - TBN * fs_in.Position); 
+        float height = texture(material.depth, fs_in.TexCoord).r;
+        vec2 p = view_dir_TBN.xy / view_dir_TBN.z * (height * material.height_scale);
+        tex_coord = fs_in.TexCoord - p;
+    }
+    if (tex_coord.x > 1.0 || tex_coord.y > 1.0 || tex_coord.x < 0.0 || tex_coord.y < 0.0)
+        discard;
     /* 计算透明度 */
-    float alpha = texture(material.diffuse, fs_in.TexCoord).a;
+    float alpha = texture(material.diffuse, tex_coord).a;
+    
     /* 采样 diffuse 贴图*/
-    vec3 color_diffuse = texture(material.diffuse, fs_in.TexCoord).rgb;
+    vec3 color_diffuse = texture(material.diffuse, tex_coord).rgb;
+    
     /* 采样 specular 贴图 */
     vec3 color_specular = vec3(0.0, 0.0, 0.0);
-    if (use_specular_map == 1) color_specular = texture(material.specular, fs_in.TexCoord).rgb;
+    if (material.use_specular_map == 1) {
+        color_specular = texture(material.specular, tex_coord).rgb;
+    }
+    
     /* 采样 normal 贴图 */
     vec3 normal_dir;
-    if (use_normal_map == 1) {
+    if (material.use_normal_map == 1) {
         // 采样法线, 法线定义在切线空间
-        normal_dir = texture(material.normal, fs_in.TexCoord).rgb;
+        normal_dir = texture(material.normal, tex_coord).rgb;
         normal_dir = normalize(normal_dir * 2.0 - 1.0);
-        // 计算世界坐标系下的TBN矩阵
-        vec3 T = normalize(fs_in.Tangent);
-        vec3 B = normalize(fs_in.Bitangent);
-        vec3 N = normalize(fs_in.Normal);
-        mat3 TBN = mat3(T, B, N);
         // 将法线通过TBN变换到世界坐标系
         normal_dir = normalize(TBN * normal_dir);
     } else {
@@ -179,6 +195,7 @@ void main() {
     for(int i = 0; i < use_spot_light_num; i++)
         color += CalcSpotLight(spot_lights[i], normal_dir, fs_in.Position, view_dir, color_diffuse, color_specular, 0.0);
 
+    /* 输出颜色 */
     FragColor = vec4(color, alpha);
 }
 

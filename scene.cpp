@@ -199,6 +199,8 @@ static void Scene_Config_Default() {
 
     GlobalValue::GetInstance().SetValue("choose_post_process", 0);
     GlobalValue::GetInstance().SetValue("show_shadow", 12);
+
+    GlobalValue::GetInstance().SetValue("height_scale", 0.03f);
 }
 static void Scene_Config_GameTick() {
     /* G 切换显示调试对象 */
@@ -219,6 +221,18 @@ static void Scene_Config_GameTick() {
     /* R 切换 Gamma 矫正 */
     if (InputSystem::GetInstance().GetKeyState(KeyCode::R) == KeyState::First_Pressed) 
         GlobalValue::GetInstance().SwitchValue("use_gamma");
+
+    /* ↑↓ 控制 height_scale */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::UP) == KeyState::Pressed) {
+        float height_scale = GlobalValue::GetInstance().GetFloatValue("height_scale");
+        height_scale += 0.001f;
+        GlobalValue::GetInstance().SetValue("height_scale", height_scale, 0.0f, 0.05f);
+    }
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::DOWN) == KeyState::Pressed) {
+        float height_scale = GlobalValue::GetInstance().GetFloatValue("height_scale");
+        height_scale -= 0.001f;
+        GlobalValue::GetInstance().SetValue("height_scale", height_scale, 0.0f, 0.05f);
+    }
 
     /* 0~9 选择后处理效果 */
     for (int i = 0; i <= num_post_process; i++) {
@@ -427,7 +441,12 @@ static void Test_Shadow_Map_Scene() {
 
     /* 墙 */
     {
-        auto wall = new GOCube("wall", new MaterialRenderPhongModel(new Texture("brickwall_diffuse.jpg"), NULL, new Texture("brickwall_normal.jpg")));
+        auto wall = new GOSquare("wall", new MaterialRenderPhongModel(
+            new Texture("brickwall2_diffuse.jpg"), 
+            NULL, 
+            new Texture("brickwall2_normal.jpg"),
+            new Texture("brickwall2_depth.jpg")
+        ));
         // auto wall = new GOCube("wall", new MaterialRenderPhongModel(new Texture("brickwall_diffuse.jpg")));
         wall->GetComponents<ComponentTransform>()[0]->TransformTranslate(glm::vec3(0.0f, 2.0f, -3.0f));
         wall->GetComponents<ComponentTransform>()[0]->TransformScale(glm::vec3(2.0f, 2.0f, 0.2f));

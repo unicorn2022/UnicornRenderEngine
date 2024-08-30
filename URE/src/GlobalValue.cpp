@@ -9,11 +9,13 @@ void GlobalValue::SetValue(std::string name, float value, float min, float max) 
     if (value < min) value = min;
     if (value > max) value = max;
     float_value[name] = value;
+    std::cout << "[INFO] " << name << " 取值为: " << value << "\n";
 }
 void GlobalValue::SetValue(std::string name, int value, int min, int max) {
     if (value < min) value = min;
     if (value > max) value = max;
     int_value[name] = value;
+    std::cout << "[INFO] " << name << " 取值为: " << value << "\n";
 }
 void GlobalValue::SwitchValue(std::string name) {
     int value = GetIntValue(name);

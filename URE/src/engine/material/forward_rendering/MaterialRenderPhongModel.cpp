@@ -2,11 +2,12 @@
 #include "GlobalValue.h"
 #include "engine/basic/UniformBuffer.h"
 
-MaterialRenderPhongModel::MaterialRenderPhongModel(Texture* diffuse, Texture* specular, Texture* normal, float shininess) : Material("MaterialRenderPhongModel") {
+MaterialRenderPhongModel::MaterialRenderPhongModel(Texture* diffuse, Texture* specular, Texture* normal, Texture* depth, float shininess) : Material("MaterialRenderPhongModel") {
     this->shader = new Shader("forward_rendering/mesh_render_phong_model");
     this->diffuse = diffuse;
     this->specular = specular;
     this->normal = normal;
+    this->depth = depth;
     this->shininess = shininess;
 }
 
@@ -14,6 +15,7 @@ MaterialRenderPhongModel::~MaterialRenderPhongModel() {
     delete diffuse;
     delete specular;
     delete normal;
+    delete depth;
 }
 
 void MaterialRenderPhongModel::Use() {
@@ -21,27 +23,36 @@ void MaterialRenderPhongModel::Use() {
     /* 材质信息 */
     // 1. diffuse 贴图
     if (diffuse != NULL) {
-        diffuse->Use(0);
-        shader->SetUniform("material.diffuse", 0);
+        diffuse->Use(texture_index_diffuse);
+        shader->SetUniform("material.diffuse", texture_index_diffuse);
     }
     // 2. specular 贴图
     if (specular != NULL) {
-        specular->Use(1);
-        shader->SetUniform("material.specular", 1);
-        shader->SetUniform("use_specular_map", 1);
+        specular->Use(texture_index_specular);
+        shader->SetUniform("material.specular", texture_index_specular);
+        shader->SetUniform("material.use_specular_map", 1);
     } else {
-        shader->SetUniform("use_specular_map", 0);
+        shader->SetUniform("material.use_specular_map", 0);
     }
     // 3. normal 贴图
     if (normal != NULL) {
-        normal->Use(2);
-        shader->SetUniform("material.normal", 2);
-        shader->SetUniform("use_normal_map", 1);
+        normal->Use(texture_index_normal);
+        shader->SetUniform("material.normal", texture_index_normal);
+        shader->SetUniform("material.use_normal_map", 1);
     } else {
-        shader->SetUniform("use_normal_map", 0);
+        shader->SetUniform("material.use_normal_map", 0);
     }
-    // 4. shiness
+    // 4. depth 贴图
+    if (depth != NULL) {
+        depth->Use(texture_index_depth);
+        shader->SetUniform("material.depth", texture_index_depth);
+        shader->SetUniform("material.use_depth_map", 1);
+    } else {
+        shader->SetUniform("material.use_depth_map", 0);
+    }
+    // 5. 其他变量
     shader->SetUniform("material.shininess", shininess);
+    shader->SetUniform("material.height_scale", GlobalValue::GetInstance().GetFloatValue("height_scale"));
     
     /* 光照模型信息 */
     use_blinn_phong = GlobalValue::GetInstance().GetIntValue("use_blinn_phong");
