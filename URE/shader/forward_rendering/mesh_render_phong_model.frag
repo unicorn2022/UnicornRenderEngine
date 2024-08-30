@@ -333,26 +333,37 @@ float CalcPointLightShadow(int index) {
 }
 
 vec2 ParallaxMapping(mat3 TBN) {
-    vec3 view_dir_TBN = normalize(TBN * fs_in.ViewPosition - TBN * fs_in.Position); 
+    const vec3 view_dir_TBN = normalize(TBN * fs_in.ViewPosition - TBN * fs_in.Position); 
     const float min_layers = 10;
     const float max_layers = 20;
     const float num_layers = mix(max_layers, min_layers, abs(dot(vec3(0, 0, 1), view_dir_TBN)));
     const float delta_layer_depth = 1.0 / num_layers;
 
-    // 分层采样深度贴图
-    float current_layer_depth = 0.0;
-    vec2 P = view_dir_TBN.xy / view_dir_TBN.z * material.height_scale;
-    vec2 delta_tex_coord = P / num_layers;
-
-    // 获取初始值
+    /* 陡峭视差映射: 遍历每层, 采样深度值, 直到找到[层深>采样值]的层 */
+    // 1. 计算层间UV坐标差值
+    const vec2 P = view_dir_TBN.xy / view_dir_TBN.z * material.height_scale;
+    const vec2 delta_tex_coord = P / num_layers;
+    // 2. 获取当前层的初始值
     vec2 current_tex_coord = fs_in.TexCoord;
     float current_depth_map_value = texture(material.depth, current_tex_coord).r;
-
+    float current_layer_depth = 0.0;
+    // 3. 分层采样深度贴图
     while(current_layer_depth < current_depth_map_value) {
         current_tex_coord -= delta_tex_coord;
         current_depth_map_value = texture(material.depth, current_tex_coord).r;
         current_layer_depth += delta_layer_depth;
     }
     
-    return current_tex_coord;
+    /* 视差遮蔽映射: 找到[层深>采样值]的层后, 对相邻两层进行插值 */
+    // 1. 计算上一层的数据
+    vec2 pre_tex_coord = current_tex_coord + delta_tex_coord;
+    float pre_depth_map_value = texture(material.depth, pre_tex_coord).r;
+    float pre_layer_depth = current_layer_depth - delta_layer_depth;
+    // 2. 计算插值权重
+    float current_delta_depth = current_depth_map_value - current_layer_depth;
+    float pre_delta_depth = pre_depth_map_value - pre_layer_depth;
+    float weight = current_delta_depth / (current_delta_depth - pre_delta_depth);
+    // 3. 插值 pre_tex_coord 和 current_tex_coord
+    vec2 final_tex_coord = pre_tex_coord * weight + current_tex_coord * (1.0 - weight);
+    return final_tex_coord;
 }
