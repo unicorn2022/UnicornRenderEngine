@@ -27,10 +27,6 @@ private:
     Texture* depth;
     float shininess;
 
-    /* 光照模型信息 */
-    int use_blinn_phong;
-    int show_render_shadow;
-
     /* 贴图使用的纹理单元编号 */
     const static int texture_index_diffuse = 0;
     const static int texture_index_specular = 1;

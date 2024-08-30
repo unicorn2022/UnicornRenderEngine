@@ -55,10 +55,9 @@ void MaterialRenderPhongModel::Use() {
     shader->SetUniform("material.height_scale", GlobalValue::GetInstance().GetFloatValue("height_scale"));
     
     /* 光照模型信息 */
-    use_blinn_phong = GlobalValue::GetInstance().GetIntValue("use_blinn_phong");
-    shader->SetUniform("use_blinn_phong", use_blinn_phong);
-    show_render_shadow = GlobalValue::GetInstance().GetIntValue("show_render_shadow");
-    shader->SetUniform("show_render_shadow", show_render_shadow);
+    shader->SetUniform("show_render_shadow", GlobalValue::GetInstance().GetIntValue("show_render_shadow"));
+    shader->SetUniform("use_render_algorithm", GlobalValue::GetInstance().GetIntValue("use_render_algorithm"));
+    shader->SetUniform("use_displace_algorithm", GlobalValue::GetInstance().GetIntValue("use_displace_algorithm"));
 
     /* 阴影贴图 */
     // 1. direct_light

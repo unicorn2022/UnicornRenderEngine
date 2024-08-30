@@ -111,9 +111,11 @@ uniform samplerCube point_light_shadow_map_3;
 // 材质
 uniform PhongMaterial material;
 // 是否使用 Blinn-Phong 模型
-uniform int use_blinn_phong;
+uniform int use_render_algorithm;
 // 是否显示阴影
 uniform int show_render_shadow;
+// 使用的视差贴图算法
+uniform int use_displace_algorithm;
 
 const float SHADOW_BIAS_MIN = 0.0001; // 阴影计算 bias: 最小值
 const float SHADOW_BIAS_MAX = 0.0001; // 阴影计算 bias: 最大值
@@ -208,7 +210,7 @@ vec3 CalcDirectLight(DirectLight light, vec3 normal_dir, vec3 view_dir, vec3 col
 
     // 3. 高光
     vec3 specular;
-    if (use_blinn_phong == 0) {
+    if (use_render_algorithm == 0) {
         vec3 reflect_dir = reflect(-light_dir, normal_dir);
         specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * color_specular;
     } else {
@@ -231,7 +233,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal_dir, vec3 frag_position, vec3 
 
     // 3. 高光
     vec3 specular;
-    if (use_blinn_phong == 0) {
+    if (use_render_algorithm == 0) {
         vec3 reflect_dir = reflect(-light_dir, normal_dir);
         specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * color_specular;
     } else {
@@ -258,7 +260,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 vi
 
     // 3. 高光
     vec3 specular;
-    if (use_blinn_phong == 0) {
+    if (use_render_algorithm == 0) {
         vec3 reflect_dir = reflect(-light_dir, normal_dir);
         specular = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess)  * light.specular * color_specular;
     } else {
@@ -339,20 +341,23 @@ vec2 ParallaxMapping(mat3 TBN) {
     const float num_layers = mix(max_layers, min_layers, abs(dot(vec3(0, 0, 1), view_dir_TBN)));
     const float delta_layer_depth = 1.0 / num_layers;
 
-    /* 陡峭视差映射: 遍历每层, 采样深度值, 直到找到[层深>采样值]的层 */
-    // 1. 计算层间UV坐标差值
+    // 计算层间UV坐标差值
     const vec2 P = view_dir_TBN.xy / view_dir_TBN.z * material.height_scale;
     const vec2 delta_tex_coord = P / num_layers;
-    // 2. 获取当前层的初始值
+
+    /* 视差映射 */
     vec2 current_tex_coord = fs_in.TexCoord;
     float current_depth_map_value = texture(material.depth, current_tex_coord).r;
     float current_layer_depth = 0.0;
-    // 3. 分层采样深度贴图
+    if (use_displace_algorithm == 0) return current_tex_coord - P * current_depth_map_value;
+
+    /* 陡峭视差映射: 遍历每层, 采样深度值, 直到找到[层深>采样值]的层 */
     while(current_layer_depth < current_depth_map_value) {
         current_tex_coord -= delta_tex_coord;
         current_depth_map_value = texture(material.depth, current_tex_coord).r;
         current_layer_depth += delta_layer_depth;
     }
+    if (use_displace_algorithm == 1) return current_tex_coord;
     
     /* 视差遮蔽映射: 找到[层深>采样值]的层后, 对相邻两层进行插值 */
     // 1. 计算上一层的数据

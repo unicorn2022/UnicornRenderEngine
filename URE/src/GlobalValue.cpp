@@ -17,18 +17,11 @@ void GlobalValue::SetValue(std::string name, int value, int min, int max) {
     int_value[name] = value;
     std::cout << "[INFO] " << name << " 取值为: " << value << "\n";
 }
-void GlobalValue::SwitchValue(std::string name) {
+void GlobalValue::SwitchValue(std::string name, int state_count) {
     int value = GetIntValue(name);
-    if (value == 0) {
-        int_value[name] = 1;
-        std::cout << "[INFO] " << name << " 取值为: 1\n";
-    } 
-    else if (value == 1) {
-        int_value[name] = 0;
-        std::cout << "[INFO] " << name << " 取值为: 0\n";
-    }
-    else std::cout << "[ERROR::GlobalValue::SwitchValue()] " << name << " 属性取值不是仅为0/1\n";
-    
+    int next_value = (value + 1) % state_count;
+    int_value[name] = next_value;
+    std::cout << "[INFO] " << name << " 取值为: " << next_value << "\n";
 }
 float GlobalValue::GetFloatValue(std::string name) {
     if (float_value.find(name) == float_value.end())

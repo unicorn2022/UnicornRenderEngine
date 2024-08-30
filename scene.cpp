@@ -194,8 +194,9 @@ static void Scene_Config_Default() {
     GlobalValue::GetInstance().SetValue("show_skybox", 1);
     GlobalValue::GetInstance().SetValue("show_render_shadow", 1);
 
-    GlobalValue::GetInstance().SetValue("use_blinn_phong", 1);
+    GlobalValue::GetInstance().SetValue("use_render_algorithm", 1);
     GlobalValue::GetInstance().SetValue("use_gamma", 1);
+    GlobalValue::GetInstance().SetValue("use_displace_algorithm", 2);
 
     GlobalValue::GetInstance().SetValue("choose_post_process", 0);
     GlobalValue::GetInstance().SetValue("show_shadow", 12);
@@ -203,26 +204,30 @@ static void Scene_Config_Default() {
     GlobalValue::GetInstance().SetValue("height_scale", 0.03f);
 }
 static void Scene_Config_GameTick() {
-    /* G 切换显示调试对象 */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::G) == KeyState::First_Pressed) 
-        GlobalValue::GetInstance().SwitchValue("show_debug");
-    /* TAB 切换显示 Border */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::TAB) == KeyState::First_Pressed)
-        GlobalValue::GetInstance().SwitchValue("show_border");
-    /* Z 切换显示天空盒 */
+    /* Z 切换是否显示天空盒 */
     if (InputSystem::GetInstance().GetKeyState(KeyCode::Z) == KeyState::First_Pressed)
         GlobalValue::GetInstance().SwitchValue("show_skybox");
-    /* X 切换渲染阴影 */
+    /* X 切换是否渲染阴影 */
     if (InputSystem::GetInstance().GetKeyState(KeyCode::X) == KeyState::First_Pressed)
         GlobalValue::GetInstance().SwitchValue("show_render_shadow");
-    /* B 切换使用 phong 模型*/
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::B) == KeyState::First_Pressed)
-        GlobalValue::GetInstance().SwitchValue("use_blinn_phong");
-    /* R 切换 Gamma 矫正 */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::R) == KeyState::First_Pressed) 
+    /* C 切换是否使用 Gamma 矫正 */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::C) == KeyState::First_Pressed) 
         GlobalValue::GetInstance().SwitchValue("use_gamma");
+    /* V 切换是否显示调试对象 */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::V) == KeyState::First_Pressed) 
+        GlobalValue::GetInstance().SwitchValue("show_debug");
+    /* B 切换是否显示 Border */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::B) == KeyState::First_Pressed)
+        GlobalValue::GetInstance().SwitchValue("show_border");
+    
+    /* R 切换渲染模型 */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::R) == KeyState::First_Pressed)
+        GlobalValue::GetInstance().SwitchValue("use_render_algorithm", 2);
+    /* T 切换视差映射算法 */
+    if (InputSystem::GetInstance().GetKeyState(KeyCode::T) == KeyState::First_Pressed) 
+        GlobalValue::GetInstance().SwitchValue("use_displace_algorithm", 3);
 
-    /* ↑↓ 控制 height_scale */
+    /* ↑↓ 控制视差映射算法中的 height_scale 参数 */
     if (InputSystem::GetInstance().GetKeyState(KeyCode::UP) == KeyState::Pressed) {
         float height_scale = GlobalValue::GetInstance().GetFloatValue("height_scale");
         height_scale += 0.001f;
