@@ -56,8 +56,8 @@ void MaterialRenderPhongModel::Use() {
     
     /* 光照模型信息 */
     shader->SetUniform("show_render_shadow", GlobalValue::GetInstance().GetIntValue("show_render_shadow"));
-    shader->SetUniform("use_render_algorithm", GlobalValue::GetInstance().GetIntValue("use_render_algorithm"));
-    shader->SetUniform("use_displace_algorithm", GlobalValue::GetInstance().GetIntValue("use_displace_algorithm"));
+    shader->SetUniform("choose_render_algorithm", GlobalValue::GetInstance().GetIntValue("choose_render_algorithm"));
+    shader->SetUniform("choose_displace_algorithm", GlobalValue::GetInstance().GetIntValue("choose_displace_algorithm"));
 
     /* 阴影贴图 */
     // 1. direct_light

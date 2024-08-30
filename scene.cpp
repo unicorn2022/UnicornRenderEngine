@@ -189,67 +189,74 @@ static void Scene_Config_MainCamera(float delta_time) {
     GameWorld::GetInstance().main_camera->gameobject->GetComponents<ComponentTransform>()[0]->ProcessKeyboard(direction, delta_time);
 }
 static void Scene_Config_Default() {
+    // 是否显示
+    GlobalValue::GetInstance().SetValue("show_skybox", 1);
     GlobalValue::GetInstance().SetValue("show_debug", 0);
     GlobalValue::GetInstance().SetValue("show_border", 0);
-    GlobalValue::GetInstance().SetValue("show_skybox", 1);
     GlobalValue::GetInstance().SetValue("show_render_shadow", 1);
-
-    GlobalValue::GetInstance().SetValue("use_render_algorithm", 1);
     GlobalValue::GetInstance().SetValue("use_gamma", 1);
-    GlobalValue::GetInstance().SetValue("use_displace_algorithm", 2);
-
+    // 选择算法
+    GlobalValue::GetInstance().SetValue("choose_displace_algorithm", 2);
+    GlobalValue::GetInstance().SetValue("choose_render_algorithm", 1);
     GlobalValue::GetInstance().SetValue("choose_post_process", 0);
-    GlobalValue::GetInstance().SetValue("show_shadow", 12);
-
+    // 参数配置
     GlobalValue::GetInstance().SetValue("height_scale", 0.03f);
+    GlobalValue::GetInstance().SetValue("show_shadow", 12);
 }
 static void Scene_Config_GameTick() {
-    /* Z 切换是否显示天空盒 */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::Z) == KeyState::First_Pressed)
-        GlobalValue::GetInstance().SwitchValue("show_skybox");
-    /* X 切换是否渲染阴影 */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::X) == KeyState::First_Pressed)
-        GlobalValue::GetInstance().SwitchValue("show_render_shadow");
-    /* C 切换是否使用 Gamma 矫正 */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::C) == KeyState::First_Pressed) 
-        GlobalValue::GetInstance().SwitchValue("use_gamma");
-    /* V 切换是否显示调试对象 */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::V) == KeyState::First_Pressed) 
-        GlobalValue::GetInstance().SwitchValue("show_debug");
-    /* B 切换是否显示 Border */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::B) == KeyState::First_Pressed)
-        GlobalValue::GetInstance().SwitchValue("show_border");
-    
-    /* R 切换渲染模型 */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::R) == KeyState::First_Pressed)
-        GlobalValue::GetInstance().SwitchValue("use_render_algorithm", 2);
-    /* T 切换视差映射算法 */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::T) == KeyState::First_Pressed) 
-        GlobalValue::GetInstance().SwitchValue("use_displace_algorithm", 3);
-
-    /* ↑↓ 控制视差映射算法中的 height_scale 参数 */
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::UP) == KeyState::Pressed) {
-        float height_scale = GlobalValue::GetInstance().GetFloatValue("height_scale");
-        height_scale += 0.001f;
-        GlobalValue::GetInstance().SetValue("height_scale", height_scale, 0.0f, 0.05f);
-    }
-    if (InputSystem::GetInstance().GetKeyState(KeyCode::DOWN) == KeyState::Pressed) {
-        float height_scale = GlobalValue::GetInstance().GetFloatValue("height_scale");
-        height_scale -= 0.001f;
-        GlobalValue::GetInstance().SetValue("height_scale", height_scale, 0.0f, 0.05f);
+    // 是否显示
+    {
+        /* 1 切换是否显示天空盒 */
+        if (InputSystem::GetInstance().GetKeyState(KeyCode::NUM1) == KeyState::First_Pressed)
+            GlobalValue::GetInstance().SwitchValue("show_skybox");
+        /* 2 切换是否显示调试对象 */
+        if (InputSystem::GetInstance().GetKeyState(KeyCode::NUM2) == KeyState::First_Pressed) 
+            GlobalValue::GetInstance().SwitchValue("show_debug");
+        /* 3 切换是否显示 Border */
+        if (InputSystem::GetInstance().GetKeyState(KeyCode::NUM3) == KeyState::First_Pressed)
+            GlobalValue::GetInstance().SwitchValue("show_border");
+        /* 4 切换是否渲染阴影 */
+        if (InputSystem::GetInstance().GetKeyState(KeyCode::NUM4) == KeyState::First_Pressed)
+            GlobalValue::GetInstance().SwitchValue("show_render_shadow");
+        /* 5 切换是否使用 Gamma 矫正 */
+        if (InputSystem::GetInstance().GetKeyState(KeyCode::NUM5) == KeyState::First_Pressed) 
+            GlobalValue::GetInstance().SwitchValue("use_gamma");
     }
 
-    /* 0~9 选择后处理效果 */
-    for (int i = 0; i <= num_post_process; i++) {
-        if (InputSystem::GetInstance().GetKeyState((KeyCode)((int)KeyCode::NUM0 + i)) == KeyState::First_Pressed) 
-            GlobalValue::GetInstance().SetValue("choose_post_process", i);
+    // 选择算法
+    {
+        /* R 切换渲染模型 */
+        if (InputSystem::GetInstance().GetKeyState(KeyCode::R) == KeyState::First_Pressed)
+            GlobalValue::GetInstance().SwitchValue("choose_render_algorithm", 2);
+        /* T 切换视差映射算法 */
+        if (InputSystem::GetInstance().GetKeyState(KeyCode::T) == KeyState::First_Pressed) 
+            GlobalValue::GetInstance().SwitchValue("choose_displace_algorithm", 3);
+        /* P 切换后处理效果 */
+        if (InputSystem::GetInstance().GetKeyState(KeyCode::P) == KeyState::First_Pressed) 
+            GlobalValue::GetInstance().SwitchValue("choose_post_process", 6);
+
     }
 
-    /* F1 ~ F12 选择显示阴影贴图 */
-    for (int i = 0; i < 12; i++) {
-        if (InputSystem::GetInstance().GetKeyState((KeyCode)((int)KeyCode::F1 + i)) == KeyState::First_Pressed)
-            GlobalValue::GetInstance().SetValue("show_shadow", i);
-    }    
+    // 参数配置
+    {
+        /* ↑↓ 控制视差映射算法中的 height_scale 参数 */
+        if (InputSystem::GetInstance().GetKeyState(KeyCode::UP) == KeyState::Pressed) {
+            float height_scale = GlobalValue::GetInstance().GetFloatValue("height_scale");
+            height_scale += 0.001f;
+            GlobalValue::GetInstance().SetValue("height_scale", height_scale, 0.0f, 0.05f);
+        }
+        if (InputSystem::GetInstance().GetKeyState(KeyCode::DOWN) == KeyState::Pressed) {
+            float height_scale = GlobalValue::GetInstance().GetFloatValue("height_scale");
+            height_scale -= 0.001f;
+            GlobalValue::GetInstance().SetValue("height_scale", height_scale, 0.0f, 0.05f);
+        }
+
+        /* F1 ~ F12 选择显示阴影贴图 */
+        for (int i = 0; i < 12; i++) {
+            if (InputSystem::GetInstance().GetKeyState((KeyCode)((int)KeyCode::F1 + i)) == KeyState::First_Pressed)
+                GlobalValue::GetInstance().SetValue("show_shadow", i);
+        }
+    }
 }
 
 /* 场景1: 测试场景 */
