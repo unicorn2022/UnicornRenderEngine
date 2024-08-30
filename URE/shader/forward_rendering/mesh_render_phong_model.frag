@@ -68,6 +68,9 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal_dir, vec3 frag_position, vec3 vi
 float CalcDirectLightShadow(int index, vec4 light_space_position, float bias);
 float CalcPointLightShadow(int index);
 
+/* 视差贴图计算函数 */
+vec2 ParallaxMapping(mat3 TBN);
+
 /* 输入输出变量 */
 out vec4 FragColor;
 in VS_OUT {
@@ -137,12 +140,8 @@ void main() {
     mat3 TBN = mat3(T, B, N);
     /* 采样 depth 贴图 */
     vec2 tex_coord = fs_in.TexCoord;
-    if (material.use_depth_map == 1) {
-        vec3 view_dir_TBN = normalize(TBN * fs_in.ViewPosition - TBN * fs_in.Position); 
-        float height = texture(material.depth, fs_in.TexCoord).r;
-        vec2 p = view_dir_TBN.xy / view_dir_TBN.z * (height * material.height_scale);
-        tex_coord = fs_in.TexCoord - p;
-    }
+    if (material.use_depth_map == 1) 
+        tex_coord = ParallaxMapping(TBN);
     if (tex_coord.x > 1.0 || tex_coord.y > 1.0 || tex_coord.x < 0.0 || tex_coord.y < 0.0)
         discard;
     /* 计算透明度 */
@@ -331,4 +330,29 @@ float CalcPointLightShadow(int index) {
     }
     shadow /= PCF_SAMPLE_POINT_NUM;
     return shadow;
+}
+
+vec2 ParallaxMapping(mat3 TBN) {
+    vec3 view_dir_TBN = normalize(TBN * fs_in.ViewPosition - TBN * fs_in.Position); 
+    const float min_layers = 10;
+    const float max_layers = 20;
+    const float num_layers = mix(max_layers, min_layers, abs(dot(vec3(0, 0, 1), view_dir_TBN)));
+    const float delta_layer_depth = 1.0 / num_layers;
+
+    // 分层采样深度贴图
+    float current_layer_depth = 0.0;
+    vec2 P = view_dir_TBN.xy / view_dir_TBN.z * material.height_scale;
+    vec2 delta_tex_coord = P / num_layers;
+
+    // 获取初始值
+    vec2 current_tex_coord = fs_in.TexCoord;
+    float current_depth_map_value = texture(material.depth, current_tex_coord).r;
+
+    while(current_layer_depth < current_depth_map_value) {
+        current_tex_coord -= delta_tex_coord;
+        current_depth_map_value = texture(material.depth, current_tex_coord).r;
+        current_layer_depth += delta_layer_depth;
+    }
+    
+    return current_tex_coord;
 }
