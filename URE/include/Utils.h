@@ -19,6 +19,10 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+/* FreeType 文本渲染 */
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 /* 移动方向 */
 enum MovementDirection {
     FORWARD,    // 前

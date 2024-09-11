@@ -16,6 +16,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/3rd-party/glfw-3.4/include
     ${PROJECT_SOURCE_DIR}/3rd-party/glad/include
     ${PROJECT_SOURCE_DIR}/3rd-party/assimp-5.4.2/include
+    ${PROJECT_SOURCE_DIR}/3rd-party/freetype-2.13.3/include
     ${PROJECT_SOURCE_DIR}/URE/include
 )
 
@@ -23,6 +24,7 @@ include_directories(
 link_directories(
     ${PROJECT_SOURCE_DIR}/3rd-party/glfw-3.4/lib
     ${PROJECT_SOURCE_DIR}/3rd-party/assimp-5.4.2/lib
+    ${PROJECT_SOURCE_DIR}/3rd-party/freetype-2.13.3/lib
 )
 
 # 递归查询 directory 目录下的所有*.cpp文件, 保存在 variable 中
@@ -38,5 +40,5 @@ add_executable(${PROJECT_NAME}
     main.cpp
     scene.cpp
 )
-target_link_libraries(${PROJECT_NAME} glfw3 assimp-vc143-mtd)
+target_link_libraries(${PROJECT_NAME} glfw3 assimp-vc143-mtd freetype)
 
